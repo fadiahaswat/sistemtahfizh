@@ -195,6 +195,21 @@
                         </div>
                     </section>
 
+                    <!-- Target Mingguan Section -->
+                    <section id="target-mingguan-section" class="fade-in p-5 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg" style="animation-delay: 200ms;">
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">Target Hafalan Pekan Ini</h3>
+                                <p class="text-sm opacity-90">An-Naba' sampai dengan Al-Ghasyiyah</p>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- Recent Activity -->
                     <section class="p-5 rounded-xl glass-card fade-in" style="animation-delay: 500ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Aktivitas Terbaru</h3>
@@ -211,31 +226,42 @@
                     </section>
                     
                     <!-- Mutqin Progress -->
-                    <section class="fade-in" style="animation-delay: 700ms;">
+                    <section class="fade-in" style="animation-delay: 500ms;">
+                         <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Mutqin (Program Tahfizh)</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card">
-                                <h3 class="text-lg font-bold text-gray-900 mb-2">Progres Mutqin Juz 30</h3>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-full bg-gray-200/50 rounded-full h-2.5">
+                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-green-800 mb-1">Progres Mutqin Juz 30</h3>
+                                        <p id="mutqin-juz30-details" class="text-xs text-green-700"></p>
+                                    </div>
+                                    <div class="bg-green-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">30</div>
+                                </div>
+                                <div class="flex items-center gap-4 mt-3">
+                                    <div class="w-full bg-green-200/80 rounded-full h-2.5">
                                         <div id="mutqin-juz30-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                                     </div>
-                                    <span id="mutqin-juz30-label" class="font-semibold text-gray-800">0%</span>
+                                    <span id="mutqin-juz30-label" class="font-semibold text-green-800 text-sm">0%</span>
                                 </div>
-                                <p id="mutqin-juz30-details" class="text-xs text-gray-600 mt-2"></p>
                             </div>
-                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card">
-                                <h3 class="text-lg font-bold text-gray-900 mb-2">Progres Mutqin Juz 29</h3>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-full bg-gray-200/50 rounded-full h-2.5">
+                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-amber-800 mb-1">Progres Mutqin Juz 29</h3>
+                                        <p id="mutqin-juz29-details" class="text-xs text-amber-700"></p>
+                                    </div>
+                                    <div class="bg-amber-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">29</div>
+                                </div>
+                                <div class="flex items-center gap-4 mt-3">
+                                    <div class="w-full bg-amber-200/80 rounded-full h-2.5">
                                         <div id="mutqin-juz29-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                                     </div>
-                                    <span id="mutqin-juz29-label" class="font-semibold text-gray-800">0%</span>
+                                    <span id="mutqin-juz29-label" class="font-semibold text-amber-800 text-sm">0%</span>
                                 </div>
-                                <p id="mutqin-juz29-details" class="text-xs text-gray-600 mt-2"></p>
                             </div>
                         </div>
                     </section>
-
+                    
                     <!-- Info Box -->
                     <section class="bg-blue-100/80 p-5 rounded-2xl fade-in flex items-center gap-4" style="animation-delay: 800ms;">
                         <div class="flex-shrink-0 text-blue-500">
