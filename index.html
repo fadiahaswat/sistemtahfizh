@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setor.in - Aplikasi Setoran Hafalan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right top, #d1d5db, #e5e7eb, #f3f4f6, #f9fafb, #ffffff);
+            background-attachment: fixed;
+            color: #1f2937;
+        }
+
+        /* Utility Classes */
+        .page-content.hidden, .skeleton-container.hidden { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Glassmorphism Styles */
+        .glass-card, .glass-modal-content {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+        .glass-input {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        }
+        .glass-input:focus {
+            background-color: rgba(255, 255, 255, 0.6) !important;
+        }
+        .glass-input::placeholder {
+            color: #6b7280;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        @keyframes highlight { from { background-color: rgba(254, 243, 199, 0.5); } to { background-color: transparent; } }
+        .highlight-new-row { animation: highlight 2s ease-out forwards; }
+        
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+        .skeleton {
+            background-color: #e0e0e0;
+            background-image: linear-gradient(to right, #e0e0e0 0%, #f5f5f5 20%, #e0e0e0 40%, #e0e0e0 100%);
+            background-repeat: no-repeat;
+            background-size: 800px 104px;
+            animation: shimmer 1s linear infinite;
+        }
+
+        /* UI Transitions */
+        #toast { transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0; transform: translate(-50%, 100px); }
+        #toast.show { opacity: 1; transform: translate(-50%, 0); }
+        
+        .modal { transition: opacity 0.3s ease; }
+        .modal.hidden { opacity: 0; pointer-events: none; }
+        .modal-content { transition: transform 0.3s ease, opacity 0.3s ease; }
+        .modal.hidden .modal-content { opacity: 0; transform: translateY(-20px); }
+
+        /* Active State Styles */
+        .tab-btn, .nav-link, .card-hover, .rekap-tab-btn, .time-filter-btn { transition: all 0.3s ease; }
+        .tab-btn.active { border-bottom: 3px solid #f59e0b; color: #b45309; }
+        .rekap-tab-btn.active, .time-filter-btn.active { background-color: #f59e0b; color: white; box-shadow: 0 2px 8px -1px rgb(0 0 0 / 0.1); }
+        .nav-link.active, .nav-link.active svg { color: #f59e0b; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07); }
+
+        /* Carousel Styles */
+        .carousel-container { scroll-snap-type: x mandatory; scroll-padding: 1rem; }
+        .carousel-item { scroll-snap-align: start; }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <div class="sm:flex min-h-screen">
+        <!-- =================================================================
+        NAVIGATION MENU
+        ================================================================== -->
+        <nav class="fixed bottom-0 left-0 w-full border-t border-gray-200 sm:relative sm:w-64 sm:flex-shrink-0 sm:border-r sm:border-t-0 z-30 glass-nav">
+            <div class="flex sm:flex-col sm:py-4 sm:px-3 h-full">
+                <!-- App Logo -->
+                <div class="hidden sm:flex items-center gap-3 p-3 mb-4">
+                    <div class="bg-amber-500 p-2 rounded-lg text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                    </div>
+                    <span class="font-bold text-lg text-gray-900">Setor.in</span>
+                </div>
+                <!-- Nav Links -->
+                <div id="main-nav" class="flex sm:flex-col w-full">
+                    <a href="#" data-page="page-beranda" class="nav-link active flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                        <span class="text-xs sm:text-sm">Beranda</span>
+                    </a>
+                    <a href="#" data-page="page-form" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        <span class="text-xs sm:text-sm">Formulir</span>
+                    </a>
+                    <a href="#" data-page="page-riwayat" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                        <span class="text-xs sm:text-sm">Riwayat</span>
+                    </a>
+                    <a href="#" data-page="page-rekap" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <span class="text-xs sm:text-sm">Rekap</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- =================================================================
+        MAIN CONTENT AREA
+        ================================================================== -->
+        <main id="main-content" class="flex-1 pb-20 sm:pb-0 overflow-y-auto">
+            
+            <!-- SKELETON: Beranda -->
+            <div id="skeleton-page-beranda" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-8">
+                <div class="h-40 skeleton rounded-2xl"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="h-24 skeleton rounded-2xl"></div>
+                    <div class="h-24 skeleton rounded-2xl"></div>
+                    <div class="h-24 skeleton rounded-2xl"></div>
+                </div>
+                <div class="h-48 skeleton rounded-2xl"></div>
+                <div class="h-32 skeleton rounded-2xl"></div>
+            </div>
+
+            <!-- PAGE: Beranda -->
+            <div id="page-beranda" class="page-content p-4 sm:p-6 lg:p-8">
+                <div class="max-w-7xl mx-auto space-y-8">
+                    <!-- Hero Section -->
+                    <header class="text-center pt-12 sm:pt-0 pb-8 fade-in">
+                        <div class="mx-auto mb-6 w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-3xl shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">Selamat Datang di Setor.in</h1>
+                        <p class="mt-4 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">Mencatat setiap langkah, merayakan setiap pencapaian. Mari mudahkan pencatatan setoran hafalan.</p>
+                        <div id="datetime-container" class="mt-4 flex flex-wrap justify-center items-center gap-2"></div>
+                        <div class="mt-8">
+                            <button data-target-page="page-form" class="quick-access-btn bg-amber-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                                Input Setoran Baru
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- Stats Cards -->
+                    <section class="fade-in" style="animation-delay: 100ms;">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Statistik Umum</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card">
+                                <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
+                                <div>
+                                    <p class="text-sm text-gray-800">Total Setoran</p>
+                                    <p id="stats-total-setoran" class="text-2xl font-bold text-gray-900">0</p>
+                                </div>
+                            </div>
+                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card">
+                                <div class="bg-green-100 text-green-600 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
+                                <div>
+                                    <p class="text-sm text-gray-800">Santri Aktif</p>
+                                    <p id="stats-santri-aktif" class="text-2xl font-bold text-gray-900">0</p>
+                                </div>
+                            </div>
+                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card">
+                                <div class="bg-amber-100 text-amber-600 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg></div>
+                                <div>
+                                    <p class="text-sm text-gray-800">Total Halaman (Skor)</p>
+                                    <p id="stats-total-halaman" class="text-2xl font-bold text-gray-900">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Recent Activity -->
+                    <section class="p-5 rounded-xl glass-card fade-in" style="animation-delay: 500ms;">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Aktivitas Terbaru</h3>
+                        <div id="recent-activity-list" class="space-y-3"></div>
+                        <div id="icon-legend-beranda" class="mt-4"></div>
+                    </section>
+
+                    <!-- Weekly Chart -->
+                    <section id="weekly-chart-container" class="hidden fade-in" style="animation-delay: 600ms;">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Grafik Setoran Mingguan</h3>
+                        <div class="p-5 rounded-xl glass-card h-64">
+                            <canvas id="weeklyChart"></canvas>
+                        </div>
+                    </section>
+                    
+                    <!-- Mutqin Progress -->
+                    <section class="fade-in" style="animation-delay: 700ms;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">Progres Mutqin Juz 30</h3>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-full bg-gray-200/50 rounded-full h-2.5">
+                                        <div id="mutqin-juz30-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                    <span id="mutqin-juz30-label" class="font-semibold text-gray-800">0%</span>
+                                </div>
+                                <p id="mutqin-juz30-details" class="text-xs text-gray-600 mt-2"></p>
+                            </div>
+                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">Progres Mutqin Juz 29</h3>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-full bg-gray-200/50 rounded-full h-2.5">
+                                        <div id="mutqin-juz29-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                    <span id="mutqin-juz29-label" class="font-semibold text-gray-800">0%</span>
+                                </div>
+                                <p id="mutqin-juz29-details" class="text-xs text-gray-600 mt-2"></p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Info Box -->
+                    <section class="bg-blue-100/80 border-l-4 border-blue-500 text-blue-900 p-4 rounded-r-lg fade-in" style="animation-delay: 800ms;">
+                        <h3 class="text-xl font-bold mb-2">Mari Berkembang Bersama!</h3>
+                        <p class="text-sm">Aplikasi ini ibarat santri baru yang masih terus belajar. Jika Anda menemukan hal yang janggal atau punya ide cemerlang, jangan ragu untuk menyampaikannya ke tim pengasuhan asrama. Kontribusi Anda sangat berarti!</p>
+                    </section>
+                    
+                    <footer class="text-center text-sm text-gray-500 py-8 mt-8">
+                        Setor.in &copy; 2025 - Dibuat untuk Asrama 1 Abu Bakar Ash-Shiddiq.
+                    </footer>
+                </div>
+            </div>
+
+            <!-- SKELETON: Form -->
+            <div id="skeleton-page-form" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-6">
+                <div class="h-12 w-3/4 skeleton rounded-lg"></div>
+                <div class="h-48 skeleton rounded-2xl"></div>
+                <div class="h-64 skeleton rounded-2xl"></div>
+                <div class="h-64 skeleton rounded-2xl"></div>
+            </div>
+            
+            <!-- PAGE: Form -->
+            <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                 <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8 fade-in">
+                     <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Formulir Setoran Baru</h2>
+                     <p class="text-gray-700 mt-2 sm:pl-11">Catat kemajuan hafalan santri dengan mudah dan cepat.</p>
+                 </div>
+                
+                 <form id="setoranForm" class="max-w-2xl mx-auto flex flex-col gap-6">
+                    <!-- Basic Information Card -->
+                    <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 50ms;">
+                        <fieldset>
+                            <legend class="flex items-center gap-3 text-lg font-semibold text-blue-800 mb-4 border-b border-white/30 pb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Informasi Dasar
+                            </legend>
+                            <div>
+                                <label for="tanggal" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg><span>Tanggal & Waktu</span></label>
+                                <input type="datetime-local" id="tanggal" name="tanggal" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all glass-input" required>
+                                <div class="text-right mt-2"><button type="button" id="nowBtn" class="text-xs text-amber-700 hover:underline">Gunakan waktu sekarang</button></div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Santri Details Card -->
+                    <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 150ms;">
+                        <fieldset>
+                            <legend class="flex items-center gap-3 text-lg font-semibold text-green-800 mb-4 border-b border-white/30 pb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                Detail Santri
+                            </legend>
+                            <div class="flex flex-col gap-5">
+                                <div>
+                                    <label for="musyrif" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg><span>Musyrif</span></label>
+                                    <select id="musyrif" name="musyrif" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all glass-input" required><option value="">Pilih Musyrif</option></select>
+                                </div>
+                                <div>
+                                    <label for="namaSantri" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg><span>Nama Santri</span></label>
+                                    <select id="namaSantri" name="namaSantri" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all disabled:bg-gray-200/50 disabled:cursor-not-allowed disabled:opacity-70 glass-input" required disabled><option value="">Pilih Musyrif dahulu</option></select>
+                                    <input type="hidden" id="santriId" name="santriId">
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label for="kelas" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg><span>Kelas</span></label>
+                                        <input type="text" id="kelas" name="kelas" class="w-full mt-1 p-3 rounded-lg disabled:bg-gray-200/50 glass-input" readonly disabled>
+                                    </div>
+                                    <div>
+                                        <label for="program" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 1v2h6V5H7zm0 4v2h6V9H7zm0 4v2h6v-2H7z" /></svg><span>Program</span></label>
+                                        <input type="text" id="program" name="program" class="w-full mt-1 p-3 rounded-lg disabled:bg-gray-200/50 glass-input" readonly disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Setoran Details Card -->
+                    <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 250ms;">
+                        <fieldset>
+                            <legend class="flex items-center gap-3 text-lg font-semibold text-amber-800 mb-4 border-b border-white/30 pb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                                Detail Setoran
+                            </legend>
+                            <div class="flex flex-col gap-5">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div>
+                                        <label for="jenis" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span>Jenis Setoran</span></label>
+                                        <select id="jenis" name="jenis" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all disabled:bg-gray-200/50 disabled:cursor-not-allowed disabled:opacity-70 glass-input" required disabled><option value="">Pilih Santri dahulu</option></select>
+                                    </div>
+                                    <div>
+                                        <label for="juz" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10zm-3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10z" clip-rule="evenodd" /></svg><span>Juz</span></label>
+                                        <select id="juz" name="juz" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all disabled:bg-gray-200/50 disabled:cursor-not-allowed disabled:opacity-70 glass-input" required disabled><option value="">Pilih Jenis dahulu</option></select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div id="halaman-container" class="hidden">
+                                        <label for="halaman" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg><span>Halaman</span></label>
+                                        <input type="number" id="halaman" name="halaman" min="1" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all disabled:bg-gray-200/50 disabled:cursor-not-allowed disabled:opacity-70 glass-input" required disabled>
+                                    </div>
+                                    <div id="surat-container" class="hidden">
+                                        <label for="surat" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804V4.804A7.968 7.968 0 0014.5 4z" /></svg><span>Surat</span></label>
+                                        <select id="surat" name="surat" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all glass-input" required></select>
+                                    </div>
+                                    <div>
+                                        <label for="kualitas" class="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg><span>Kualitas</span></label>
+                                        <select id="kualitas" name="kualitas" class="w-full mt-1 p-3 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition-all glass-input" required>
+                                            <option value="Mumtaz">Mumtaz</option><option value="Jayyid Jiddan">Jayyid Jiddan</option><option value="Jayyid">Jayyid</option><option value="Maqbul">Maqbul</option><option value="Dhoif">Dhoif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mt-2">
+                        <button type="submit" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300">Simpan Setoran</button>
+                    </div>
+                 </form>
+            </div>
+
+            <!-- SKELETON: Riwayat -->
+            <div id="skeleton-page-riwayat" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-6">
+                <div class="h-12 w-3/4 skeleton rounded-lg"></div>
+                <div class="h-24 skeleton rounded-2xl"></div>
+                <div class="h-96 skeleton rounded-2xl"></div>
+            </div>
+
+            <!-- PAGE: Riwayat -->
+            <div id="page-riwayat" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8"><h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg> Riwayat Setoran</h2><p class="text-gray-700 mt-2 sm:pl-11">Cari dan filter 50 riwayat setoran terakhir yang tercatat.</p></div>
+                    
+                    <!-- Filter Section -->
+                    <div class="p-4 rounded-xl mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end glass-card">
+                        <div class="lg:col-span-2">
+                            <label for="search-riwayat" class="text-sm font-medium text-gray-800">Cari Nama Santri</label>
+                            <div class="relative">
+                                <input type="search" id="search-riwayat" placeholder="Ketik nama..." class="w-full mt-1 p-2 rounded-lg focus:ring-amber-500 focus:border-amber-500 glass-input" autocomplete="off">
+                                <div id="suggestions-container" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden"></div>
+                            </div>
+                        </div>
+                        <div>
+                             <label for="filter-program" class="text-sm font-medium text-gray-800">Program</label>
+                             <select id="filter-program" class="w-full mt-1 p-2 rounded-lg focus:ring-amber-500 focus:border-amber-500 glass-input">
+                                 <option value="Semua">Semua Program</option>
+                                 <option value="Tahfizh">Tahfizh</option>
+                                 <option value="Unggulan">Unggulan</option>
+                             </select>
+                        </div>
+                        <div>
+                            <label for="filter-tanggal-mulai" class="text-sm font-medium text-gray-800">Dari Tanggal</label>
+                            <input type="date" id="filter-tanggal-mulai" class="w-full mt-1 p-2 rounded-lg focus:ring-amber-500 focus:border-amber-500 glass-input">
+                        </div>
+                        <div>
+                            <label for="filter-tanggal-akhir" class="text-sm font-medium text-gray-800">Sampai Tanggal</label>
+                            <input type="date" id="filter-tanggal-akhir" class="w-full mt-1 p-2 rounded-lg focus:ring-amber-500 focus:border-amber-500 glass-input">
+                        </div>
+                    </div>
+
+                    <div id="icon-legend-riwayat" class="mb-6"></div>
+
+                    <!-- History Table -->
+                    <div id="content-riwayat" class="rounded-2xl overflow-hidden glass-card overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="glass-nav border-b border-white/30 sticky top-0 z-10">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Santri</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Detail Setoran</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Kualitas</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider hidden sm:table-cell">Tanggal</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="setoranTableBody" class="divide-y divide-gray-200/60"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SKELETON: Rekap -->
+            <div id="skeleton-page-rekap" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-6">
+                <div class="h-12 w-3/4 skeleton rounded-lg"></div>
+                <div class="h-12 skeleton rounded-2xl"></div>
+                <div class="h-96 skeleton rounded-2xl"></div>
+            </div>
+
+            <!-- PAGE: Rekap -->
+            <div id="page-rekap" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8"><h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Rekapitulasi Setoran</h2><p class="text-gray-700 mt-2 sm:pl-11">Pantau perkembangan setiap kelas dan ekspor laporannya.</p></div>
+                    <div id="icon-legend-rekap" class="mb-6"></div>
+                    <div id="content-rekap" class="rounded-2xl p-5 glass-card">
+                        <div class="flex justify-center">
+                            <div id="rekap-tabs" class="carousel-container flex space-x-1 overflow-x-auto rounded-lg bg-gray-200/50 p-1 hide-scrollbar">
+                                <!-- Rekap tabs will be generated here -->
+                            </div>
+                        </div>
+                        <div id="rekap-content-container" class="mt-6">
+                            <!-- Rekap content will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- =================================================================
+    MODALS & NOTIFICATIONS
+    ================================================================== -->
+    <!-- Password Confirmation Modal -->
+    <div id="passwordConfirmModal" class="modal fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-backdrop fixed inset-0" aria-hidden="true"></div>
+        <div class="modal-content w-full max-w-sm relative z-50 p-6 rounded-2xl glass-modal-content">
+            <h3 class="text-lg font-bold text-gray-900">Masukkan Kata Sandi</h3>
+            <p class="text-sm text-gray-800 my-4">Untuk menghapus data, silakan masukkan kata sandi.</p>
+            <input type="password" id="passwordInput" class="w-full mt-1 p-2 rounded-lg focus:ring-amber-500 focus:border-amber-500 glass-input" placeholder="Kata Sandi">
+            <div id="passwordError" class="text-red-500 text-xs mt-2 hidden">Kata sandi salah.</div>
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="cancelPasswordBtn" class="px-6 py-2 rounded-lg bg-gray-200/50 text-gray-800 font-semibold hover:bg-gray-200/80">Batal</button>
+                <button id="confirmPasswordBtn" class="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-20 sm:bottom-8 left-1/2 z-50 flex items-center gap-3 bg-gray-900/80 text-white text-sm font-semibold py-3 px-5 rounded-lg border border-gray-700/50 backdrop-blur-sm">
+        <svg id="toast-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"></svg>
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- =================================================================
+    HTML TEMPLATES
+    ================================================================== -->
+    <!-- Template for History Table Row -->
+    <template id="history-row-template">
+        <tr class="hover:bg-gray-100/50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="font-medium text-gray-900 data-nama"></div>
+                    <span class="data-program-icon"></span>
+                    <span class="data-kelas-icon"></span>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <div><span class="data-jenis"></span> Juz <span class="data-juz"></span></div>
+                <div class="text-xs text-gray-500 data-unit"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 data-kualitas"></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell data-tanggal"></td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <button class="delete-btn text-gray-500 hover:text-red-500 p-1 rounded-full transition-colors" aria-label="Hapus setoran">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            </td>
+        </tr>
+    </template>
+
+<script>
+    /**
+     * @namespace App
+     * @description Main application object for Setor.in.
+     * Manages state, UI, data fetching, and event handling.
+     */
+    const App = {
+        /**
+         * @property {object} state - Holds the dynamic data of the application.
+         */
+        state: {
+            allSetoran: [],
+            santriData: [],
+            surahData: {},
+            setoranIdToDelete: null,
+            weeklyChart: null,
+            searchDebounceTimer: null,
+        },
+        
+        /**
+         * @property {object} cache - Stores references to frequently accessed DOM elements.
+         */
+        cache: {},
+
+        /**
+         * @property {object} config - Application configuration and static data.
+         */
+        config: {
+            // URL for Google Apps Script backend
+            scriptURL: 'https://script.google.com/macros/s/AKfycbyl2FCcGUtolkJIDsoiTYFKeKp8IQwHT0V3z8n1pOHH9CLiyvYZTBaimrojILJM_A-HLg/exec',
+            // Password for delete operations
+            deletePassword: 'sparman68',
+            // Defines how musyrif names are sorted in dropdowns
+            musyrifSortOrder: ['Andi Aqillah Fadia Haswat', 'Abdullah'],
+            // Static data sources
+            dataSources: {
+                classGroups: {},
+                santriEmojis: ['👨🏻‍⚕', '👨🏻‍🎓', '👨🏻‍🏫', '👨🏻‍⚖', '👨🏻‍🌾', '👨🏻‍🍳', '👨🏻‍🔧', '👨🏻‍🏭', '👨🏻‍💼', '👨🏻‍🔬', '👨🏻‍💻', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍✈', '👨🏻‍🚀', '👨🏻‍🚒', '👮🏻‍♂️', '🕵🏻‍♂️', '💂🏻‍♂️', '👷🏻‍♂️', '🤵🏻‍♂️']
+            }
+        },
+        
+        /**
+         * Initializes the application.
+         * Caches DOM elements, sets up event listeners, loads data, and renders the initial page.
+         */
+        async init() {
+            this.cacheElements();
+            this.setupEventListeners();
+            this.ui.showSkeleton('page-beranda');
+            this.utils.setCurrentDateTime();
+            this.ui.updateDateTime();
+            setInterval(this.ui.updateDateTime, 60000); // Update time every minute
+
+            await this.data.loadAllData();
+            
+            this.data.processSantriData();
+            this.data.calculateMutqinProgress();
+            
+            this.ui.renderAll();
+            this.ui.switchPage('page-beranda', false);
+        },
+
+        /**
+         * Caches all necessary DOM elements for faster access.
+         */
+        cacheElements() {
+            const ids = [
+                'main-nav', 'main-content', 'setoranForm', 'tanggal', 'nowBtn', 'musyrif', 'namaSantri', 'santriId', 
+                'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 
+                'setoranTableBody', 'history-row-template', 'search-riwayat', 'suggestions-container', 
+                'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'stats-total-setoran', 
+                'stats-santri-aktif', 'stats-total-halaman', 'recent-activity-list', 'weeklyChart', 
+                'weekly-chart-container', 'mutqin-juz29-progress-container', 'mutqin-juz29-bar', 
+                'mutqin-juz29-label', 'mutqin-juz29-details', 'mutqin-juz30-progress-container', 
+                'mutqin-juz30-bar', 'mutqin-juz30-label', 'mutqin-juz30-details', 'rekap-tabs', 
+                'rekap-content-container', 'toast', 'toast-message', 'toast-icon', 'passwordConfirmModal', 
+                'passwordInput', 'passwordError', 'cancelPasswordBtn', 'confirmPasswordBtn', 
+                'icon-legend-beranda', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap'
+            ];
+            ids.forEach(id => {
+                // Convert kebab-case id to camelCase for cache key
+                const key = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
+                this.cache[key] = document.getElementById(id);
+            });
+            this.cache.pages = document.querySelectorAll('.page-content');
+            this.cache.skeletonContainers = document.querySelectorAll('.skeleton-container');
+        },
+
+        /**
+         * Sets up all global event listeners for the application.
+         */
+        setupEventListeners() {
+            this.cache.setoranForm.addEventListener('submit', this.handlers.handleFormSubmit.bind(this));
+            this.cache.nowBtn.addEventListener('click', this.utils.setCurrentDateTime.bind(this));
+            this.cache.mainNav.addEventListener('click', this.handlers.handleNavClick.bind(this));
+            this.cache.mainContent.addEventListener('click', this.handlers.handleMainContentClick.bind(this));
+            
+            // Form select changes
+            this.cache.musyrif.addEventListener('change', this.handlers.handleMusyrifChange.bind(this));
+            this.cache.namaSantri.addEventListener('change', this.handlers.handleSantriChange.bind(this));
+            this.cache.jenis.addEventListener('change', this.handlers.handleJenisChange.bind(this));
+            this.cache.juz.addEventListener('change', this.handlers.handleJuzChange.bind(this));
+
+            // Riwayat page filters
+            this.cache.searchRiwayat.addEventListener('input', this.handlers.handleHistorySearch.bind(this));
+            this.cache.suggestionsContainer.addEventListener('click', this.handlers.handleSuggestionClick.bind(this));
+            [this.cache.filterTanggalMulai, this.cache.filterTanggalAkhir, this.cache.filterProgram].forEach(el => {
+                el.addEventListener('input', () => this.ui.renderHistoryTable());
+            });
+            
+            // Rekap page tabs
+            this.cache.rekapTabs.addEventListener('click', this.handlers.handleTabClick.bind(this));
+
+            // Modal listeners
+            this.cache.cancelPasswordBtn.addEventListener('click', () => this.ui.closeModal('passwordConfirmModal'));
+            this.cache.confirmPasswordBtn.addEventListener('click', this.handlers.handleConfirmDelete.bind(this));
+            this.cache.passwordConfirmModal.addEventListener('click', (e) => { 
+                if (e.target === this.cache.passwordConfirmModal) this.ui.closeModal('passwordConfirmModal'); 
+            });
+
+            // Global click listener to hide suggestions
+            document.addEventListener('click', (e) => {
+                if (!this.cache.searchRiwayat.contains(e.target) && !this.cache.suggestionsContainer.contains(e.target)) {
+                    this.cache.suggestionsContainer.classList.add('hidden');
+                }
+            });
+        },
+
+        /**
+         * @namespace App.handlers
+         * @description Contains all event handler functions.
+         */
+        handlers: {
+            /**
+             * Handles the submission of the new setoran form.
+             * @param {Event} e - The form submission event.
+             */
+            handleFormSubmit(e) {
+                e.preventDefault();
+                const form = App.cache.setoranForm;
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Menyimpan...';
+
+                const santriSelect = App.cache.namaSantri;
+                const selectedSantriName = santriSelect.options[santriSelect.selectedIndex].text;
+                const formData = new FormData(form);
+                formData.set('namaSantri', selectedSantriName); // Ensure the text name is sent
+
+                fetch(App.config.scriptURL, { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(async (data) => {
+                        if (data.result === 'success') {
+                            App.ui.showToast('Setoran berhasil disimpan!', 'success');
+                            App.ui.resetForm();
+                            await App.data.loadAllData();
+                            App.data.calculateMutqinProgress();
+                            App.ui.renderAll();
+                        } else {
+                            throw new Error(data.error || 'Terjadi kesalahan saat menyimpan.');
+                        }
+                    })
+                    .catch(error => App.ui.showToast(`Gagal: ${error.message}`, 'error'))
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = 'Simpan Setoran';
+                    });
+            },
+
+            /**
+             * Handles the confirmation of a delete operation.
+             */
+            async handleConfirmDelete() {
+                const password = this.cache.passwordInput.value;
+                if (password !== App.config.deletePassword) {
+                    this.cache.passwordError.classList.remove('hidden');
+                    return;
+                }
+                this.cache.passwordError.classList.add('hidden');
+                
+                const idToDelete = this.state.setoranIdToDelete;
+                const setoranToDelete = this.state.allSetoran.find(s => s.id === idToDelete);
+                if (!setoranToDelete) return;
+
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('rowNumber', setoranToDelete.rowNumber);
+                formData.append('password', password); 
+
+                this.ui.closeModal('passwordConfirmModal');
+
+                try {
+                    const res = await fetch(this.config.scriptURL, { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.result === 'success') {
+                        this.ui.showToast('Data berhasil dihapus.', 'success');
+                        await this.data.loadAllData();
+                        this.data.calculateMutqinProgress();
+                        this.ui.renderAll();
+                    } else {
+                        throw new Error(data.error || 'Gagal menghapus data dari server.');
+                    }
+                } catch (error) {
+                    this.ui.showToast(`Gagal menghapus: ${error.message}`, 'error');
+                }
+            },
+            
+            /** Handles clicks on the main navigation. */
+            handleNavClick(e) {
+                const link = e.target.closest('.nav-link');
+                if (link && link.dataset.page) {
+                    e.preventDefault();
+                    this.ui.switchPage(link.dataset.page);
+                }
+            },
+
+            /** Handles clicks on tab buttons (e.g., in Rekap page). */
+            handleTabClick(e) {
+                const button = e.target.closest('.rekap-tab-btn');
+                if (button && button.dataset.tab) {
+                    this.ui.switchTab(button.parentElement, '.rekap-tab-content', button, 'rekap-tab');
+                }
+            },
+
+            /** Handles search input in the history page with debouncing. */
+            handleHistorySearch(e) {
+                clearTimeout(this.state.searchDebounceTimer);
+                this.state.searchDebounceTimer = setTimeout(() => {
+                    this.ui.renderHistoryTable();
+                    this.ui.renderSearchSuggestions(e.target.value);
+                }, 300);
+            },
+
+            /** Handles clicks on a search suggestion item. */
+            handleSuggestionClick(e) {
+                if (e.target.matches('.suggestion-item')) {
+                    this.cache.searchRiwayat.value = e.target.textContent;
+                    this.cache.suggestionsContainer.classList.add('hidden');
+                    this.ui.renderHistoryTable();
+                }
+            },
+
+            /** Handles delegated clicks within the main content area. */
+            handleMainContentClick(e) {
+                const target = e.target.closest('.export-pdf-btn, .delete-btn, .quick-access-btn');
+                if (!target) return;
+
+                if (target.matches('.export-pdf-btn')) {
+                    this.utils.exportRecapToPDF(target.dataset.classGroup);
+                } else if (target.matches('.delete-btn')) {
+                    this.state.setoranIdToDelete = target.dataset.id;
+                    this.ui.openModal('passwordConfirmModal');
+                } else if (target.matches('.quick-access-btn')) {
+                    this.ui.switchPage(target.dataset.targetPage);
+                }
+            },
+
+            // Form update handlers
+            handleMusyrifChange() { this.ui.updateSantriOptions(); },
+            handleSantriChange() { this.ui.updateSantriDetails(); this.ui.updateJenisOptions(); },
+            handleJenisChange() { this.ui.updateJuzOptions(); },
+            handleJuzChange() { this.ui.updateSetoranInputs(); },
+        },
+
+        /**
+         * @namespace App.data
+         * @description Manages data loading, processing, and calculations.
+         */
+        data: {
+            /** Loads all necessary data from sources. */
+            async loadAllData() {
+                // These can run in parallel if they were truly async, but they are currently synchronous.
+                this.loadSantriData();
+                this.loadSurahData();
+                await this.loadSetoranData(); // This one is async.
+            },
+
+            /** Loads static santri data into state. */
+            loadSantriData() {
+                if (App.state.santriData.length > 0) return; // Avoid reloading
+                App.state.santriData = [
+                    // Data santri lengkap di sini...
+                    { id: 'santri1', nama: 'Adelio Daffa Syahrizha', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri2', nama: 'Ahmad Ahsanur Rizqi', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri3', nama: 'Arkana El Sabilly', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri4', nama: "Athaya Auza'I Mubarak", kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri5', nama: 'Dama Arza Evannova', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri6', nama: 'Danar Nizam Daniswara', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri7', nama: 'Devgan Jadid Sahlvatico', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri8', nama: 'Fariq Imtiyas Aufaa Kamil', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri9', nama: 'Firaas Izzulhaq', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri10', nama: 'Gilang Omar F', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri11', nama: 'Jaladri Arif Wirasena', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri12', nama: 'Kemal Mubarak Siregar', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri13', nama: 'Khairil Nizam', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri14', nama: 'Mirza Nasyath Ahza Attaillah', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri15', nama: 'Muhammad Farros Linggar Cahyono', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri16', nama: 'Muhammad Fathir Alfalah', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri17', nama: 'Narendra Wibawa', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri18', nama: 'Naufal Zhafran Purnama', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri19', nama: 'Alano Faaiq Alfeno', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri20', nama: 'Arfandhika Fakhrul Islam', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri21', nama: 'Aydin Rafif', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri22', nama: 'Danish Alzahid Dinasti', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri23', nama: 'Ghani Arif Witjaksono', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri24', nama: 'Haidarrafid Satriaa Ardhani', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri25', nama: 'Iqbal Zulfikar Al Hanif', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri26', nama: 'Jangky Dausat', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri27', nama: 'Kumara Banyu Argani', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri28', nama: 'M. Dede Afkar', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri29', nama: 'Mekha Ilham Lutfianto', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri30', nama: 'Muhammad Aiman Naim', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri31', nama: 'Muhammad Karel Ashiddiq', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri32', nama: 'Naufal Fahmi Darsono', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri33', nama: 'Nazhif Fahreza Zuhairy', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri34', nama: 'Rais Abqari Ash Shidqi', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri35', nama: 'William Ramadhan Al Ghazali', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri36', nama: 'Zia El Ibrahim Aqeela Putra Wijaya', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri37', nama: "Ahmad Arkan Sya'Bani", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri38', nama: 'Ahmad Darwis', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri39', nama: 'Ahmad Ghozi El Muntazhor', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri40', nama: "Aldan 'Izzul Islam", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri41', nama: 'Fawwaz Elfareza Zuhri', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri42', nama: 'M. Fathan Alfarisi Harahap', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri43', nama: 'Muhammad Ahsani Taqwim', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri44', nama: 'Muhammad Ayyub Al Fatih', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri45', nama: 'Muhammad Gibran Rafassya', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri46', nama: 'Narendra Gerrardi Kusumah', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri47', nama: "Rijal Abdul A'Ziz", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri48', nama: 'Rizki Chandra Dewantara', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
+                    { id: 'santri49', nama: 'Ahmad Miqdad', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri50', nama: 'Dzaky Salman Al Farisi', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri51', nama: 'Muhammad Alvi Mumtaz Brillian Hafizh', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri52', nama: 'Muhammad Mahdi Hafidz', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri53', nama: 'Muhammad Naufal Rasyid Arafi', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri54', nama: 'Nahsif Ilman Hazim Purwono', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri55', nama: 'Nawwaf Bahy Rafif', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri56', nama: 'Nizar Adhyatma Aryanda', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri57', nama: 'Rafa Agitananda Az Zayyan', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri58', nama: "Rafa Faeyza Fa'Iz", kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri59', nama: 'Rizqi Satria Putra Surya', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri60', nama: 'Umar Ubaidillah Tsaqif', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri61', nama: 'Wildan Faiz Mahendra', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
+                    { id: 'santri62', nama: 'Faiq Fauzil Adhim', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri63', nama: 'Fairuz Azzam Mahfuzh', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri64', nama: 'Muhammad Arkhan Attaqi', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri65', nama: 'Muhammad Daffa Naufal Alaika', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri66', nama: 'Muzakki Fairuzzaman', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri67', nama: 'Neymar Tsaqif Hikmatyar', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri68', nama: 'Rifqi Maliki', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri69', nama: "Yasykur Slamer'Abqariy", kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri70', nama: 'Zhafran Dhiaurrahman Hakim', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri71', nama: 'Achmad Adi Darwis Elfaza', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri72', nama: 'Galang Afkar Artyanto', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri73', nama: 'Gilang Asytar Artyanto', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri74', nama: 'Muhammad Alif Al-Fatih', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri75', nama: 'Muhammad Faiz Ibnu Zakaria', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri76', nama: 'Muhammad Mahdi Hanafi', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri77', nama: 'Muhammad Muhdi Hafidz', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri78', nama: 'Rizqi Ahmad Altaf Zafar', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri79', nama: 'Dzaky Anthony Akbar', kelas: '2G', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri80', nama: 'Muwafaqi Amru Ahmad', kelas: '2G', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri81', nama: 'Abdul Ghani Irfan Rafif', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri82', nama: 'Abid Fadhil Abiyah', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri83', nama: "Ahmad Dahlan Asy'Ari", kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri84', nama: 'Athallah Azmi Ghaisan Muhammad', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri85', nama: 'Azmi Zulfadli Syafiq', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri86', nama: 'Azri Labibul Khawarizmi', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri87', nama: 'Dzar Al Ghifari', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri88', nama: 'Fatihan Al Ghifari', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri89', nama: 'Hisyam Nabil Pasha', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri90', nama: 'Ibadillah Kaiazmi Mubarak', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri91', nama: 'Kashvi Jabbar Azana', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri92', nama: 'Khawarizmi Fakhrulhaq', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri93', nama: 'Muh. Naufal Alif', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri94', nama: 'Muhammad Aghna Ilman Rafa', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri95', nama: 'Royyan Abdurrahman Ibtisam', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                    { id: 'santri96', nama: 'Sakhi Arkan Elfariza', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
+                ];
+            },
+            
+            /** Loads static surah data into state. */
+            loadSurahData() {
+                App.state.surahData = {
+                    surahPageValues: { 'Al-Mulk': 2, 'Al-Qalam': 2, 'Al-Haqqah': 2, 'Al-Ma\'arij': 1.5, 'Nuh': 1.5, 'Al-Jinn': 1.5, 'Al-Muzzammil': 1.5, 'Al-Muddaththir': 1.5, 'Al-Qiyamah': 1, 'Al-Insan': 1.5, 'Al-Mursalat': 1.5, 'Al-Mujadilah': 2, 'Al-Hashr': 2.5, 'Al-Mumtahanah': 1.5, 'As-Saff': 1, 'Al-Jumu\'ah': 1, 'Al-Munafiqun': 1, 'At-Taghabun': 1.5, 'At-Talaq': 1.5, 'At-Tahrim': 1.5, 'An-Naba': 1.5, 'An-Nazi\'at': 1, 'Abasa': 1, 'At-Takwir': 0.5, 'Al-Infitar': 0.5, 'Al-Mutaffifin': 1, 'Al-Inshiqaq': 0.5, 'Al-Buruj': 0.5, 'At-Tariq': 0.5, 'Al-A\'la': 0.5, 'Al-Ghashiyah': 0.5, 'Al-Fajr': 1, 'Al-Balad': 0.5, 'Ash-Shams': 0.5, 'Al-Lail': 0.5, 'Ad-Duha': 0.25, 'Ash-Sharh': 0.25, 'At-Tin': 0.25, 'Al-\'Alaq': 0.5, 'Al-Qadr': 0.25, 'Al-Bayyinah': 0.5, 'Az-Zalzalah': 0.25, 'Al-\'Adiyat': 0.5, 'Al-Qari\'ah': 0.25, 'At-Takathur': 0.25, 'Al-\'Asr': 0.25, 'Al-Humazah': 0.25, 'Al-Fil': 0.25, 'Quraysh': 0.25, 'Al-Ma\'un': 0.25, 'Al-Kawthar': 0.25, 'Al-Kafirun': 0.25, 'An-Nasr': 0.25, 'Al-Masad': 0.25, 'Al-Ikhlas': 0.25, 'Al-Falaq': 0.25, 'An-Nas': 0.25 },
+                    28: { list: ['Al-Mujadilah', 'Al-Hashr', 'Al-Mumtahanah', 'As-Saff', 'Al-Jumu\'ah', 'Al-Munafiqun', 'At-Taghabun', 'At-Talaq', 'At-Tahrim'] },
+                    29: { list: ['Al-Mulk', 'Al-Qalam', 'Al-Haqqah', 'Al-Ma\'arij', 'Nuh', 'Al-Jinn', 'Al-Muzzammil', 'Al-Muddaththir', 'Al-Qiyamah', 'Al-Insan', 'Al-Mursalat'] },
+                    30: { list: ['An-Naba', 'An-Nazi\'at', 'Abasa', 'At-Takwir', 'Al-Infitar', 'Al-Mutaffifin', 'Al-Inshiqaq', 'Al-Buruj', 'At-Tariq', 'Al-A\'la', 'Al-Ghashiyah', 'Al-Fajr', 'Al-Balad', 'Ash-Shams', 'Al-Lail', 'Ad-Duha', 'Ash-Sharh', 'At-Tin', 'Al-\'Alaq', 'Al-Qadr', 'Al-Bayyinah', 'Az-Zalzalah', 'Al-\'Adiyat', 'Al-Qari\'ah', 'At-Takathur', 'Al-\'Asr', 'Al-Humazah', 'Al-Fil', 'Quraysh', 'Al-Ma\'un', 'Al-Kawthar', 'Al-Kafirun', 'An-Nasr', 'Al-Masad', 'Al-Ikhlas', 'Al-Falaq', 'An-Nas'] }
+                };
+            },
+
+            /** Fetches setoran data from Google Sheets. */
+            async loadSetoranData() {
+                try {
+                    const response = await fetch(App.config.scriptURL);
+                    const dataFromServer = await response.json();
+                    
+                    const santriNameMap = new Map(App.state.santriData.map(s => [App.utils.normalizeName(s.nama), s.id]));
+                    const unmatchedNames = new Set();
+
+                    App.state.allSetoran = dataFromServer.map(item => {
+                        const santriNameFromSheet = item.namaSantri || item['Nama Santri'] || '';
+                        const normalizedSheetName = App.utils.normalizeName(santriNameFromSheet);
+                        const santriId = santriNameMap.get(normalizedSheetName);
+                        
+                        if (!santriId && santriNameFromSheet) {
+                            unmatchedNames.add(santriNameFromSheet.trim());
+                        }
+                        
+                        return {
+                            id: `row-${item.rowNumber}`,
+                            santriId: santriId || null, 
+                            createdAt: item.tanggal,
+                            ...item
+                        };
+                    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                    if (unmatchedNames.size > 0) {
+                        console.warn("PERINGATAN: Nama santri berikut dari spreadsheet tidak dapat ditemukan di daftar data aplikasi. Setoran mereka tidak akan masuk rekapitulasi dengan benar:", Array.from(unmatchedNames));
+                    }
+
+                } catch(error) {
+                    console.error('Gagal memuat data setoran:', error);
+                    App.ui.showToast('Gagal memuat riwayat setoran.', 'error');
+                }
+            },
+
+            /** Processes raw santri data to create class groups. */
+            processSantriData() {
+                const musyrifList = [...new Set(App.state.santriData.map(s => s.musyrif))];
+                
+                musyrifList.sort((a, b) => {
+                    const order = App.config.musyrifSortOrder;
+                    const indexA = order.indexOf(a);
+                    const indexB = order.indexOf(b);
+                    if (indexA > -1 && indexB > -1) return indexA - indexB;
+                    if (indexA > -1) return -1;
+                    if (indexB > -1) return 1;
+                    return a.localeCompare(b);
+                });
+
+                const tempGroups = {};
+                App.state.santriData.forEach(santri => {
+                    if (!tempGroups[santri.musyrif]) {
+                        tempGroups[santri.musyrif] = { santri: [], musyrif: santri.musyrif, classes: new Set() };
+                    }
+                    tempGroups[santri.musyrif].santri.push(santri);
+                    tempGroups[santri.musyrif].classes.add(santri.kelas);
+                });
+
+                App.config.dataSources.classGroups = {};
+                for (const musyrif in tempGroups) {
+                    const group = tempGroups[musyrif];
+                    // Special naming for a specific musyrif's group
+                    const groupName = (musyrif === 'Muhammad Zhafir Setiaji') ? '2CDGH' : [...group.classes].sort().join(', ');
+                    App.config.dataSources.classGroups[groupName] = { santri: group.santri, musyrif: group.musyrif };
+                }
+
+                App.utils.populateSelect(App.cache.musyrif, musyrifList, 'Pilih Musyrif');
+            },
+            
+            /** Calculates mutqin progress for each santri. */
+            calculateMutqinProgress() {
+                App.state.santriData.forEach(s => s.setoranMutqin = new Set());
+                App.state.allSetoran.forEach(setoran => {
+                    if (setoran.jenis === 'Mutqin' && setoran.santriId) {
+                        const santri = this.findSantriById(setoran.santriId);
+                        const isFullJuz = !setoran.halaman || parseInt(setoran.halaman, 10) >= 20;
+                        if (santri && isFullJuz) {
+                            santri.setoranMutqin.add(parseInt(setoran.juz, 10));
+                        }
+                    }
+                });
+            },
+
+            /** Finds a santri by their ID. */
+            findSantriById(id) { return App.state.santriData.find(s => s.id === id); },
+            
+            /** Calculates the page value (score) for a setoran. */
+            calculatePageValue(setoran) {
+                if (setoran.jenis === 'Mutqin' && (!setoran.halaman || parseInt(setoran.halaman, 10) >= 20)) return 20;
+                if (setoran.halaman) return parseFloat(setoran.halaman) || 0;
+                if (setoran.surat) return App.state.surahData.surahPageValues[setoran.surat] || 0;
+                return 0;
+            },
+
+            /** Filters the history based on current search and filter values. */
+            getFilteredHistory() {
+                const searchTerm = App.cache.searchRiwayat.value.toLowerCase();
+                const programFilter = App.cache.filterProgram.value;
+                const startDate = App.cache.filterTanggalMulai.value ? new Date(App.cache.filterTanggalMulai.value) : null;
+                const endDate = App.cache.filterTanggalAkhir.value ? new Date(App.cache.filterTanggalAkhir.value) : null;
+                if(startDate) startDate.setHours(0,0,0,0);
+                if(endDate) endDate.setHours(23,59,59,999);
+
+                return App.state.allSetoran.filter(s => {
+                    const setoranDate = new Date(s.createdAt);
+                    const santri = App.data.findSantriById(s.santriId);
+                    return s.namaSantri.toLowerCase().includes(searchTerm) &&
+                           (programFilter === 'Semua' || (santri && santri.program === programFilter)) &&
+                           (!startDate || setoranDate >= startDate) &&
+                           (!endDate || setoranDate <= endDate);
+                });
+            },
+            
+            /** Calculates mutqin statistics for progress bars. */
+            getMutqinStats() {
+                const tahfizhSantri = App.state.santriData.filter(s => s.program === 'Tahfizh');
+                const totalTahfizh = tahfizhSantri.length;
+                if (totalTahfizh === 0) return { totalTahfizh: 0, mutqin29: 0, mutqin30: 0 };
+                const mutqin30 = tahfizhSantri.filter(s => s.setoranMutqin.has(30)).length;
+                const mutqin29 = tahfizhSantri.filter(s => s.setoranMutqin.has(29)).length;
+                return { totalTahfizh, mutqin29, mutqin30 };
+            }
+        },
+
+        /**
+         * @namespace App.ui
+         * @description Contains all functions that manipulate the UI.
+         */
+        ui: {
+            /** Renders all major UI components. */
+            renderAll() {
+                this.renderHistoryTable();
+                this.renderBeranda();
+                this.renderAllRecaps();
+                this.renderIconLegends();
+            },
+
+            /** Renders the Beranda (Home) page content. */
+            renderBeranda() {
+                const totalHalaman = App.state.allSetoran.reduce((sum, s) => sum + App.data.calculatePageValue(s), 0);
+                const santriAktifIds = new Set(App.state.allSetoran.map(s => s.namaSantri));
+
+                App.cache.statsTotalSetoran.textContent = App.state.allSetoran.length;
+                App.cache.statsSantriAktif.textContent = santriAktifIds.size;
+                App.cache.statsTotalHalaman.textContent = totalHalaman.toFixed(1);
+                
+                this.renderRecentActivity();
+                this.renderWeeklySummaryChart();
+                this.renderMutqinProgress();
+            },
+
+            /** Renders the history table with filtered data. */
+            renderHistoryTable() {
+                const filteredSetoran = App.data.getFilteredHistory();
+                const itemsToRender = filteredSetoran.slice(0, 50); // Limit to 50 items
+                const tableBody = App.cache.setoranTableBody;
+                const template = App.cache.historyRowTemplate;
+                tableBody.innerHTML = '';
+
+                if (itemsToRender.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-gray-500">Tidak ada data yang cocok.</td></tr>`;
+                    return;
+                }
+                
+                const fragment = document.createDocumentFragment();
+                itemsToRender.forEach(setoran => {
+                    const santri = App.data.findSantriById(setoran.santriId);
+                    const clone = template.content.cloneNode(true);
+                    
+                    clone.querySelector('.data-nama').textContent = setoran.namaSantri;
+                    clone.querySelector('.data-program-icon').innerHTML = App.utils.getProgramIcon(santri ? santri.program : '');
+                    clone.querySelector('.data-kelas-icon').innerHTML = App.utils.getClassIcon(santri ? santri.kelas : '');
+                    clone.querySelector('.data-jenis').textContent = setoran.jenis;
+                    clone.querySelector('.data-juz').textContent = setoran.juz;
+                    clone.querySelector('.data-unit').textContent = setoran.halaman ? `${setoran.halaman} halaman` : setoran.surat;
+                    clone.querySelector('.data-kualitas').innerHTML = App.utils.getKualitasSVG(setoran.kualitas);
+                    clone.querySelector('.data-tanggal').textContent = new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                    
+                    const deleteButton = clone.querySelector('.delete-btn');
+                    deleteButton.dataset.id = setoran.id;
+                    deleteButton.dataset.rowNumber = setoran.rowNumber;
+
+                    fragment.appendChild(clone);
+                });
+                tableBody.appendChild(fragment);
+            },
+
+            /** Renders all recap tabs and content. */
+            renderAllRecaps() {
+                const classGroups = App.config.dataSources.classGroups;
+                const sortedGroupNames = Object.keys(classGroups).sort((a,b) => a.localeCompare(b));
+
+                App.cache.rekapTabs.innerHTML = sortedGroupNames.map((groupName, index) => 
+                    `<button data-tab="${groupName.replace(/, /g, '')}" class="rekap-tab-btn ${index === 0 ? 'active' : ''} flex-shrink-0 snap-center whitespace-nowrap py-2 px-5 text-sm font-medium text-gray-700 rounded-md">Kelas ${groupName}</button>`
+                ).join('');
+
+                App.cache.rekapContentContainer.innerHTML = sortedGroupNames.map((groupName, index) => `
+                    <div id="rekap-tab-${groupName.replace(/, /g, '')}" class="rekap-tab-content ${index > 0 ? 'hidden' : ''}">${this.createRecapHTML(groupName)}</div>
+                `).join('');
+            },
+
+            /** Creates the HTML for a single recap table. */
+            createRecapHTML(groupName) {
+                const group = App.config.dataSources.classGroups[groupName];
+                if (!group) return '<p>Grup tidak ditemukan.</p>';
+                const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+                
+                const tableRows = group.santri.sort((a,b) => a.nama.localeCompare(b.nama)).map((santri, index) => {
+                    const totalHalaman = App.state.allSetoran
+                        .filter(s => s.santriId === santri.id)
+                        .reduce((sum, s) => sum + App.data.calculatePageValue(s), 0);
+                    const isTuntas = (santri.setoranMutqin?.size || 0) >= 30;
+                    const keterangan = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span>`;
+                    return `<tr class="hover:bg-gray-50/50"><td class="px-4 py-2 text-gray-800">${index + 1}</td><td class="px-4 py-2 text-sm text-gray-800"><div class="flex items-center">${santri.nama}${App.utils.getProgramIcon(santri.program)}${App.utils.getClassIcon(santri.kelas)}</div></td><td class="px-4 py-2 font-medium text-gray-800">${totalHalaman.toFixed(1)}</td><td class="px-4 py-2">${keterangan}</td></tr>`;
+                }).join('');
+
+                return `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                    <div><h3 class="font-bold text-amber-700 text-lg">Rekap Capaian - Kelas ${groupName}</h3><p class="text-sm text-gray-600">Musyrif: ${group.musyrif}</p><p class="text-xs text-gray-500">${timestamp}</p></div>
+                    <button data-class-group="${groupName}" class="export-pdf-btn mt-3 sm:mt-0 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Ekspor ke PDF</button>
+                </div>
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200/80"><thead class="bg-gray-100/80"><tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skor</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th></tr></thead><tbody class="divide-y divide-gray-200/80">${tableRows}</tbody></table></div>
+                `;
+            },
+
+            /** Renders the recent activity list on the home page. */
+            renderRecentActivity() {
+                const recentActivities = App.state.allSetoran.slice(0, 5);
+                if(recentActivities.length > 0) {
+                    App.cache.recentActivityList.innerHTML = recentActivities.map(s => {
+                        const santri = App.data.findSantriById(s.santriId);
+                        const emoji = App.config.dataSources.santriEmojis[s.namaSantri.charCodeAt(0) % App.config.dataSources.santriEmojis.length];
+                        return `
+                        <div class="flex items-start gap-3">
+                            <div class="bg-gray-200/80 p-2 text-xl rounded-full mt-1">${emoji}</div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800 flex items-center">${s.namaSantri} ${App.utils.getProgramIcon(santri ? santri.program : '')} ${App.utils.getClassIcon(santri ? santri.kelas : '')}</p>
+                                <p class="text-xs text-gray-500">Menyetor ${s.jenis} ${s.halaman ? `${s.halaman} halaman` : s.surat}</p>
+                            </div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    App.cache.recentActivityList.innerHTML = `<p class="text-sm text-gray-500">Belum ada aktivitas.</p>`;
+                }
+            },
+            
+            /** Renders the weekly summary chart. */
+            renderWeeklySummaryChart() {
+                if (App.state.allSetoran.length === 0) {
+                    App.cache.weeklyChartContainer.classList.add('hidden');
+                    return;
+                }
+                App.cache.weeklyChartContainer.classList.remove('hidden');
+
+                const labels = [];
+                const data = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    labels.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
+                    const setoranOnDay = App.state.allSetoran.filter(s => new Date(s.createdAt).toDateString() === d.toDateString());
+                    data.push(setoranOnDay.length);
+                }
+
+                if (App.state.weeklyChart) App.state.weeklyChart.destroy();
+                
+                App.state.weeklyChart = new Chart(App.cache.weeklyChart, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah Setoran',
+                            data: data,
+                            backgroundColor: 'rgba(59, 130, 246, 0.4)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#9ca3af' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                            x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            },
+
+            /** Renders the mutqin progress bars. */
+            renderMutqinProgress() {
+                const stats = App.data.getMutqinStats();
+                if (stats.totalTahfizh === 0) {
+                    App.cache.mutqinJuz29ProgressContainer.classList.add('hidden');
+                    App.cache.mutqinJuz30ProgressContainer.classList.add('hidden');
+                    return;
+                }
+                App.cache.mutqinJuz29ProgressContainer.classList.remove('hidden');
+                App.cache.mutqinJuz30ProgressContainer.classList.remove('hidden');
+
+                const pct30 = ((stats.mutqin30 / stats.totalTahfizh) * 100).toFixed(0);
+                App.cache.mutqinJuz30Bar.style.width = `${pct30}%`;
+                App.cache.mutqinJuz30Label.textContent = `${pct30}%`;
+                App.cache.mutqinJuz30Details.textContent = `${stats.mutqin30} dari ${stats.totalTahfizh} santri telah tuntas.`;
+
+                const pct29 = ((stats.mutqin29 / stats.totalTahfizh) * 100).toFixed(0);
+                App.cache.mutqinJuz29Bar.style.width = `${pct29}%`;
+                App.cache.mutqinJuz29Label.textContent = `${pct29}%`;
+                App.cache.mutqinJuz29Details.textContent = `${stats.mutqin29} dari ${stats.totalTahfizh} santri telah tuntas.`;
+            },
+
+            /** Renders the icon legends. */
+            renderIconLegends() {
+                const legendItemsHTML = `
+                    <div class="flex items-center gap-2">${App.utils.getProgramIcon('Tahfizh')} <span>Program Tahfizh</span></div>
+                    <div class="flex items-center gap-2">${App.utils.getProgramIcon('Unggulan')} <span>Program Unggulan</span></div>
+                    <div class="flex items-center gap-2">${App.utils.getClassIcon('2A')} <span>Kelas 2A</span></div>
+                    <div class="flex items-center gap-2">${App.utils.getClassIcon('2B')} <span>Kelas 2B, dst.</span></div>
+                `;
+
+                const fullLegendHTML = `
+                <div class="p-4 rounded-xl glass-card">
+                    <h4 class="font-bold text-gray-800 text-sm mb-3">Keterangan Ikon</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 text-xs text-gray-700">
+                        ${legendItemsHTML}
+                    </div>
+                </div>
+                `;
+                
+                App.cache.iconLegendBeranda.innerHTML = fullLegendHTML;
+                App.cache.iconLegendRiwayat.innerHTML = fullLegendHTML;
+                App.cache.iconLegendRekap.innerHTML = fullLegendHTML;
+            },
+            
+            /** Renders search suggestions based on user input. */
+            renderSearchSuggestions(query) {
+                if (query.length < 2) {
+                    App.cache.suggestionsContainer.classList.add('hidden');
+                    return;
+                }
+                const suggestions = App.state.santriData
+                    .filter(s => s.nama.toLowerCase().includes(query.toLowerCase()))
+                    .slice(0, 5);
+                
+                if (suggestions.length > 0) {
+                    App.cache.suggestionsContainer.innerHTML = suggestions
+                        .map(s => `<div class="suggestion-item p-2 hover:bg-gray-100 cursor-pointer">${s.nama}</div>`)
+                        .join('');
+                    App.cache.suggestionsContainer.classList.remove('hidden');
+                } else {
+                    App.cache.suggestionsContainer.classList.add('hidden');
+                }
+            },
+            
+            /** Resets the setoran form to its initial state. */
+            resetForm() {
+                App.cache.setoranForm.reset();
+                App.utils.setCurrentDateTime();
+                App.cache.musyrif.value = "";
+                ['namaSantri', 'jenis', 'juz'].forEach(key => {
+                    App.utils.populateSelect(App.cache[key], [], `Pilih ${key === 'namaSantri' ? 'Musyrif' : '...'} dahulu`);
+                    App.cache[key].disabled = true;
+                });
+                ['kelas', 'program', 'santriId'].forEach(key => App.cache[key].value = '');
+                this.resetSetoranInputs();
+            },
+
+            /** Resets only the setoran-specific inputs (halaman/surat). */
+            resetSetoranInputs() {
+                App.cache.halamanContainer.classList.add('hidden');
+                App.cache.suratContainer.classList.add('hidden');
+                ['halaman', 'surat'].forEach(key => {
+                    App.cache[key].disabled = true;
+                    App.cache[key].required = false;
+                    App.cache[key].value = '';
+                });
+                App.cache.halaman.min = 1;
+                App.cache.halaman.placeholder = '';
+            },
+            
+            /** Updates the santri dropdown based on the selected musyrif. */
+            updateSantriOptions() {
+                const selectedMusyrif = App.cache.musyrif.value;
+                this.resetSetoranInputs();
+                ['jenis', 'juz'].forEach(key => { App.cache[key].disabled = true; });
+                if (selectedMusyrif) {
+                    const santriOptions = App.state.santriData
+                        .filter(s => s.musyrif === selectedMusyrif)
+                        .sort((a, b) => a.nama.localeCompare(b.nama))
+                        .map(s => ({ text: s.nama, value: s.id }));
+                    App.utils.populateSelect(App.cache.namaSantri, santriOptions, 'Pilih Santri');
+                    App.cache.namaSantri.disabled = false;
+                } else {
+                    App.utils.populateSelect(App.cache.namaSantri, [], 'Pilih Musyrif dahulu');
+                    App.cache.namaSantri.disabled = true;
+                }
+                this.updateSantriDetails();
+            },
+
+            /** Updates the read-only fields for kelas and program. */
+            updateSantriDetails() {
+                const santri = App.data.findSantriById(App.cache.namaSantri.value);
+                this.resetSetoranInputs();
+                if (santri) {
+                    App.cache.kelas.value = santri.kelas;
+                    App.cache.program.value = santri.program;
+                    App.cache.santriId.value = santri.id;
+                } else {
+                    ['kelas', 'program', 'santriId'].forEach(key => App.cache[key].value = '');
+                }
+            },
+
+            /** Updates the 'Jenis Setoran' dropdown based on the santri's program and progress. */
+            updateJenisOptions() {
+                const santri = App.data.findSantriById(App.cache.namaSantri.value);
+                if (santri) {
+                    const hasCompletedBasicMutqin = santri.setoranMutqin.has(29) && santri.setoranMutqin.has(30);
+                    const jenisOptions = [];
+                    if (santri.program === "Unggulan" || (santri.program === "Tahfizh" && hasCompletedBasicMutqin)) {
+                        jenisOptions.push("Ziyadah");
+                    }
+                    jenisOptions.push("Murajaah", "Mutqin");
+                    App.utils.populateSelect(App.cache.jenis, jenisOptions, 'Pilih Jenis');
+                    App.cache.jenis.disabled = false;
+                } else {
+                    App.cache.jenis.disabled = true;
+                    App.utils.populateSelect(App.cache.jenis, [], 'Pilih Santri dahulu');
+                }
+                this.updateJuzOptions();
+            },
+
+            /** Updates the 'Juz' dropdown based on the selected 'Jenis Setoran'. */
+            updateJuzOptions() {
+                const jenis = App.cache.jenis.value;
+                const santri = App.data.findSantriById(App.cache.namaSantri.value);
+                this.resetSetoranInputs();
+                if (!jenis || !santri) {
+                    App.cache.juz.disabled = true;
+                    App.utils.populateSelect(App.cache.juz, [], 'Pilih Jenis dahulu');
+                    return;
+                }
+                let juzOptions = [];
+                if (jenis === "Mutqin") {
+                    for (let i = 1; i <= 30; i++) if (!santri.setoranMutqin.has(i)) juzOptions.push({ text: `Juz ${i}`, value: i });
+                } else { // Ziyadah or Murajaah
+                    for (let i = 1; i <= 30; i++) juzOptions.push({ text: `Juz ${i}`, value: i });
+                }
+                App.utils.populateSelect(App.cache.juz, juzOptions, 'Pilih Juz');
+                App.cache.juz.disabled = false;
+                this.updateSetoranInputs();
+            },
+
+            /** Updates the final setoran inputs (halaman/surat) based on juz and jenis. */
+            updateSetoranInputs() {
+                const jenis = App.cache.jenis.value;
+                const juz = parseInt(App.cache.juz.value, 10);
+                this.resetSetoranInputs();
+                if (!jenis || !juz) return;
+
+                const surahList = App.state.surahData[juz] ? App.state.surahData[juz].list : [];
+                const isSurahBased = (jenis === 'Ziyadah' || jenis === 'Murajaah') && [28, 29, 30].includes(juz) && surahList.length > 0;
+
+                if (isSurahBased) {
+                    App.cache.suratContainer.classList.remove('hidden');
+                    App.cache.surat.required = true;
+                    App.utils.populateSelect(App.cache.surat, surahList, 'Pilih Surat');
+                } else if (jenis === 'Ziyadah' || jenis === 'Murajaah') {
+                    App.cache.halamanContainer.classList.remove('hidden');
+                    App.cache.halaman.required = true;
+                    App.cache.halaman.disabled = false;
+                } else if (jenis === 'Mutqin') {
+                    App.cache.halamanContainer.classList.remove('hidden');
+                    App.cache.halaman.disabled = false;
+                    App.cache.halaman.placeholder = 'Min 5 hlm / Kosongkan utk 1 Juz';
+                    App.cache.halaman.min = 5;
+                    App.cache.halaman.required = false; // Not required, can be empty for full juz
+                }
+            },
+
+            /** Shows a toast notification. */
+            showToast(message, type = 'success') {
+                App.cache.toastMessage.textContent = message;
+                const isSuccess = type === 'success';
+                App.cache.toastIcon.innerHTML = isSuccess 
+                    ? `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`
+                    : `<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+                App.cache.toastIcon.classList.toggle('text-green-400', isSuccess);
+                App.cache.toastIcon.classList.toggle('text-red-400', !isSuccess);
+                App.cache.toast.classList.add('show');
+                setTimeout(() => App.cache.toast.classList.remove('show'), 3000);
+            },
+
+            /** Opens a modal dialog. */
+            openModal(modalId) { 
+                const modal = App.cache[modalId];
+                if (modal) modal.classList.remove('hidden');
+            },
+
+            /** Closes a modal dialog. */
+            closeModal(modalId) { 
+                const modal = App.cache[modalId];
+                if (modal) modal.classList.add('hidden');
+            },
+            
+            /** Switches the visible page. */
+            switchPage(pageId, showSkeleton = true) {
+                if (!pageId) return;
+                
+                this.hideAllContent();
+                if (showSkeleton) this.showSkeleton(pageId);
+
+                // Use a short timeout to allow the skeleton to render before loading content
+                setTimeout(() => {
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) targetPage.classList.remove('hidden');
+                    this.hideAllSkeletons();
+                    
+                    // Update active nav link
+                    App.cache.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+                    const activeLink = App.cache.mainNav.querySelector(`a[data-page="${pageId}"]`);
+                    if(activeLink) activeLink.classList.add('active');
+                }, 100);
+            },
+
+            /** Switches the visible tab within a container. */
+            switchTab(container, contentSelector, clickedBtn, idPrefix) {
+                container.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                clickedBtn.classList.add('active');
+                
+                const targetTabId = clickedBtn.dataset.tab.replace(/, /g, '');
+                const parentContainer = container.closest('.glass-card, .page-content');
+                parentContainer.querySelectorAll(contentSelector).forEach(content => content.classList.add('hidden'));
+                const targetId = `${idPrefix}-${targetTabId}`;
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.classList.remove('hidden');
+                }
+            },
+
+            /** Updates the date and time display on the hero section. */
+            updateDateTime() {
+                const now = new Date();
+                const gregorianDate = new Intl.DateTimeFormat('id-ID', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }).format(now).replace('pukul', '');
+
+                const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-nu-latn', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                }).format(now);
+
+                const finalHTML = `
+                    <div class="flex items-center gap-2 bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <span>${gregorianDate}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                        <span>${hijriDate}</span>
+                    </div>
+                `;
+
+                if (App.cache.datetimeContainer) {
+                    App.cache.datetimeContainer.innerHTML = finalHTML;
+                }
+            },
+
+            // Skeleton and content visibility helpers
+            showSkeleton(pageId) {
+                this.hideAllSkeletons();
+                const skeleton = document.getElementById(`skeleton-${pageId}`);
+                if (skeleton) skeleton.classList.remove('hidden');
+            },
+            hideAllSkeletons() { App.cache.skeletonContainers.forEach(s => s.classList.add('hidden')); },
+            hideAllContent() { App.cache.pages.forEach(p => p.classList.add('hidden')); },
+        },
+
+        /**
+         * @namespace App.utils
+         * @description Contains helper and utility functions.
+         */
+        utils: {
+            /** Sets the date-time input to the current time. */
+            setCurrentDateTime() {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                App.cache.tanggal.value = now.toISOString().slice(0, 16);
+            },
+
+            /** Populates a select element with options. */
+            populateSelect(selectEl, options, placeholder) {
+                selectEl.innerHTML = '';
+                if (placeholder) selectEl.add(new Option(placeholder, ''));
+                options.forEach(opt => {
+                    const option = (typeof opt === 'string') ? new Option(opt, opt) : new Option(opt.text, opt.value);
+                    selectEl.add(option);
+                });
+            },
+
+            /** Generates SVG for quality rating stars. */
+            getKualitasSVG(kualitas) {
+                const qualityMap = { 'Mumtaz': 5, 'Jayyid Jiddan': 4, 'Jayyid': 3, 'Maqbul': 2, 'Dhoif': 1 };
+                const stars = qualityMap[kualitas] || 0;
+                const starIcon = `<svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+                const emptyStarIcon = `<svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+                return `<div class="flex">${starIcon.repeat(stars)}${emptyStarIcon.repeat(5 - stars)}</div>`;
+            },
+
+            /** Generates HTML for a program icon. */
+            getProgramIcon(program) { 
+                return program === 'Unggulan' 
+                    ? `<span title="Unggulan" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gray-200 text-gray-800 text-xs font-bold">U</span>` 
+                    : `<span title="Tahfizh" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-200 text-purple-800 text-xs font-bold">T</span>`; 
+            },
+            
+            /** Generates HTML for a class icon with color coding. */
+            getClassIcon(className) {
+                if (!className) return '';
+                let colorClass = 'bg-gray-200 text-gray-800';
+                const classInitial = className.charAt(1);
+                if (['A'].includes(classInitial)) colorClass = 'bg-red-100 text-red-800';
+                if (['B'].includes(classInitial)) colorClass = 'bg-yellow-100 text-yellow-800';
+                if (['C', 'D'].includes(classInitial)) colorClass = 'bg-green-100 text-green-800';
+                if (['G', 'H'].includes(classInitial)) colorClass = 'bg-blue-100 text-blue-800';
+                return `<span title="Kelas ${className}" class="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full ${colorClass} text-xs font-bold">${className}</span>`;
+            },
+
+            /** Normalizes a name string for comparison. */
+            normalizeName(name) {
+                if (typeof name !== 'string') return '';
+                return name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
+            },
+
+            /** Exports a recap table to PDF. */
+            exportRecapToPDF(classGroup) {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p', 'pt', 'a4');
+                    const group = App.config.dataSources.classGroups[classGroup];
+                    if (!group) return App.ui.showToast('Grup kelas tidak ditemukan.', 'error');
+
+                    doc.autoTable({
+                        head: [['No.', 'Nama Santri', 'Program', 'Skor', 'Keterangan']],
+                        body: group.santri.sort((a, b) => a.nama.localeCompare(b.nama)).map((santri, index) => {
+                            const totalHalaman = App.state.allSetoran.filter(s => s.santriId === santri.id).reduce((sum, s) => sum + App.data.calculatePageValue(s), 0);
+                            const isTuntas = (santri.setoranMutqin?.size || 0) >= 30;
+                            return [ index + 1, santri.nama, santri.program, totalHalaman.toFixed(1), isTuntas ? 'Tuntas' : 'Belum Tuntas' ];
+                        }),
+                        theme: 'grid',
+                        headStyles: { fillColor: [217, 119, 6] },
+                        styles: { font: 'Inter', cellPadding: 6, valign: 'middle' },
+                        columnStyles: {
+                            0: { cellWidth: 30 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 60 },
+                            3: { cellWidth: 40, halign: 'center' }, 4: { cellWidth: 80, halign: 'center' }
+                        },
+                        didParseCell: (data) => { if (data.column.index === 1) data.cell.styles.fontSize = 8; },
+                        didDrawPage: (data) => {
+                            doc.setFontSize(20); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold');
+                            doc.text('Laporan Capaian Tahfizh', data.settings.margin.left, 40);
+                            doc.setFontSize(12); doc.setTextColor(40); doc.setFont('helvetica', 'normal');
+                            doc.text(`Kelas: ${classGroup} | Musyrif: ${group.musyrif}`, data.settings.margin.left, 58);
+                            const pageCount = doc.internal.getNumberOfPages();
+                            doc.setFontSize(8); doc.setTextColor(150);
+                            doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 20);
+                            doc.text(`Dibuat pada: ${new Date().toLocaleString('id-ID')}`, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 20, { align: 'right' });
+                        },
+                        margin: { top: 70, bottom: 40 }
+                    });
+                    doc.save(`rekap_setoran_${classGroup.replace(/, /g, '_')}_${Date.now()}.pdf`);
+                } catch (error) {
+                    console.error("PDF Export Error:", error);
+                    App.ui.showToast('Gagal mengekspor PDF.', 'error');
+                }
+            },
+        }
+    };
+
+    // Initialize the application when the DOM is fully loaded.
+    document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
