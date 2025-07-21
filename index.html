@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setor.in - Aplikasi Setoran Hafalan</title>
+    <title>Setor.in - Aplikasi Setoran Hafalan (Optimized)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- JavaScript Libraries -->
@@ -51,9 +53,7 @@
         .glass-input:focus {
             background-color: rgba(255, 255, 255, 0.6) !important;
         }
-        .glass-input::placeholder {
-            color: #6b7280;
-        }
+        .glass-input::placeholder { color: #6b7280; }
 
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -67,7 +67,7 @@
             background-color: #e0e0e0;
             background-image: linear-gradient(to right, #e0e0e0 0%, #f5f5f5 20%, #e0e0e0 40%, #e0e0e0 100%);
             background-repeat: no-repeat;
-            background-size: 800px 100%; /* Fix: ensure shimmer covers full height */
+            background-size: 800px 100%;
             animation: shimmer 1s linear infinite;
         }
 
@@ -158,7 +158,7 @@
                         <h2 class="text-xl font-medium text-gray-600 mb-2">Assalamu 'alaikum ustadz,</h2>
                         <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">Selamat Datang di Setor.in</h1>
                         <p class="mt-4 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">Mencatat setiap langkah, merayakan setiap pencapaian. Mari mudahkan pencatatan setoran hafalan.</p>
-                        <div id="datetime-container" class="mt-6 flex flex-wrap justify-center items-center gap-2 sm:gap-4"></div>
+                        <div id="datetime-container" class="mt-6 flex flex-col items-center justify-center gap-1"></div>
                         <div class="mt-8">
                             <button data-target-page="page-form" class="quick-access-btn group inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
@@ -195,17 +195,90 @@
                         </div>
                     </section>
 
-                    <!-- Target Mingguan Section -->
-                    <section id="target-mingguan-section" class="fade-in p-5 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg" style="animation-delay: 200ms;">
-                        <div class="flex items-center gap-4">
-                            <div class="flex-shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
-                                </svg>
+                    <!-- Target Ketuntasan Section -->
+                    <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 200ms;">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Target Ketuntasan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Target 1: Nilai Akademik -->
+                            <div class="p-5 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white shadow-lg flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-white/20 p-2 rounded-lg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                                        </div>
+                                        <h4 class="text-lg font-bold">A. Penilaian Akademik</h4>
+                                    </div>
+                                    <p class="text-sm opacity-90 mt-2">Mutqin Setengah Juz 30 (An-Naba' s.d. Ath-Thariq) untuk mendapatkan nilai 100.</p>
+                                </div>
+                                <div class="text-xs font-semibold mt-4 opacity-80">Berlaku untuk: Unggulan & Tahfizh</div>
                             </div>
-                            <div>
-                                <h3 class="text-lg font-bold">Target Hafalan Pekan Ini</h3>
-                                <p class="text-sm opacity-90">An-Naba' sampai dengan Al-Ghasyiyah</p>
+                            <!-- Target 2: Program Tahfizh -->
+                            <div class="p-5 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white shadow-lg flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-white/20 p-2 rounded-lg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14h14V5H5z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 12L5 5m7 7l7 7m-7-7l7-7m-7 7l-7 7" /></svg>
+                                        </div>
+                                        <h4 class="text-lg font-bold">B. Ketuntasan Tahfizh</h4>
+                                    </div>
+                                    <p class="text-sm opacity-90 mt-2">Wajib menyelesaikan Mutqin Juz 30 & Juz 29 secara penuh.</p>
+                                </div>
+                                <div class="text-xs font-semibold mt-4 opacity-80">Berlaku untuk: Program Tahfizh</div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Mutqin Progress -->
+                    <section class="fade-in" style="animation-delay: 500ms;">
+                         <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Ketuntasan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Progress Unggulan -->
+                            <div id="mutqin-unggulan-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-sky-50 to-sky-100/50 border-sky-200">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-sky-800 mb-1">P. Unggulan (Nilai 100)</h3>
+                                        <p id="mutqin-unggulan-details" class="text-xs text-sky-700"></p>
+                                    </div>
+                                    <div class="bg-sky-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">U</div>
+                                </div>
+                                <div class="flex items-center gap-4 mt-3">
+                                    <div class="w-full bg-sky-200/80 rounded-full h-2.5">
+                                        <div id="mutqin-unggulan-bar" class="bg-sky-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                    <span id="mutqin-unggulan-label" class="font-semibold text-sky-800 text-sm">0%</span>
+                                </div>
+                            </div>
+                            <!-- Progress Tahfizh Juz 30 -->
+                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-green-800 mb-1">P. Tahfizh (Mutqin Juz 30)</h3>
+                                        <p id="mutqin-juz30-details" class="text-xs text-green-700"></p>
+                                    </div>
+                                    <div class="bg-green-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">30</div>
+                                </div>
+                                <div class="flex items-center gap-4 mt-3">
+                                    <div class="w-full bg-green-200/80 rounded-full h-2.5">
+                                        <div id="mutqin-juz30-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                    <span id="mutqin-juz30-label" class="font-semibold text-green-800 text-sm">0%</span>
+                                </div>
+                            </div>
+                            <!-- Progress Tahfizh Juz 29 -->
+                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-amber-800 mb-1">P. Tahfizh (Mutqin Juz 29)</h3>
+                                        <p id="mutqin-juz29-details" class="text-xs text-amber-700"></p>
+                                    </div>
+                                    <div class="bg-amber-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">29</div>
+                                </div>
+                                <div class="flex items-center gap-4 mt-3">
+                                    <div class="w-full bg-amber-200/80 rounded-full h-2.5">
+                                        <div id="mutqin-juz29-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                    <span id="mutqin-juz29-label" class="font-semibold text-amber-800 text-sm">0%</span>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -224,54 +297,12 @@
                             <canvas id="weeklyChart"></canvas>
                         </div>
                     </section>
-                    
-                    <!-- Mutqin Progress -->
-                    <section class="fade-in" style="animation-delay: 500ms;">
-                         <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Mutqin (Program Tahfizh)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-green-800 mb-1">Progres Mutqin Juz 30</h3>
-                                        <p id="mutqin-juz30-details" class="text-xs text-green-700"></p>
-                                    </div>
-                                    <div class="bg-green-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">30</div>
-                                </div>
-                                <div class="flex items-center gap-4 mt-3">
-                                    <div class="w-full bg-green-200/80 rounded-full h-2.5">
-                                        <div id="mutqin-juz30-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                    </div>
-                                    <span id="mutqin-juz30-label" class="font-semibold text-green-800 text-sm">0%</span>
-                                </div>
-                            </div>
-                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-amber-800 mb-1">Progres Mutqin Juz 29</h3>
-                                        <p id="mutqin-juz29-details" class="text-xs text-amber-700"></p>
-                                    </div>
-                                    <div class="bg-amber-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">29</div>
-                                </div>
-                                <div class="flex items-center gap-4 mt-3">
-                                    <div class="w-full bg-amber-200/80 rounded-full h-2.5">
-                                        <div id="mutqin-juz29-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                    </div>
-                                    <span id="mutqin-juz29-label" class="font-semibold text-amber-800 text-sm">0%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <!-- Info Box -->
-                    <section class="bg-blue-100/80 p-5 rounded-2xl fade-in flex items-center gap-4" style="animation-delay: 800ms;">
-                        <div class="flex-shrink-0 text-blue-500">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
-                               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                             </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-blue-900">Mari Berkembang Bersama!</h3>
-                            <p class="text-sm text-blue-800">Aplikasi ini masih terus belajar. Jika Anda menemukan hal yang janggal atau punya ide cemerlang, sampaikan ke tim pengasuhan asrama. Kontribusi Anda sangat berarti!</p>
+
+                    <!-- Tuntas Tracking Section -->
+                    <section id="tuntas-tracking-section" class="fade-in" style="animation-delay: 700ms;">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Lacak Ketuntasan per Kelas</h3>
+                        <div id="tuntas-tracking-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Content will be generated by JS -->
                         </div>
                     </section>
                     
@@ -393,7 +424,7 @@
                     <!-- Submit Button -->
                     <div class="mt-2">
                         <button type="submit" class="w-full group inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                             Simpan Setoran
                         </button>
                     </div>
@@ -524,7 +555,7 @@
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                <div><span class="data-jenis"></span> Juz <span class="data-juz"></span></div>
+                <div><span class="data-jenis"></span> <span class="data-juz-text"></span></div>
                 <div class="text-xs text-gray-500 data-unit"></div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 data-kualitas"></td>
@@ -536,652 +567,425 @@
             </td>
         </tr>
     </template>
+    
+    <!-- Template for Recent Activity Item -->
+    <template id="recent-activity-template">
+         <div class="flex items-start gap-3">
+            <div class="data-emoji bg-gray-200/80 p-2 text-xl rounded-full mt-1"></div>
+            <div>
+                <p class="text-sm font-semibold text-gray-800 flex items-center">
+                    <span class="data-nama"></span>
+                    <span class="data-program-icon"></span>
+                    <span class="data-kelas-icon"></span>
+                </p>
+                <p class="text-xs text-gray-500 data-detail"></p>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template for Rekap Tab and Content -->
+    <template id="rekap-tab-template">
+        <button class="rekap-tab-btn flex-shrink-0 snap-center whitespace-nowrap py-2 px-5 text-sm font-medium text-gray-700 rounded-md"></button>
+    </template>
+    <template id="rekap-content-template">
+        <div class="rekap-tab-content hidden">
+            <div class="bg-white/20 p-4 rounded-t-xl border-b border-white/30 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                    <h3 class="font-bold text-amber-700 text-lg data-title"></h3>
+                    <p class="text-sm text-gray-600 data-musyrif"></p>
+                    <p class="text-xs text-gray-500 data-timestamp"></p>
+                </div>
+                <button class="export-pdf-btn mt-3 sm:mt-0 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Ekspor ke PDF</button>
+            </div>
+            <div class="overflow-x-auto bg-white/10 p-2 rounded-b-xl">
+                <table class="min-w-full divide-y divide-gray-200/80">
+                    <thead class="bg-gray-100/80">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ziyadah (hlm)</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200/80 data-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </template>
 
 <script>
     /**
-     * @namespace App
-     * @description Main application object for Setor.in.
-     * Manages state, UI, data fetching, and event handling.
+     * @file Manages the Setor.in application.
+     * @author Refactored by Gemini
+     * @version 2.4 - Robust Calculation Fix
+     * @description This script is organized into modular objects for better maintainability and clarity.
      */
-    const App = {
-        /**
-         * @property {object} state - Holds the dynamic data of the application.
-         */
-        state: {
-            allSetoran: [],
-            santriData: [],
-            surahData: {},
-            setoranIdToDelete: null,
-            weeklyChart: null,
-            searchDebounceTimer: null,
-        },
-        
-        /**
-         * @property {object} cache - Stores references to frequently accessed DOM elements.
-         */
-        cache: {},
 
-        /**
-         * @property {object} config - Application configuration and static data.
-         */
-        config: {
-            // URL for Google Apps Script backend
-            scriptURL: 'https://script.google.com/macros/s/AKfycbyl2FCcGUtolkJIDsoiTYFKeKp8IQwHT0V3z8n1pOHH9CLiyvYZTBaimrojILJM_A-HLg/exec',
-            // Password for delete operations
-            deletePassword: 'sparman68',
-            // Defines how musyrif names are sorted in dropdowns
-            musyrifSortOrder: ['Andi Aqillah Fadia Haswat', 'Abdullah'],
-            // Static data sources
-            dataSources: {
-                classGroups: {},
-                santriEmojis: ['👨🏻‍⚕', '👨🏻‍🎓', '👨🏻‍🏫', '👨🏻‍⚖', '👨🏻‍🌾', '👨🏻‍🍳', '👨🏻‍🔧', '👨🏻‍🏭', '👨🏻‍💼', '👨🏻‍🔬', '👨🏻‍💻', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍✈', '👨🏻‍🚀', '👨🏻‍🚒', '👮🏻‍♂️', '🕵🏻‍♂️', '💂🏻‍♂️', '👷🏻‍♂️', '🤵🏻‍♂️']
-            }
-        },
-        
-        /**
-         * Initializes the application.
-         * Caches DOM elements, sets up event listeners, loads data, and renders the initial page.
-         */
-        async init() {
-            this.cacheElements();
-            this.setupEventListeners();
-            this.ui.showSkeleton('page-beranda');
-            this.utils.setCurrentDateTime();
-            this.ui.updateDateTime();
-            setInterval(this.ui.updateDateTime, 60000); // Update time every minute
+    // -------------------------------------------------------------------
+    // MODULE: CONFIGURATION & STATIC DATA
+    // -------------------------------------------------------------------
+    const Config = {
+        scriptURL: 'https://script.google.com/macros/s/AKfycbyl2FCcGUtolkJIDsoiTYFKeKp8IQwHT0V3z8n1pOHH9CLiyvYZTBaimrojILJM_A-HLg/exec',
+        deletePassword: 'sparman68',
+        musyrifSortOrder: ['Andi Aqillah Fadia Haswat', 'Abdullah'],
+        deadlineJuz30Score: new Date('2026-01-03T23:59:59'),
+        deadlineTahfizhTuntas: new Date('2025-09-30T23:59:59'),
+        santriEmojis: ['👨🏻‍⚕', '👨🏻‍🎓', '👨🏻‍🏫', '👨🏻‍⚖', '👨🏻‍🌾', '👨🏻‍🍳', '👨🏻‍🔧', '👨🏻‍🏭', '👨🏻‍💼', '👨🏻‍🔬', '👨🏻‍💻', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍✈', '👨🏻‍🚀', '👨🏻‍🚒', '👮🏻‍♂️', '🕵🏻‍♂️', '💂🏻‍♂️', '👷🏻‍♂️', '🤵🏻‍♂️'],
+        santriList: [
+            // Data santri lengkap di sini...
+            { id: 'santri1', nama: 'Adelio Daffa Syahrizha', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri2', nama: 'Ahmad Ahsanur Rizqi', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri3', nama: 'Arkana El Sabilly', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri4', nama: "Athaya Auza'I Mubarak", kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri5', nama: 'Dama Arza Evannova', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri6', nama: 'Danar Nizam Daniswara', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri7', nama: 'Devgan Jadid Sahlvatico', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri8', nama: 'Fariq Imtiyas Aufaa Kamil', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri9', nama: 'Firaas Izzulhaq', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri10', nama: 'Gilang Omar F', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri11', nama: 'Jaladri Arif Wirasena', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri12', nama: 'Kemal Mubarak Siregar', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri13', nama: 'Khairil Nizam', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri14', nama: 'Mirza Nasyath Ahza Attaillah', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri15', nama: 'Muhammad Farros Linggar Cahyono', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri16', nama: 'Muhammad Fathir Alfalah', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri17', nama: 'Narendra Wibawa', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri18', nama: 'Naufal Zhafran Purnama', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri19', nama: 'Alano Faaiq Alfeno', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri20', nama: 'Arfandhika Fakhrul Islam', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri21', nama: 'Aydin Rafif', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri22', nama: 'Danish Alzahid Dinasti', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri23', nama: 'Ghani Arif Witjaksono', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri24', nama: 'Haidarrafid Satriaa Ardhani', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri25', nama: 'Iqbal Zulfikar Al Hanif', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri26', nama: 'Jangky Dausat', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri27', nama: 'Kumara Banyu Argani', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri28', nama: 'M. Dede Afkar', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri29', nama: 'Mekha Ilham Lutfianto', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri30', nama: 'Muhammad Aiman Naim', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri31', nama: 'Muhammad Karel Ashiddiq', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri32', nama: 'Naufal Fahmi Darsono', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri33', nama: 'Nazhif Fahreza Zuhairy', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri34', nama: 'Rais Abqari Ash Shidqi', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri35', nama: 'William Ramadhan Al Ghazali', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri36', nama: 'Zia El Ibrahim Aqeela Putra Wijaya', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah' },
+            { id: 'santri37', nama: "Ahmad Arkan Sya'Bani", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri38', nama: 'Ahmad Darwis', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri39', nama: 'Ahmad Ghozi El Muntazhor', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri40', nama: "Aldan 'Izzul Islam", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri41', nama: 'Fawwaz Elfareza Zuhri', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri42', nama: 'M. Fathan Alfarisi Harahap', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri43', nama: 'Muhammad Ahsani Taqwim', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri44', nama: 'Muhammad Ayyub Al Fatih', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri45', nama: 'Muhammad Gibran Rafassya', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri46', nama: 'Narendra Gerrardi Kusumah', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri47', nama: "Rijal Abdul A'Ziz", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri48', nama: 'Rizki Chandra Dewantara', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat' },
+            { id: 'santri49', nama: 'Ahmad Miqdad', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri50', nama: 'Dzaky Salman Al Farisi', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri51', nama: 'Muhammad Alvi Mumtaz Brillian Hafizh', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri52', nama: 'Muhammad Mahdi Hafidz', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri53', nama: 'Muhammad Naufal Rasyid Arafi', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri54', nama: 'Nahsif Ilman Hazim Purwono', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri55', nama: 'Nawwaf Bahy Rafif', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri56', nama: 'Nizar Adhyatma Aryanda', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri57', nama: 'Rafa Agitananda Az Zayyan', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri58', nama: "Rafa Faeyza Fa'Iz", kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri59', nama: 'Rizqi Satria Putra Surya', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri60', nama: 'Umar Ubaidillah Tsaqif', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri61', nama: 'Wildan Faiz Mahendra', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah' },
+            { id: 'santri62', nama: 'Faiq Fauzil Adhim', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri63', nama: 'Fairuz Azzam Mahfuzh', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri64', nama: 'Muhammad Arkhan Attaqi', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri65', nama: 'Muhammad Daffa Naufal Alaika', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri66', nama: 'Muzakki Fairuzzaman', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri67', nama: 'Neymar Tsaqif Hikmatyar', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri68', nama: 'Rifqi Maliki', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri69', nama: "Yasykur Slamer'Abqariy", kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri70', nama: 'Zhafran Dhiaurrahman Hakim', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri71', nama: 'Achmad Adi Darwis Elfaza', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri72', nama: 'Galang Afkar Artyanto', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri73', nama: 'Gilang Asytar Artyanto', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri74', nama: 'Muhammad Alif Al-Fatih', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri75', nama: 'Muhammad Faiz Ibnu Zakaria', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri76', nama: 'Muhammad Mahdi Hanafi', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri77', nama: 'Muhammad Muhdi Hafidz', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri78', nama: 'Rizqi Ahmad Altaf Zafar', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri79', nama: 'Dzaky Anthony Akbar', kelas: '2G', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri80', nama: 'Muwafaqi Amru Ahmad', kelas: '2G', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri81', nama: 'Abdul Ghani Irfan Rafif', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri82', nama: 'Abid Fadhil Abiyah', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri83', nama: "Ahmad Dahlan Asy'Ari", kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri84', nama: 'Athallah Azmi Ghaisan Muhammad', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri85', nama: 'Azmi Zulfadli Syafiq', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri86', nama: 'Azri Labibul Khawarizmi', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri87', nama: 'Dzar Al Ghifari', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri88', nama: 'Fatihan Al Ghifari', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri89', nama: 'Hisyam Nabil Pasha', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri90', nama: 'Ibadillah Kaiazmi Mubarak', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri91', nama: 'Kashvi Jabbar Azana', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri92', nama: 'Khawarizmi Fakhrulhaq', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri93', nama: 'Muh. Naufal Alif', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri94', nama: 'Muhammad Aghna Ilman Rafa', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri95', nama: 'Royyan Abdurrahman Ibtisam', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+            { id: 'santri96', nama: 'Sakhi Arkan Elfariza', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji' },
+        ],
+        surahData: {
+            juz30FirstHalfSurahs: ['An-Naba', 'An-Nazi\'at', 'Abasa', 'At-Takwir', 'Al-Infitar', 'Al-Mutaffifin', 'Al-Inshiqaq', 'Al-Buruj', 'At-Tariq'],
+            surahPageValues: { 'Al-Mulk': 2, 'Al-Qalam': 2, 'Al-Haqqah': 2, 'Al-Ma\'arij': 1.5, 'Nuh': 1.5, 'Al-Jinn': 1.5, 'Al-Muzzammil': 1.5, 'Al-Muddaththir': 1.5, 'Al-Qiyamah': 1, 'Al-Insan': 1.5, 'Al-Mursalat': 1.5, 'Al-Mujadilah': 2, 'Al-Hashr': 2.5, 'Al-Mumtahanah': 1.5, 'As-Saff': 1, 'Al-Jumu\'ah': 1, 'Al-Munafiqun': 1, 'At-Taghabun': 1.5, 'At-Talaq': 1.5, 'At-Tahrim': 1.5, 'An-Naba': 1.5, 'An-Nazi\'at': 1, 'Abasa': 1, 'At-Takwir': 0.5, 'Al-Infitar': 0.5, 'Al-Mutaffifin': 1, 'Al-Inshiqaq': 0.5, 'Al-Buruj': 0.5, 'At-Tariq': 0.5, 'Al-A\'la': 0.5, 'Al-Ghashiyah': 0.5, 'Al-Fajr': 1, 'Al-Balad': 0.5, 'Ash-Shams': 0.5, 'Al-Lail': 0.5, 'Ad-Duha': 0.25, 'Ash-Sharh': 0.25, 'At-Tin': 0.25, 'Al-\'Alaq': 0.5, 'Al-Qadr': 0.25, 'Al-Bayyinah': 0.5, 'Az-Zalzalah': 0.25, 'Al-\'Adiyat': 0.5, 'Al-Qari\'ah': 0.25, 'At-Takathur': 0.25, 'Al-\'Asr': 0.25, 'Al-Humazah': 0.25, 'Al-Fil': 0.25, 'Quraysh': 0.25, 'Al-Ma\'un': 0.25, 'Al-Kawthar': 0.25, 'Al-Kafirun': 0.25, 'An-Nasr': 0.25, 'Al-Masad': 0.25, 'Al-Ikhlas': 0.25, 'Al-Falaq': 0.25, 'An-Nas': 0.25 },
+            28: { list: ['Al-Mujadilah', 'Al-Hashr', 'Al-Mumtahanah', 'As-Saff', 'Al-Jumu\'ah', 'Al-Munafiqun', 'At-Taghabun', 'At-Talaq', 'At-Tahrim'] },
+            29: { list: ['Al-Mulk', 'Al-Qalam', 'Al-Haqqah', 'Al-Ma\'arij', 'Nuh', 'Al-Jinn', 'Al-Muzzammil', 'Al-Muddaththir', 'Al-Qiyamah', 'Al-Insan', 'Al-Mursalat'] },
+            30: { list: ['An-Naba', 'An-Nazi\'at', 'Abasa', 'At-Takwir', 'Al-Infitar', 'Al-Mutaffifin', 'Al-Inshiqaq', 'Al-Buruj', 'At-Tariq', 'Al-A\'la', 'Al-Ghashiyah', 'Al-Fajr', 'Al-Balad', 'Ash-Shams', 'Al-Lail', 'Ad-Duha', 'Ash-Sharh', 'At-Tin', 'Al-\'Alaq', 'Al-Qadr', 'Al-Bayyinah', 'Az-Zalzalah', 'Al-\'Adiyat', 'Al-Qari\'ah', 'At-Takathur', 'Al-\'Asr', 'Al-Humazah', 'Al-Fil', 'Quraysh', 'Al-Ma\'un', 'Al-Kawthar', 'Al-Kafirun', 'An-Nasr', 'Al-Masad', 'Al-Ikhlas', 'Al-Falaq', 'An-Nas'] }
+        }
+    };
 
-            await this.data.loadAllData();
-            
-            this.data.processSantriData();
-            this.data.calculateMutqinProgress();
-            
-            this.ui.renderAll();
-            this.ui.switchPage('page-beranda', false);
-        },
+    // -------------------------------------------------------------------
+    // MODULE: APPLICATION STATE
+    // -------------------------------------------------------------------
+    const State = {
+        allSetoran: [],
+        santriData: [], // This will be processed data from Config.santriList
+        classGroups: {},
+        setoranIdToDelete: null,
+        weeklyChart: null,
+        searchDebounceTimer: null,
+    };
 
-        /**
-         * Caches all necessary DOM elements for faster access.
-         */
-        cacheElements() {
-            const ids = [
-                'main-nav', 'main-content', 'setoranForm', 'tanggal', 'nowBtn', 'musyrif', 'namaSantri', 'santriId', 
-                'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 
-                'setoranTableBody', 'history-row-template', 'search-riwayat', 'suggestions-container', 
-                'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'stats-total-setoran', 
-                'stats-santri-aktif', 'stats-total-halaman', 'recent-activity-list', 'weeklyChart', 
-                'weekly-chart-container', 'mutqin-juz29-progress-container', 'mutqin-juz29-bar', 
-                'mutqin-juz29-label', 'mutqin-juz29-details', 'mutqin-juz30-progress-container', 
-                'mutqin-juz30-bar', 'mutqin-juz30-label', 'mutqin-juz30-details', 'rekap-tabs', 
-                'rekap-content-container', 'toast', 'toast-message', 'toast-icon', 'passwordConfirmModal', 
-                'passwordInput', 'passwordError', 'cancelPasswordBtn', 'confirmPasswordBtn', 
-                'icon-legend-beranda', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap'
-            ];
-            ids.forEach(id => {
-                // Convert kebab-case id to camelCase for cache key
-                const key = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
-                this.cache[key] = document.getElementById(id);
-            });
-            this.cache.pages = document.querySelectorAll('.page-content');
-            this.cache.skeletonContainers = document.querySelectorAll('.skeleton-container');
-        },
+    // -------------------------------------------------------------------
+    // MODULE: DOM ELEMENT CACHE
+    // -------------------------------------------------------------------
+    const Cache = {};
 
-        /**
-         * Sets up all global event listeners for the application.
-         */
-        setupEventListeners() {
-            this.cache.setoranForm.addEventListener('submit', this.handlers.handleFormSubmit.bind(this));
-            this.cache.nowBtn.addEventListener('click', this.utils.setCurrentDateTime.bind(this));
-            this.cache.mainNav.addEventListener('click', this.handlers.handleNavClick.bind(this));
-            this.cache.mainContent.addEventListener('click', this.handlers.handleMainContentClick.bind(this));
-            
-            // Form select changes
-            this.cache.musyrif.addEventListener('change', this.handlers.handleMusyrifChange.bind(this));
-            this.cache.namaSantri.addEventListener('change', this.handlers.handleSantriChange.bind(this));
-            this.cache.jenis.addEventListener('change', this.handlers.handleJenisChange.bind(this));
-            this.cache.juz.addEventListener('change', this.handlers.handleJuzChange.bind(this));
-
-            // Riwayat page filters
-            this.cache.searchRiwayat.addEventListener('input', this.handlers.handleHistorySearch.bind(this));
-            this.cache.suggestionsContainer.addEventListener('click', this.handlers.handleSuggestionClick.bind(this));
-            [this.cache.filterTanggalMulai, this.cache.filterTanggalAkhir, this.cache.filterProgram].forEach(el => {
-                el.addEventListener('input', () => this.ui.renderHistoryTable());
-            });
-            
-            // Rekap page tabs
-            this.cache.rekapTabs.addEventListener('click', this.handlers.handleTabClick.bind(this));
-
-            // Modal listeners
-            this.cache.cancelPasswordBtn.addEventListener('click', () => this.ui.closeModal('passwordConfirmModal'));
-            this.cache.confirmPasswordBtn.addEventListener('click', this.handlers.handleConfirmDelete.bind(this));
-            this.cache.passwordConfirmModal.addEventListener('click', (e) => { 
-                if (e.target === this.cache.passwordConfirmModal) this.ui.closeModal('passwordConfirmModal'); 
-            });
-
-            // Global click listener to hide suggestions
-            document.addEventListener('click', (e) => {
-                if (!this.cache.searchRiwayat.contains(e.target) && !this.cache.suggestionsContainer.contains(e.target)) {
-                    this.cache.suggestionsContainer.classList.add('hidden');
-                }
-            });
-        },
-
-        /**
-         * @namespace App.handlers
-         * @description Contains all event handler functions.
-         */
-        handlers: {
-            /**
-             * Handles the submission of the new setoran form.
-             * @param {Event} e - The form submission event.
-             */
-            handleFormSubmit(e) {
-                e.preventDefault();
-                const form = App.cache.setoranForm;
-                const submitButton = form.querySelector('button[type="submit"]');
-                submitButton.disabled = true;
-                submitButton.innerHTML = 'Menyimpan...';
-
-                const santriSelect = App.cache.namaSantri;
-                const selectedSantriName = santriSelect.options[santriSelect.selectedIndex].text;
-                const formData = new FormData(form);
-                formData.set('namaSantri', selectedSantriName); // Ensure the text name is sent
-
-                fetch(App.config.scriptURL, { method: 'POST', body: formData })
-                    .then(res => res.json())
-                    .then(async (data) => {
-                        if (data.result === 'success') {
-                            App.ui.showToast('Setoran berhasil disimpan!', 'success');
-                            App.ui.resetForm();
-                            await App.data.loadAllData();
-                            App.data.calculateMutqinProgress();
-                            App.ui.renderAll();
-                        } else {
-                            throw new Error(data.error || 'Terjadi kesalahan saat menyimpan.');
-                        }
-                    })
-                    .catch(error => App.ui.showToast(`Gagal: ${error.message}`, 'error'))
-                    .finally(() => {
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = 'Simpan Setoran';
-                    });
-            },
-
-            /**
-             * Handles the confirmation of a delete operation.
-             */
-            async handleConfirmDelete() {
-                const password = this.cache.passwordInput.value;
-                if (password !== App.config.deletePassword) {
-                    this.cache.passwordError.classList.remove('hidden');
-                    return;
-                }
-                this.cache.passwordError.classList.add('hidden');
-                
-                const idToDelete = this.state.setoranIdToDelete;
-                const setoranToDelete = this.state.allSetoran.find(s => s.id === idToDelete);
-                if (!setoranToDelete) return;
-
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('rowNumber', setoranToDelete.rowNumber);
-                formData.append('password', password); 
-
-                this.ui.closeModal('passwordConfirmModal');
-
-                try {
-                    const res = await fetch(this.config.scriptURL, { method: 'POST', body: formData });
-                    const data = await res.json();
-                    if (data.result === 'success') {
-                        this.ui.showToast('Data berhasil dihapus.', 'success');
-                        await this.data.loadAllData();
-                        this.data.calculateMutqinProgress();
-                        this.ui.renderAll();
-                    } else {
-                        throw new Error(data.error || 'Gagal menghapus data dari server.');
-                    }
-                } catch (error) {
-                    this.ui.showToast(`Gagal menghapus: ${error.message}`, 'error');
-                }
-            },
-            
-            /** Handles clicks on the main navigation. */
-            handleNavClick(e) {
-                const link = e.target.closest('.nav-link');
-                if (link && link.dataset.page) {
-                    e.preventDefault();
-                    this.ui.switchPage(link.dataset.page);
-                }
-            },
-
-            /** Handles clicks on tab buttons (e.g., in Rekap page). */
-            handleTabClick(e) {
-                const button = e.target.closest('.rekap-tab-btn');
-                if (button && button.dataset.tab) {
-                    this.ui.switchTab(button.parentElement, '.rekap-tab-content', button, 'rekap-tab');
-                }
-            },
-
-            /** Handles search input in the history page with debouncing. */
-            handleHistorySearch(e) {
-                clearTimeout(this.state.searchDebounceTimer);
-                this.state.searchDebounceTimer = setTimeout(() => {
-                    this.ui.renderHistoryTable();
-                    this.ui.renderSearchSuggestions(e.target.value);
-                }, 300);
-            },
-
-            /** Handles clicks on a search suggestion item. */
-            handleSuggestionClick(e) {
-                if (e.target.matches('.suggestion-item')) {
-                    this.cache.searchRiwayat.value = e.target.textContent;
-                    this.cache.suggestionsContainer.classList.add('hidden');
-                    this.ui.renderHistoryTable();
-                }
-            },
-
-            /** Handles delegated clicks within the main content area. */
-            handleMainContentClick(e) {
-                const target = e.target.closest('.export-pdf-btn, .delete-btn, .quick-access-btn');
-                if (!target) return;
-
-                if (target.matches('.export-pdf-btn')) {
-                    this.utils.exportRecapToPDF(target.dataset.classGroup);
-                } else if (target.matches('.delete-btn')) {
-                    this.state.setoranIdToDelete = target.dataset.id;
-                    this.ui.openModal('passwordConfirmModal');
-                } else if (target.matches('.quick-access-btn')) {
-                    this.ui.switchPage(target.dataset.targetPage);
-                }
-            },
-
-            // Form update handlers
-            handleMusyrifChange() { this.ui.updateSantriOptions(); },
-            handleSantriChange() { this.ui.updateSantriDetails(); this.ui.updateJenisOptions(); },
-            handleJenisChange() { this.ui.updateJuzOptions(); },
-            handleJuzChange() { this.ui.updateSetoranInputs(); },
-        },
-
-        /**
-         * @namespace App.data
-         * @description Manages data loading, processing, and calculations.
-         */
-        data: {
-            /** Loads all necessary data from sources. */
-            async loadAllData() {
-                // These can run in parallel if they were truly async, but they are currently synchronous.
-                this.loadSantriData();
-                this.loadSurahData();
-                await this.loadSetoranData(); // This one is async.
-            },
-
-            /** Loads static santri data into state. */
-            loadSantriData() {
-                if (App.state.santriData.length > 0) return; // Avoid reloading
-                App.state.santriData = [
-                    // Data santri lengkap di sini...
-                    { id: 'santri1', nama: 'Adelio Daffa Syahrizha', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri2', nama: 'Ahmad Ahsanur Rizqi', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri3', nama: 'Arkana El Sabilly', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri4', nama: "Athaya Auza'I Mubarak", kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri5', nama: 'Dama Arza Evannova', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri6', nama: 'Danar Nizam Daniswara', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri7', nama: 'Devgan Jadid Sahlvatico', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri8', nama: 'Fariq Imtiyas Aufaa Kamil', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri9', nama: 'Firaas Izzulhaq', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri10', nama: 'Gilang Omar F', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri11', nama: 'Jaladri Arif Wirasena', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri12', nama: 'Kemal Mubarak Siregar', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri13', nama: 'Khairil Nizam', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri14', nama: 'Mirza Nasyath Ahza Attaillah', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri15', nama: 'Muhammad Farros Linggar Cahyono', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri16', nama: 'Muhammad Fathir Alfalah', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri17', nama: 'Narendra Wibawa', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri18', nama: 'Naufal Zhafran Purnama', kelas: '2A', program: 'Unggulan', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri19', nama: 'Alano Faaiq Alfeno', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri20', nama: 'Arfandhika Fakhrul Islam', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri21', nama: 'Aydin Rafif', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri22', nama: 'Danish Alzahid Dinasti', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri23', nama: 'Ghani Arif Witjaksono', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri24', nama: 'Haidarrafid Satriaa Ardhani', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri25', nama: 'Iqbal Zulfikar Al Hanif', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri26', nama: 'Jangky Dausat', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri27', nama: 'Kumara Banyu Argani', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri28', nama: 'M. Dede Afkar', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri29', nama: 'Mekha Ilham Lutfianto', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri30', nama: 'Muhammad Aiman Naim', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri31', nama: 'Muhammad Karel Ashiddiq', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri32', nama: 'Naufal Fahmi Darsono', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri33', nama: 'Nazhif Fahreza Zuhairy', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri34', nama: 'Rais Abqari Ash Shidqi', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri35', nama: 'William Ramadhan Al Ghazali', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri36', nama: 'Zia El Ibrahim Aqeela Putra Wijaya', kelas: '2B', program: 'Unggulan', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri37', nama: "Ahmad Arkan Sya'Bani", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri38', nama: 'Ahmad Darwis', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri39', nama: 'Ahmad Ghozi El Muntazhor', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri40', nama: "Aldan 'Izzul Islam", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri41', nama: 'Fawwaz Elfareza Zuhri', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri42', nama: 'M. Fathan Alfarisi Harahap', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri43', nama: 'Muhammad Ahsani Taqwim', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri44', nama: 'Muhammad Ayyub Al Fatih', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri45', nama: 'Muhammad Gibran Rafassya', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri46', nama: 'Narendra Gerrardi Kusumah', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri47', nama: "Rijal Abdul A'Ziz", kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri48', nama: 'Rizki Chandra Dewantara', kelas: '2A', program: 'Tahfizh', musyrif: 'Andi Aqillah Fadia Haswat', setoranMutqin: new Set() },
-                    { id: 'santri49', nama: 'Ahmad Miqdad', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri50', nama: 'Dzaky Salman Al Farisi', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri51', nama: 'Muhammad Alvi Mumtaz Brillian Hafizh', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri52', nama: 'Muhammad Mahdi Hafidz', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri53', nama: 'Muhammad Naufal Rasyid Arafi', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri54', nama: 'Nahsif Ilman Hazim Purwono', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri55', nama: 'Nawwaf Bahy Rafif', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri56', nama: 'Nizar Adhyatma Aryanda', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri57', nama: 'Rafa Agitananda Az Zayyan', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri58', nama: "Rafa Faeyza Fa'Iz", kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri59', nama: 'Rizqi Satria Putra Surya', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri60', nama: 'Umar Ubaidillah Tsaqif', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri61', nama: 'Wildan Faiz Mahendra', kelas: '2B', program: 'Tahfizh', musyrif: 'Abdullah', setoranMutqin: new Set() },
-                    { id: 'santri62', nama: 'Faiq Fauzil Adhim', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri63', nama: 'Fairuz Azzam Mahfuzh', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri64', nama: 'Muhammad Arkhan Attaqi', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri65', nama: 'Muhammad Daffa Naufal Alaika', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri66', nama: 'Muzakki Fairuzzaman', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri67', nama: 'Neymar Tsaqif Hikmatyar', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri68', nama: 'Rifqi Maliki', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri69', nama: "Yasykur Slamer'Abqariy", kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri70', nama: 'Zhafran Dhiaurrahman Hakim', kelas: '2C', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri71', nama: 'Achmad Adi Darwis Elfaza', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri72', nama: 'Galang Afkar Artyanto', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri73', nama: 'Gilang Asytar Artyanto', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri74', nama: 'Muhammad Alif Al-Fatih', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri75', nama: 'Muhammad Faiz Ibnu Zakaria', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri76', nama: 'Muhammad Mahdi Hanafi', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri77', nama: 'Muhammad Muhdi Hafidz', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri78', nama: 'Rizqi Ahmad Altaf Zafar', kelas: '2D', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri79', nama: 'Dzaky Anthony Akbar', kelas: '2G', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri80', nama: 'Muwafaqi Amru Ahmad', kelas: '2G', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri81', nama: 'Abdul Ghani Irfan Rafif', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri82', nama: 'Abid Fadhil Abiyah', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri83', nama: "Ahmad Dahlan Asy'Ari", kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri84', nama: 'Athallah Azmi Ghaisan Muhammad', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri85', nama: 'Azmi Zulfadli Syafiq', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri86', nama: 'Azri Labibul Khawarizmi', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri87', nama: 'Dzar Al Ghifari', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri88', nama: 'Fatihan Al Ghifari', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri89', nama: 'Hisyam Nabil Pasha', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri90', nama: 'Ibadillah Kaiazmi Mubarak', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri91', nama: 'Kashvi Jabbar Azana', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri92', nama: 'Khawarizmi Fakhrulhaq', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri93', nama: 'Muh. Naufal Alif', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri94', nama: 'Muhammad Aghna Ilman Rafa', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri95', nama: 'Royyan Abdurrahman Ibtisam', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                    { id: 'santri96', nama: 'Sakhi Arkan Elfariza', kelas: '2H', program: 'Tahfizh', musyrif: 'Muhammad Zhafir Setiaji', setoranMutqin: new Set() },
-                ];
-            },
-            
-            /** Loads static surah data into state. */
-            loadSurahData() {
-                App.state.surahData = {
-                    surahPageValues: { 'Al-Mulk': 2, 'Al-Qalam': 2, 'Al-Haqqah': 2, 'Al-Ma\'arij': 1.5, 'Nuh': 1.5, 'Al-Jinn': 1.5, 'Al-Muzzammil': 1.5, 'Al-Muddaththir': 1.5, 'Al-Qiyamah': 1, 'Al-Insan': 1.5, 'Al-Mursalat': 1.5, 'Al-Mujadilah': 2, 'Al-Hashr': 2.5, 'Al-Mumtahanah': 1.5, 'As-Saff': 1, 'Al-Jumu\'ah': 1, 'Al-Munafiqun': 1, 'At-Taghabun': 1.5, 'At-Talaq': 1.5, 'At-Tahrim': 1.5, 'An-Naba': 1.5, 'An-Nazi\'at': 1, 'Abasa': 1, 'At-Takwir': 0.5, 'Al-Infitar': 0.5, 'Al-Mutaffifin': 1, 'Al-Inshiqaq': 0.5, 'Al-Buruj': 0.5, 'At-Tariq': 0.5, 'Al-A\'la': 0.5, 'Al-Ghashiyah': 0.5, 'Al-Fajr': 1, 'Al-Balad': 0.5, 'Ash-Shams': 0.5, 'Al-Lail': 0.5, 'Ad-Duha': 0.25, 'Ash-Sharh': 0.25, 'At-Tin': 0.25, 'Al-\'Alaq': 0.5, 'Al-Qadr': 0.25, 'Al-Bayyinah': 0.5, 'Az-Zalzalah': 0.25, 'Al-\'Adiyat': 0.5, 'Al-Qari\'ah': 0.25, 'At-Takathur': 0.25, 'Al-\'Asr': 0.25, 'Al-Humazah': 0.25, 'Al-Fil': 0.25, 'Quraysh': 0.25, 'Al-Ma\'un': 0.25, 'Al-Kawthar': 0.25, 'Al-Kafirun': 0.25, 'An-Nasr': 0.25, 'Al-Masad': 0.25, 'Al-Ikhlas': 0.25, 'Al-Falaq': 0.25, 'An-Nas': 0.25 },
-                    28: { list: ['Al-Mujadilah', 'Al-Hashr', 'Al-Mumtahanah', 'As-Saff', 'Al-Jumu\'ah', 'Al-Munafiqun', 'At-Taghabun', 'At-Talaq', 'At-Tahrim'] },
-                    29: { list: ['Al-Mulk', 'Al-Qalam', 'Al-Haqqah', 'Al-Ma\'arij', 'Nuh', 'Al-Jinn', 'Al-Muzzammil', 'Al-Muddaththir', 'Al-Qiyamah', 'Al-Insan', 'Al-Mursalat'] },
-                    30: { list: ['An-Naba', 'An-Nazi\'at', 'Abasa', 'At-Takwir', 'Al-Infitar', 'Al-Mutaffifin', 'Al-Inshiqaq', 'Al-Buruj', 'At-Tariq', 'Al-A\'la', 'Al-Ghashiyah', 'Al-Fajr', 'Al-Balad', 'Ash-Shams', 'Al-Lail', 'Ad-Duha', 'Ash-Sharh', 'At-Tin', 'Al-\'Alaq', 'Al-Qadr', 'Al-Bayyinah', 'Az-Zalzalah', 'Al-\'Adiyat', 'Al-Qari\'ah', 'At-Takathur', 'Al-\'Asr', 'Al-Humazah', 'Al-Fil', 'Quraysh', 'Al-Ma\'un', 'Al-Kawthar', 'Al-Kafirun', 'An-Nasr', 'Al-Masad', 'Al-Ikhlas', 'Al-Falaq', 'An-Nas'] }
-                };
-            },
-
-            /** Fetches setoran data from Google Sheets. */
-            async loadSetoranData() {
-                try {
-                    const response = await fetch(App.config.scriptURL);
-                    const dataFromServer = await response.json();
-                    
-                    const santriNameMap = new Map(App.state.santriData.map(s => [App.utils.normalizeName(s.nama), s.id]));
-                    const unmatchedNames = new Set();
-
-                    App.state.allSetoran = dataFromServer.map(item => {
-                        const santriNameFromSheet = item.namaSantri || item['Nama Santri'] || '';
-                        const normalizedSheetName = App.utils.normalizeName(santriNameFromSheet);
-                        const santriId = santriNameMap.get(normalizedSheetName);
-                        
-                        if (!santriId && santriNameFromSheet) {
-                            unmatchedNames.add(santriNameFromSheet.trim());
-                        }
-                        
-                        return {
-                            id: `row-${item.rowNumber}`,
-                            santriId: santriId || null, 
-                            createdAt: item.tanggal,
-                            ...item
-                        };
-                    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-                    if (unmatchedNames.size > 0) {
-                        console.warn("PERINGATAN: Nama santri berikut dari spreadsheet tidak dapat ditemukan di daftar data aplikasi. Setoran mereka tidak akan masuk rekapitulasi dengan benar:", Array.from(unmatchedNames));
-                    }
-
-                } catch(error) {
-                    console.error('Gagal memuat data setoran:', error);
-                    App.ui.showToast('Gagal memuat riwayat setoran.', 'error');
-                }
-            },
-
-            /** Processes raw santri data to create class groups. */
-            processSantriData() {
-                const musyrifList = [...new Set(App.state.santriData.map(s => s.musyrif))];
-                
-                musyrifList.sort((a, b) => {
-                    const order = App.config.musyrifSortOrder;
-                    const indexA = order.indexOf(a);
-                    const indexB = order.indexOf(b);
-                    if (indexA > -1 && indexB > -1) return indexA - indexB;
-                    if (indexA > -1) return -1;
-                    if (indexB > -1) return 1;
-                    return a.localeCompare(b);
-                });
-
-                const tempGroups = {};
-                App.state.santriData.forEach(santri => {
-                    if (!tempGroups[santri.musyrif]) {
-                        tempGroups[santri.musyrif] = { santri: [], musyrif: santri.musyrif, classes: new Set() };
-                    }
-                    tempGroups[santri.musyrif].santri.push(santri);
-                    tempGroups[santri.musyrif].classes.add(santri.kelas);
-                });
-
-                App.config.dataSources.classGroups = {};
-                for (const musyrif in tempGroups) {
-                    const group = tempGroups[musyrif];
-                    // Special naming for a specific musyrif's group
-                    const groupName = (musyrif === 'Muhammad Zhafir Setiaji') ? '2CDGH' : [...group.classes].sort().join(', ');
-                    App.config.dataSources.classGroups[groupName] = { santri: group.santri, musyrif: group.musyrif };
-                }
-
-                App.utils.populateSelect(App.cache.musyrif, musyrifList, 'Pilih Musyrif');
-            },
-            
-            /** Calculates mutqin progress for each santri. */
-            calculateMutqinProgress() {
-                App.state.santriData.forEach(s => s.setoranMutqin = new Set());
-                App.state.allSetoran.forEach(setoran => {
-                    if (setoran.jenis === 'Mutqin' && setoran.santriId) {
-                        const santri = this.findSantriById(setoran.santriId);
-                        const isFullJuz = !setoran.halaman || parseInt(setoran.halaman, 10) >= 20;
-                        if (santri && isFullJuz) {
-                            santri.setoranMutqin.add(parseInt(setoran.juz, 10));
-                        }
-                    }
-                });
-            },
-
-            /** Finds a santri by their ID. */
-            findSantriById(id) { return App.state.santriData.find(s => s.id === id); },
-            
-            /** Calculates the page value (score) for a setoran. */
-            calculatePageValue(setoran) {
-                if (setoran.jenis === 'Mutqin' && (!setoran.halaman || parseInt(setoran.halaman, 10) >= 20)) return 20;
-                if (setoran.halaman) return parseFloat(setoran.halaman) || 0;
-                if (setoran.surat) return App.state.surahData.surahPageValues[setoran.surat] || 0;
-                return 0;
-            },
-
-            /** Filters the history based on current search and filter values. */
-            getFilteredHistory() {
-                const searchTerm = App.cache.searchRiwayat.value.toLowerCase();
-                const programFilter = App.cache.filterProgram.value;
-                const startDate = App.cache.filterTanggalMulai.value ? new Date(App.cache.filterTanggalMulai.value) : null;
-                const endDate = App.cache.filterTanggalAkhir.value ? new Date(App.cache.filterTanggalAkhir.value) : null;
-                if(startDate) startDate.setHours(0,0,0,0);
-                if(endDate) endDate.setHours(23,59,59,999);
-
-                return App.state.allSetoran.filter(s => {
-                    const setoranDate = new Date(s.createdAt);
-                    const santri = App.data.findSantriById(s.santriId);
-                    return s.namaSantri.toLowerCase().includes(searchTerm) &&
-                           (programFilter === 'Semua' || (santri && santri.program === programFilter)) &&
-                           (!startDate || setoranDate >= startDate) &&
-                           (!endDate || setoranDate <= endDate);
-                });
-            },
-            
-            /** Calculates mutqin statistics for progress bars. */
-            getMutqinStats() {
-                const tahfizhSantri = App.state.santriData.filter(s => s.program === 'Tahfizh');
-                const totalTahfizh = tahfizhSantri.length;
-                if (totalTahfizh === 0) return { totalTahfizh: 0, mutqin29: 0, mutqin30: 0 };
-                const mutqin30 = tahfizhSantri.filter(s => s.setoranMutqin.has(30)).length;
-                const mutqin29 = tahfizhSantri.filter(s => s.setoranMutqin.has(29)).length;
-                return { totalTahfizh, mutqin29, mutqin30 };
+    /** Caches all necessary DOM elements for faster access. */
+    function cacheElements() {
+        const ids = [
+            'main-nav', 'main-content', 'setoranForm', 'tanggal', 'nowBtn', 'musyrif', 'namaSantri', 'santriId', 
+            'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 
+            'kualitas', 'setoranTableBody', 'history-row-template', 'search-riwayat', 'suggestions-container', 
+            'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'stats-total-setoran', 
+            'stats-santri-aktif', 'stats-total-halaman', 'recent-activity-list', 'weeklyChart', 
+            'weekly-chart-container', 'mutqin-juz29-progress-container', 'mutqin-juz29-bar', 
+            'mutqin-juz29-label', 'mutqin-juz29-details', 'mutqin-juz30-progress-container', 
+            'mutqin-juz30-bar', 'mutqin-juz30-label', 'mutqin-juz30-details', 'rekap-tabs', 
+            'rekap-content-container', 'toast', 'toast-message', 'toast-icon', 'passwordConfirmModal', 
+            'passwordInput', 'passwordError', 'cancelPasswordBtn', 'confirmPasswordBtn', 
+            'icon-legend-beranda', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap',
+            'recent-activity-template', 'rekap-tab-template', 'rekap-content-template',
+            'mutqin-unggulan-progress-container', 'mutqin-unggulan-bar', 'mutqin-unggulan-label', 'mutqin-unggulan-details',
+            'tuntas-tracking-container'
+        ];
+        ids.forEach(id => {
+            const key = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
+            Cache[key] = document.getElementById(id);
+        });
+        Cache.pages = document.querySelectorAll('.page-content');
+        Cache.skeletonContainers = document.querySelectorAll('.skeleton-container');
+    }
+    
+    // -------------------------------------------------------------------
+    // MODULE: API (Data Fetching)
+    // -------------------------------------------------------------------
+    const API = {
+        /** Fetches all setoran data from the Google Apps Script backend. */
+        async fetchSetoranData() {
+            try {
+                const response = await fetch(Config.scriptURL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Failed to load setoran data:', error);
+                UI.showToast('Gagal memuat riwayat setoran.', 'error');
+                return []; // Return empty array on failure
             }
         },
 
-        /**
-         * @namespace App.ui
-         * @description Contains all functions that manipulate the UI.
-         */
-        ui: {
-            /** Renders all major UI components. */
-            renderAll() {
-                this.renderHistoryTable();
-                this.renderBeranda();
-                this.renderAllRecaps();
-                this.renderIconLegends();
-            },
+        /** Posts form data to the backend. */
+        async postData(formData) {
+            try {
+                const response = await fetch(Config.scriptURL, { method: 'POST', body: formData });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Failed to post data:', error);
+                UI.showToast(`Gagal: ${error.message}`, 'error');
+                return { result: 'error', error: error.message };
+            }
+        }
+    };
 
-            /** Renders the Beranda (Home) page content. */
-            renderBeranda() {
-                const totalHalaman = App.state.allSetoran.reduce((sum, s) => sum + App.data.calculatePageValue(s), 0);
-                const santriAktifIds = new Set(App.state.allSetoran.map(s => s.namaSantri));
+    // -------------------------------------------------------------------
+    // MODULE: UTILITIES
+    // -------------------------------------------------------------------
+    const Utils = {
+        /** Sets the date-time input to the current local time. */
+        setCurrentDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            Cache.tanggal.value = now.toISOString().slice(0, 16);
+        },
 
-                App.cache.statsTotalSetoran.textContent = App.state.allSetoran.length;
-                App.cache.statsSantriAktif.textContent = santriAktifIds.size;
-                App.cache.statsTotalHalaman.textContent = totalHalaman.toFixed(1);
+        /** Populates a select element with options. */
+        populateSelect(selectEl, options, placeholder) {
+            selectEl.innerHTML = '';
+            if (placeholder) selectEl.add(new Option(placeholder, ''));
+            options.forEach(opt => {
+                const option = (typeof opt === 'string') ? new Option(opt, opt) : new Option(opt.text, opt.value);
+                selectEl.add(option);
+            });
+        },
+
+        /** Normalizes a name string for reliable comparison. */
+        normalizeName(name) {
+            if (typeof name !== 'string') return '';
+            return name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
+        },
+
+        /** Generates SVG for quality rating stars. */
+        getKualitasSVG(kualitas) {
+            const qualityMap = { 'Mumtaz': 5, 'Jayyid Jiddan': 4, 'Jayyid': 3, 'Maqbul': 2, 'Dhoif': 1 };
+            const stars = qualityMap[kualitas] || 0;
+            const starIcon = `<svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+            const emptyStarIcon = `<svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+            return `<div class="flex">${starIcon.repeat(stars)}${emptyStarIcon.repeat(5 - stars)}</div>`;
+        },
+
+        /** Generates HTML for a program icon. */
+        getProgramIcon(program) {
+            return program === 'Unggulan' 
+                ? `<span title="Unggulan" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gray-200 text-gray-800 text-xs font-bold">U</span>` 
+                : `<span title="Tahfizh" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-200 text-purple-800 text-xs font-bold">T</span>`;
+        },
+        
+        /** Generates HTML for a class icon with color coding. */
+        getClassIcon(className) {
+            if (!className) return '';
+            let colorClass = 'bg-gray-200 text-gray-800';
+            const classInitial = className.charAt(1);
+            if (['A'].includes(classInitial)) colorClass = 'bg-red-100 text-red-800';
+            if (['B'].includes(classInitial)) colorClass = 'bg-yellow-100 text-yellow-800';
+            if (['C', 'D'].includes(classInitial)) colorClass = 'bg-green-100 text-green-800';
+            if (['G', 'H'].includes(classInitial)) colorClass = 'bg-blue-100 text-blue-800';
+            return `<span title="Kelas ${className}" class="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full ${colorClass} text-xs font-bold">${className}</span>`;
+        },
+
+        /** Calculates the page value (score) for a setoran. */
+        calculatePageValue(setoran) {
+            // This specific Mutqin is handled by the juz30Score logic, so it shouldn't add to the general page score.
+            if (setoran.jenis === 'Mutqin' && String(setoran.juz) === "juz30_setengah") return 0;
+            if (setoran.jenis === 'Mutqin' && (!setoran.halaman || parseInt(setoran.halaman, 10) >= 20)) return 20;
+            if (setoran.halaman) return parseFloat(setoran.halaman) || 0;
+            if (setoran.surat) return Config.surahData.surahPageValues[setoran.surat] || 0;
+            return 0;
+        },
+
+        /** Exports a recap table to PDF. */
+        exportRecapToPDF(classGroup) {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'a4');
+                const group = State.classGroups[classGroup];
+                if (!group) return UI.showToast('Grup kelas tidak ditemukan.', 'error');
+
+                doc.autoTable({
+                    head: [['No.', 'Nama Santri', 'Nilai', 'Ziyadah (hlm)', 'Keterangan']],
+                    body: group.santri.sort((a, b) => a.nama.localeCompare(b.nama)).map((santri, index) => {
+                        return [ 
+                            index + 1, 
+                            santri.nama, 
+                            santri.nilai,
+                            santri.program === 'Tahfizh' ? santri.ziyadahPages.toFixed(1) : '-',
+                            santri.isTuntas ? 'Tuntas' : 'Belum Tuntas'
+                        ];
+                    }),
+                    theme: 'grid',
+                    headStyles: { fillColor: [217, 119, 6] },
+                    styles: { font: 'Inter', cellPadding: 6, valign: 'middle' },
+                    columnStyles: {
+                        0: { cellWidth: 30 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 40, halign: 'center' },
+                        3: { cellWidth: 70, halign: 'center' }, 4: { cellWidth: 80, halign: 'center' }
+                    },
+                    didParseCell: (data) => { if (data.column.index === 1) data.cell.styles.fontSize = 8; },
+                    didDrawPage: (data) => {
+                        doc.setFontSize(20); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold');
+                        doc.text('Laporan Capaian Tahfizh', data.settings.margin.left, 40);
+                        doc.setFontSize(12); doc.setTextColor(40); doc.setFont('helvetica', 'normal');
+                        doc.text(`Kelas: ${classGroup} | Musyrif: ${group.musyrif}`, data.settings.margin.left, 58);
+                        const pageCount = doc.internal.getNumberOfPages();
+                        doc.setFontSize(8); doc.setTextColor(150);
+                        doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 20);
+                        doc.text(`Dibuat pada: ${new Date().toLocaleString('id-ID')}`, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 20, { align: 'right' });
+                    },
+                    margin: { top: 70, bottom: 40 }
+                });
+                doc.save(`rekap_setoran_${classGroup.replace(/, /g, '_')}_${Date.now()}.pdf`);
+            } catch (error) {
+                console.error("PDF Export Error:", error);
+                UI.showToast('Gagal mengekspor PDF.', 'error');
+            }
+        },
+    };
+
+    // -------------------------------------------------------------------
+    // MODULE: UI (Rendering and DOM Manipulation)
+    // -------------------------------------------------------------------
+    const UI = {
+        /** Renders all major UI components based on the current state. */
+        renderAll() {
+            this.beranda.render();
+            this.history.renderTable();
+            this.rekap.renderAll();
+            this.renderIconLegends();
+        },
+
+        // --- Sub-module for Beranda Page ---
+        beranda: {
+            render() {
+                const totalHalaman = State.allSetoran.reduce((sum, s) => sum + Utils.calculatePageValue(s), 0);
+                const santriAktifIds = new Set(State.allSetoran.map(s => s.namaSantri));
+
+                Cache.statsTotalSetoran.textContent = State.allSetoran.length;
+                Cache.statsSantriAktif.textContent = santriAktifIds.size;
+                Cache.statsTotalHalaman.textContent = totalHalaman.toFixed(1);
                 
                 this.renderRecentActivity();
                 this.renderWeeklySummaryChart();
                 this.renderMutqinProgress();
+                this.renderTuntasTracking();
             },
+            renderRecentActivity() {
+                const recentActivities = State.allSetoran.slice(0, 5);
+                const container = Cache.recentActivityList;
+                const template = Cache.recentActivityTemplate;
+                container.innerHTML = '';
 
-            /** Renders the history table with filtered data. */
-            renderHistoryTable() {
-                const filteredSetoran = App.data.getFilteredHistory();
-                const itemsToRender = filteredSetoran.slice(0, 50); // Limit to 50 items
-                const tableBody = App.cache.setoranTableBody;
-                const template = App.cache.historyRowTemplate;
-                tableBody.innerHTML = '';
-
-                if (itemsToRender.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-gray-500">Tidak ada data yang cocok.</td></tr>`;
+                if (recentActivities.length === 0) {
+                    container.innerHTML = `<p class="text-sm text-gray-500">Belum ada aktivitas.</p>`;
                     return;
                 }
                 
                 const fragment = document.createDocumentFragment();
-                itemsToRender.forEach(setoran => {
-                    const santri = App.data.findSantriById(setoran.santriId);
+                recentActivities.forEach(setoran => {
+                    const santri = State.santriData.find(s => s.id === setoran.santriId);
                     const clone = template.content.cloneNode(true);
                     
                     clone.querySelector('.data-nama').textContent = setoran.namaSantri;
-                    clone.querySelector('.data-program-icon').innerHTML = App.utils.getProgramIcon(santri ? santri.program : '');
-                    clone.querySelector('.data-kelas-icon').innerHTML = App.utils.getClassIcon(santri ? santri.kelas : '');
-                    clone.querySelector('.data-jenis').textContent = setoran.jenis;
-                    clone.querySelector('.data-juz').textContent = setoran.juz;
-                    clone.querySelector('.data-unit').textContent = setoran.halaman ? `${setoran.halaman} halaman` : setoran.surat;
-                    clone.querySelector('.data-kualitas').innerHTML = App.utils.getKualitasSVG(setoran.kualitas);
-                    clone.querySelector('.data-tanggal').textContent = new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-                    
-                    const deleteButton = clone.querySelector('.delete-btn');
-                    deleteButton.dataset.id = setoran.id;
-                    deleteButton.dataset.rowNumber = setoran.rowNumber;
-
+                    clone.querySelector('.data-emoji').textContent = Config.santriEmojis[setoran.namaSantri.charCodeAt(0) % Config.santriEmojis.length];
+                    clone.querySelector('.data-detail').textContent = `Menyetor ${setoran.jenis} ${setoran.halaman ? `${setoran.halaman} halaman` : setoran.surat}`;
+                    if (santri) {
+                        clone.querySelector('.data-program-icon').innerHTML = Utils.getProgramIcon(santri.program);
+                        clone.querySelector('.data-kelas-icon').innerHTML = Utils.getClassIcon(santri.kelas);
+                    }
                     fragment.appendChild(clone);
                 });
-                tableBody.appendChild(fragment);
+                container.appendChild(fragment);
             },
-
-            /** Renders all recap tabs and content. */
-            renderAllRecaps() {
-                const classGroups = App.config.dataSources.classGroups;
-                const sortedGroupNames = Object.keys(classGroups).sort((a,b) => a.localeCompare(b));
-
-                App.cache.rekapTabs.innerHTML = sortedGroupNames.map((groupName, index) => 
-                    `<button data-tab="${groupName.replace(/, /g, '')}" class="rekap-tab-btn ${index === 0 ? 'active' : ''} flex-shrink-0 snap-center whitespace-nowrap py-2 px-5 text-sm font-medium text-gray-700 rounded-md">Kelas ${groupName}</button>`
-                ).join('');
-
-                App.cache.rekapContentContainer.innerHTML = sortedGroupNames.map((groupName, index) => `
-                    <div id="rekap-tab-${groupName.replace(/, /g, '')}" class="rekap-tab-content ${index > 0 ? 'hidden' : ''}">${this.createRecapHTML(groupName)}</div>
-                `).join('');
-            },
-
-            /** Creates the HTML for a single recap table. */
-            createRecapHTML(groupName) {
-                const group = App.config.dataSources.classGroups[groupName];
-                if (!group) return '<p>Grup tidak ditemukan.</p>';
-                const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
-                
-                const tableRows = group.santri.sort((a,b) => a.nama.localeCompare(b.nama)).map((santri, index) => {
-                    const totalHalaman = App.state.allSetoran
-                        .filter(s => s.santriId === santri.id)
-                        .reduce((sum, s) => sum + App.data.calculatePageValue(s), 0);
-                    const isTuntas = (santri.setoranMutqin?.size || 0) >= 30;
-                    const keterangan = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span>`;
-                    return `<tr class="hover:bg-gray-50/50"><td class="px-4 py-2 text-gray-800">${index + 1}</td><td class="px-4 py-2 text-sm text-gray-800"><div class="flex items-center">${santri.nama}${App.utils.getProgramIcon(santri.program)}${App.utils.getClassIcon(santri.kelas)}</div></td><td class="px-4 py-2 font-medium text-gray-800">${totalHalaman.toFixed(1)}</td><td class="px-4 py-2">${keterangan}</td></tr>`;
-                }).join('');
-
-                return `
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-                    <div><h3 class="font-bold text-amber-700 text-lg">Rekap Capaian - Kelas ${groupName}</h3><p class="text-sm text-gray-600">Musyrif: ${group.musyrif}</p><p class="text-xs text-gray-500">${timestamp}</p></div>
-                    <button data-class-group="${groupName}" class="export-pdf-btn mt-3 sm:mt-0 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Ekspor ke PDF</button>
-                </div>
-                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200/80"><thead class="bg-gray-100/80"><tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skor</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th></tr></thead><tbody class="divide-y divide-gray-200/80">${tableRows}</tbody></table></div>
-                `;
-            },
-
-            /** Renders the recent activity list on the home page. */
-            renderRecentActivity() {
-                const recentActivities = App.state.allSetoran.slice(0, 5);
-                if(recentActivities.length > 0) {
-                    App.cache.recentActivityList.innerHTML = recentActivities.map(s => {
-                        const santri = App.data.findSantriById(s.santriId);
-                        const emoji = App.config.dataSources.santriEmojis[s.namaSantri.charCodeAt(0) % App.config.dataSources.santriEmojis.length];
-                        return `
-                        <div class="flex items-start gap-3">
-                            <div class="bg-gray-200/80 p-2 text-xl rounded-full mt-1">${emoji}</div>
-                            <div>
-                                <p class="text-sm font-semibold text-gray-800 flex items-center">${s.namaSantri} ${App.utils.getProgramIcon(santri ? santri.program : '')} ${App.utils.getClassIcon(santri ? santri.kelas : '')}</p>
-                                <p class="text-xs text-gray-500">Menyetor ${s.jenis} ${s.halaman ? `${s.halaman} halaman` : s.surat}</p>
-                            </div>
-                        </div>`;
-                    }).join('');
-                } else {
-                    App.cache.recentActivityList.innerHTML = `<p class="text-sm text-gray-500">Belum ada aktivitas.</p>`;
-                }
-            },
-            
-            /** Renders the weekly summary chart. */
             renderWeeklySummaryChart() {
-                if (App.state.allSetoran.length === 0) {
-                    App.cache.weeklyChartContainer.classList.add('hidden');
+                if (State.allSetoran.length === 0) {
+                    Cache.weeklyChartContainer.classList.add('hidden');
                     return;
                 }
-                App.cache.weeklyChartContainer.classList.remove('hidden');
+                Cache.weeklyChartContainer.classList.remove('hidden');
 
                 const labels = [];
                 const data = [];
@@ -1189,23 +993,20 @@
                     const d = new Date();
                     d.setDate(d.getDate() - i);
                     labels.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
-                    const setoranOnDay = App.state.allSetoran.filter(s => new Date(s.createdAt).toDateString() === d.toDateString());
+                    const setoranOnDay = State.allSetoran.filter(s => new Date(s.createdAt).toDateString() === d.toDateString());
                     data.push(setoranOnDay.length);
                 }
 
-                if (App.state.weeklyChart) App.state.weeklyChart.destroy();
+                if (State.weeklyChart) State.weeklyChart.destroy();
                 
-                App.state.weeklyChart = new Chart(App.cache.weeklyChart, {
+                State.weeklyChart = new Chart(Cache.weeklyChart, {
                     type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Jumlah Setoran',
-                            data: data,
-                            backgroundColor: 'rgba(59, 130, 246, 0.4)',
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            borderWidth: 1,
-                            borderRadius: 5
+                            label: 'Jumlah Setoran', data: data,
+                            backgroundColor: 'rgba(59, 130, 246, 0.4)', borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1, borderRadius: 5
                         }]
                     },
                     options: {
@@ -1218,409 +1019,753 @@
                     }
                 });
             },
-
-            /** Renders the mutqin progress bars. */
             renderMutqinProgress() {
-                const stats = App.data.getMutqinStats();
-                if (stats.totalTahfizh === 0) {
-                    App.cache.mutqinJuz29ProgressContainer.classList.add('hidden');
-                    App.cache.mutqinJuz30ProgressContainer.classList.add('hidden');
+                // --- Progress Unggulan ---
+                const unggulanSantri = State.santriData.filter(s => s.program === 'Unggulan');
+                const totalUnggulan = unggulanSantri.length;
+                if (totalUnggulan > 0) {
+                    Cache.mutqinUnggulanProgressContainer.classList.remove('hidden');
+                    const tuntasUnggulan = unggulanSantri.filter(s => s.nilai >= 100).length;
+                    const pctUnggulan = ((tuntasUnggulan / totalUnggulan) * 100).toFixed(0);
+                    Cache.mutqinUnggulanBar.style.width = `${pctUnggulan}%`;
+                    Cache.mutqinUnggulanLabel.textContent = `${pctUnggulan}%`;
+                    Cache.mutqinUnggulanDetails.textContent = `${tuntasUnggulan} dari ${totalUnggulan} santri telah mencapai nilai 100.`;
+                } else {
+                    Cache.mutqinUnggulanProgressContainer.classList.add('hidden');
+                }
+
+                // --- Progress Tahfizh ---
+                const tahfizhSantri = State.santriData.filter(s => s.program === 'Tahfizh');
+                const totalTahfizh = tahfizhSantri.length;
+                if (totalTahfizh > 0) {
+                    Cache.mutqinJuz29ProgressContainer.classList.remove('hidden');
+                    Cache.mutqinJuz30ProgressContainer.classList.remove('hidden');
+
+                    const mutqin30 = tahfizhSantri.filter(s => s.mutqinJuz.has(30)).length;
+                    const pct30 = ((mutqin30 / totalTahfizh) * 100).toFixed(0);
+                    Cache.mutqinJuz30Bar.style.width = `${pct30}%`;
+                    Cache.mutqinJuz30Label.textContent = `${pct30}%`;
+                    Cache.mutqinJuz30Details.textContent = `${mutqin30} dari ${totalTahfizh} santri telah tuntas.`;
+
+                    const mutqin29 = tahfizhSantri.filter(s => s.mutqinJuz.has(29)).length;
+                    const pct29 = ((mutqin29 / totalTahfizh) * 100).toFixed(0);
+                    Cache.mutqinJuz29Bar.style.width = `${pct29}%`;
+                    Cache.mutqinJuz29Label.textContent = `${pct29}%`;
+                    Cache.mutqinJuz29Details.textContent = `${mutqin29} dari ${totalTahfizh} santri telah tuntas.`;
+                } else {
+                    Cache.mutqinJuz29ProgressContainer.classList.add('hidden');
+                    Cache.mutqinJuz30ProgressContainer.classList.add('hidden');
+                }
+            },
+            renderTuntasTracking() {
+                const container = Cache.tuntasTrackingContainer;
+                container.innerHTML = '';
+                const fragment = document.createDocumentFragment();
+
+                for (const groupName in State.classGroups) {
+                    const group = State.classGroups[groupName];
+                    const card = document.createElement('div');
+                    card.className = 'glass-card rounded-xl p-4';
+
+                    const tuntasList = group.santri.filter(s => s.isTuntas).map(s => s.nama).sort();
+                    const belumTuntasList = group.santri.filter(s => !s.isTuntas).map(s => s.nama).sort();
+
+                    card.innerHTML = `
+                        <h4 class="font-bold text-lg text-gray-800 border-b border-gray-300/50 pb-2 mb-3">Kelas ${groupName}</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div>
+                                <h5 class="font-semibold text-green-700 mb-2">✅ Sudah Tuntas (${tuntasList.length})</h5>
+                                <ul class="space-y-1 list-disc list-inside text-gray-700">
+                                    ${tuntasList.length > 0 ? tuntasList.map(nama => `<li>${nama}</li>`).join('') : '<li class="list-none text-gray-500">Belum ada</li>'}
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-red-700 mb-2">❌ Belum Tuntas (${belumTuntasList.length})</h5>
+                                <ul class="space-y-1 list-disc list-inside text-gray-700">
+                                    ${belumTuntasList.length > 0 ? belumTuntasList.map(nama => `<li>${nama}</li>`).join('') : '<li class="list-none text-gray-500">Semua tuntas</li>'}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                }
+                container.appendChild(fragment);
+            }
+        },
+
+        // --- Sub-module for Riwayat Page ---
+        history: {
+            getFilteredData() {
+                const searchTerm = Cache.searchRiwayat.value.toLowerCase();
+                const programFilter = Cache.filterProgram.value;
+                const startDate = Cache.filterTanggalMulai.value ? new Date(Cache.filterTanggalMulai.value) : null;
+                const endDate = Cache.filterTanggalAkhir.value ? new Date(Cache.filterTanggalAkhir.value) : null;
+                if(startDate) startDate.setHours(0,0,0,0);
+                if(endDate) endDate.setHours(23,59,59,999);
+
+                return State.allSetoran.filter(s => {
+                    const setoranDate = new Date(s.createdAt);
+                    const santri = State.santriData.find(st => st.id === s.santriId);
+                    return s.namaSantri.toLowerCase().includes(searchTerm) &&
+                           (programFilter === 'Semua' || (santri && santri.program === programFilter)) &&
+                           (!startDate || setoranDate >= startDate) &&
+                           (!endDate || setoranDate <= endDate);
+                });
+            },
+            renderTable() {
+                const filteredSetoran = this.getFilteredData();
+                const itemsToRender = filteredSetoran.slice(0, 50); // Limit to 50 items
+                const tableBody = Cache.setoranTableBody;
+                const template = Cache.historyRowTemplate;
+                tableBody.innerHTML = '';
+
+                if (itemsToRender.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-gray-500">Tidak ada data yang cocok.</td></tr>`;
                     return;
                 }
-                App.cache.mutqinJuz29ProgressContainer.classList.remove('hidden');
-                App.cache.mutqinJuz30ProgressContainer.classList.remove('hidden');
-
-                const pct30 = ((stats.mutqin30 / stats.totalTahfizh) * 100).toFixed(0);
-                App.cache.mutqinJuz30Bar.style.width = `${pct30}%`;
-                App.cache.mutqinJuz30Label.textContent = `${pct30}%`;
-                App.cache.mutqinJuz30Details.textContent = `${stats.mutqin30} dari ${stats.totalTahfizh} santri telah tuntas.`;
-
-                const pct29 = ((stats.mutqin29 / stats.totalTahfizh) * 100).toFixed(0);
-                App.cache.mutqinJuz29Bar.style.width = `${pct29}%`;
-                App.cache.mutqinJuz29Label.textContent = `${pct29}%`;
-                App.cache.mutqinJuz29Details.textContent = `${stats.mutqin29} dari ${stats.totalTahfizh} santri telah tuntas.`;
-            },
-
-            /** Renders the icon legends with a more varied layout. */
-            renderIconLegends() {
-                const legendItems = [
-                    { icon: App.utils.getProgramIcon('Tahfizh'), text: 'Program Tahfizh' },
-                    { icon: App.utils.getProgramIcon('Unggulan'), text: 'Program Unggulan' },
-                    { icon: App.utils.getClassIcon('2A'), text: 'Kelas 2A' },
-                    { icon: App.utils.getClassIcon('2B'), text: 'Kelas 2B' },
-                    { icon: App.utils.getClassIcon('2C'), text: 'Kelas 2C/D' },
-                    { icon: App.utils.getClassIcon('2G'), text: 'Kelas 2G/H' }
-                ];
-
-                const legendItemsHTML = legendItems.map(item => `
-                    <div class="flex items-center text-xs font-medium text-gray-700 bg-gray-100/80 rounded-full px-3 py-1">
-                        ${item.icon}
-                        <span class="ml-2">${item.text}</span>
-                    </div>
-                `).join('');
-
-                const fullLegendHTML = `
-                <div class="p-4 rounded-xl glass-card">
-                    <h4 class="font-bold text-gray-800 text-sm mb-3">Keterangan Ikon</h4>
-                    <div class="flex flex-wrap items-center gap-2">
-                        ${legendItemsHTML}
-                    </div>
-                </div>
-                `;
                 
-                App.cache.iconLegendBeranda.innerHTML = fullLegendHTML;
-                App.cache.iconLegendRiwayat.innerHTML = fullLegendHTML;
-                App.cache.iconLegendRekap.innerHTML = fullLegendHTML;
+                const fragment = document.createDocumentFragment();
+                itemsToRender.forEach(setoran => {
+                    const santri = State.santriData.find(s => s.id === setoran.santriId);
+                    const clone = template.content.cloneNode(true);
+                    
+                    let juzText = '';
+                    // Use string comparison for the special value
+                    if (String(setoran.juz) === "juz30_setengah") {
+                        juzText = "Setengah Juz 30";
+                    } else {
+                        juzText = `Juz ${setoran.juz}`;
+                    }
+
+                    clone.querySelector('.data-nama').textContent = setoran.namaSantri;
+                    clone.querySelector('.data-jenis').textContent = setoran.jenis;
+                    clone.querySelector('.data-juz-text').textContent = juzText;
+                    clone.querySelector('.data-unit').textContent = setoran.halaman ? `${setoran.halaman} halaman` : setoran.surat;
+                    clone.querySelector('.data-kualitas').innerHTML = Utils.getKualitasSVG(setoran.kualitas);
+                    clone.querySelector('.data-tanggal').textContent = new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                    clone.querySelector('.delete-btn').dataset.id = setoran.id;
+                    
+                    if (santri) {
+                        clone.querySelector('.data-program-icon').innerHTML = Utils.getProgramIcon(santri.program);
+                        clone.querySelector('.data-kelas-icon').innerHTML = Utils.getClassIcon(santri.kelas);
+                    }
+                    fragment.appendChild(clone);
+                });
+                tableBody.appendChild(fragment);
             },
-            
-            /** Renders search suggestions based on user input. */
             renderSearchSuggestions(query) {
                 if (query.length < 2) {
-                    App.cache.suggestionsContainer.classList.add('hidden');
+                    Cache.suggestionsContainer.classList.add('hidden');
                     return;
                 }
-                const suggestions = App.state.santriData
+                const suggestions = State.santriData
                     .filter(s => s.nama.toLowerCase().includes(query.toLowerCase()))
                     .slice(0, 5);
                 
                 if (suggestions.length > 0) {
-                    App.cache.suggestionsContainer.innerHTML = suggestions
+                    Cache.suggestionsContainer.innerHTML = suggestions
                         .map(s => `<div class="suggestion-item p-2 hover:bg-gray-100 cursor-pointer">${s.nama}</div>`)
                         .join('');
-                    App.cache.suggestionsContainer.classList.remove('hidden');
+                    Cache.suggestionsContainer.classList.remove('hidden');
                 } else {
-                    App.cache.suggestionsContainer.classList.add('hidden');
+                    Cache.suggestionsContainer.classList.add('hidden');
                 }
             },
-            
-            /** Resets the setoran form to its initial state. */
-            resetForm() {
-                App.cache.setoranForm.reset();
-                App.utils.setCurrentDateTime();
-                App.cache.musyrif.value = "";
-                ['namaSantri', 'jenis', 'juz'].forEach(key => {
-                    App.utils.populateSelect(App.cache[key], [], `Pilih ${key === 'namaSantri' ? 'Musyrif' : '...'} dahulu`);
-                    App.cache[key].disabled = true;
-                });
-                ['kelas', 'program', 'santriId'].forEach(key => App.cache[key].value = '');
-                this.resetSetoranInputs();
-            },
+        },
 
-            /** Resets only the setoran-specific inputs (halaman/surat). */
-            resetSetoranInputs() {
-                App.cache.halamanContainer.classList.add('hidden');
-                App.cache.suratContainer.classList.add('hidden');
-                ['halaman', 'surat'].forEach(key => {
-                    App.cache[key].disabled = true;
-                    App.cache[key].required = false;
-                    App.cache[key].value = '';
+        // --- Sub-module for Rekap Page ---
+        rekap: {
+            renderAll() {
+                const sortedGroupNames = Object.keys(State.classGroups).sort((a,b) => a.localeCompare(b));
+                const tabsContainer = Cache.rekapTabs;
+                const contentContainer = Cache.rekapContentContainer;
+                const tabTemplate = Cache.rekapTabTemplate;
+                const contentTemplate = Cache.rekapContentTemplate;
+                tabsContainer.innerHTML = '';
+                contentContainer.innerHTML = '';
+
+                const tabsFragment = document.createDocumentFragment();
+                const contentFragment = document.createDocumentFragment();
+
+                sortedGroupNames.forEach((groupName, index) => {
+                    // Render Tab
+                    const tabClone = tabTemplate.content.cloneNode(true);
+                    const tabButton = tabClone.querySelector('button');
+                    tabButton.dataset.tab = groupName.replace(/, /g, '');
+                    tabButton.textContent = `Kelas ${groupName}`;
+                    if (index === 0) tabButton.classList.add('active');
+                    tabsFragment.appendChild(tabClone);
+
+                    // Render Content
+                    const contentClone = contentTemplate.content.cloneNode(true);
+                    const group = State.classGroups[groupName];
+                    const contentDiv = contentClone.querySelector('.rekap-tab-content');
+                    contentDiv.id = `rekap-tab-${groupName.replace(/, /g, '')}`;
+                    if (index > 0) contentDiv.classList.add('hidden');
+                    
+                    contentDiv.querySelector('.data-title').textContent = `Rekap Capaian - Kelas ${groupName}`;
+                    contentDiv.querySelector('.data-musyrif').textContent = `Musyrif: ${group.musyrif}`;
+                    contentDiv.querySelector('.data-timestamp').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+                    contentDiv.querySelector('.export-pdf-btn').dataset.classGroup = groupName;
+                    
+                    const tableBody = contentDiv.querySelector('.data-table-body');
+                    group.santri.sort((a,b) => a.nama.localeCompare(b.nama)).forEach((santri, idx) => {
+                        const isTuntas = santri.isTuntas;
+                        const keterangan = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span>`;
+                        const row = tableBody.insertRow();
+                        row.className = 'hover:bg-gray-50/50';
+                        row.innerHTML = `
+                            <td class="px-4 py-2 text-gray-800">${idx + 1}</td>
+                            <td class="px-4 py-2 text-sm text-gray-800"><div class="flex items-center">${santri.nama}${Utils.getProgramIcon(santri.program)}${Utils.getClassIcon(santri.kelas)}</div></td>
+                            <td class="px-4 py-2 font-medium text-gray-800 text-center">${santri.nilai}</td>
+                            <td class="px-4 py-2 font-medium text-gray-800 text-center">${santri.program === 'Tahfizh' ? santri.ziyadahPages.toFixed(1) : '-'}</td>
+                            <td class="px-4 py-2 text-center">${keterangan}</td>
+                        `;
+                    });
+
+                    contentFragment.appendChild(contentClone);
                 });
-                App.cache.halaman.min = 1;
-                App.cache.halaman.placeholder = '';
+
+                tabsContainer.appendChild(tabsFragment);
+                contentContainer.appendChild(contentFragment);
             },
-            
-            /** Updates the santri dropdown based on the selected musyrif. */
-            updateSantriOptions() {
-                const selectedMusyrif = App.cache.musyrif.value;
+        },
+        
+        // --- Sub-module for Form ---
+        form: {
+            reset() {
+                Cache.setoranForm.reset();
+                Utils.setCurrentDateTime();
+                Cache.musyrif.value = "";
+                ['namaSantri', 'jenis', 'juz'].forEach(key => {
+                    Utils.populateSelect(Cache[key], [], `Pilih ${key === 'namaSantri' ? 'Musyrif' : '...'} dahulu`);
+                    Cache[key].disabled = true;
+                });
+                ['kelas', 'program', 'santriId'].forEach(key => Cache[key].value = '');
                 this.resetSetoranInputs();
-                ['jenis', 'juz'].forEach(key => { App.cache[key].disabled = true; });
+            },
+            resetSetoranInputs() {
+                Cache.halamanContainer.classList.add('hidden');
+                Cache.suratContainer.classList.add('hidden');
+                ['halaman', 'surat'].forEach(key => {
+                    Cache[key].disabled = true;
+                    Cache[key].required = false;
+                    Cache[key].value = '';
+                });
+                Cache.halaman.min = 1;
+                Cache.halaman.placeholder = '';
+            },
+            updateSantriOptions() {
+                const selectedMusyrif = Cache.musyrif.value;
+                this.resetSetoranInputs();
+                ['jenis', 'juz'].forEach(key => { Cache[key].disabled = true; });
                 if (selectedMusyrif) {
-                    const santriOptions = App.state.santriData
+                    const santriOptions = State.santriData
                         .filter(s => s.musyrif === selectedMusyrif)
                         .sort((a, b) => a.nama.localeCompare(b.nama))
                         .map(s => ({ text: s.nama, value: s.id }));
-                    App.utils.populateSelect(App.cache.namaSantri, santriOptions, 'Pilih Santri');
-                    App.cache.namaSantri.disabled = false;
+                    Utils.populateSelect(Cache.namaSantri, santriOptions, 'Pilih Santri');
+                    Cache.namaSantri.disabled = false;
                 } else {
-                    App.utils.populateSelect(App.cache.namaSantri, [], 'Pilih Musyrif dahulu');
-                    App.cache.namaSantri.disabled = true;
+                    Utils.populateSelect(Cache.namaSantri, [], 'Pilih Musyrif dahulu');
+                    Cache.namaSantri.disabled = true;
                 }
                 this.updateSantriDetails();
             },
-
-            /** Updates the read-only fields for kelas and program. */
             updateSantriDetails() {
-                const santri = App.data.findSantriById(App.cache.namaSantri.value);
+                const santri = State.santriData.find(s => s.id === Cache.namaSantri.value);
                 this.resetSetoranInputs();
                 if (santri) {
-                    App.cache.kelas.value = santri.kelas;
-                    App.cache.program.value = santri.program;
-                    App.cache.santriId.value = santri.id;
+                    Cache.kelas.value = santri.kelas;
+                    Cache.program.value = santri.program;
+                    Cache.santriId.value = santri.id;
                 } else {
-                    ['kelas', 'program', 'santriId'].forEach(key => App.cache[key].value = '');
+                    ['kelas', 'program', 'santriId'].forEach(key => Cache[key].value = '');
                 }
             },
-
-            /** Updates the 'Jenis Setoran' dropdown based on the santri's program and progress. */
             updateJenisOptions() {
-                const santri = App.data.findSantriById(App.cache.namaSantri.value);
+                const santri = State.santriData.find(s => s.id === Cache.namaSantri.value);
                 if (santri) {
-                    const hasCompletedBasicMutqin = santri.setoranMutqin.has(29) && santri.setoranMutqin.has(30);
                     const jenisOptions = [];
-                    if (santri.program === "Unggulan" || (santri.program === "Tahfizh" && hasCompletedBasicMutqin)) {
+                    // Ziyadah is available for Unggulan, or for Tahfizh *after* they are tuntas.
+                    if (santri.program === "Unggulan" || (santri.program === "Tahfizh" && santri.isTuntas)) {
                         jenisOptions.push("Ziyadah");
                     }
                     jenisOptions.push("Murajaah", "Mutqin");
-                    App.utils.populateSelect(App.cache.jenis, jenisOptions, 'Pilih Jenis');
-                    App.cache.jenis.disabled = false;
+                    Utils.populateSelect(Cache.jenis, jenisOptions, 'Pilih Jenis');
+                    Cache.jenis.disabled = false;
                 } else {
-                    App.cache.jenis.disabled = true;
-                    App.utils.populateSelect(App.cache.jenis, [], 'Pilih Santri dahulu');
+                    Cache.jenis.disabled = true;
+                    Utils.populateSelect(Cache.jenis, [], 'Pilih Santri dahulu');
                 }
                 this.updateJuzOptions();
             },
-
-            /** Updates the 'Juz' dropdown based on the selected 'Jenis Setoran'. */
             updateJuzOptions() {
-                const jenis = App.cache.jenis.value;
-                const santri = App.data.findSantriById(App.cache.namaSantri.value);
+                const jenis = Cache.jenis.value;
+                const santri = State.santriData.find(s => s.id === Cache.namaSantri.value);
                 this.resetSetoranInputs();
                 if (!jenis || !santri) {
-                    App.cache.juz.disabled = true;
-                    App.utils.populateSelect(App.cache.juz, [], 'Pilih Jenis dahulu');
+                    Cache.juz.disabled = true;
+                    Utils.populateSelect(Cache.juz, [], 'Pilih Jenis dahulu');
                     return;
                 }
                 let juzOptions = [];
                 if (jenis === "Mutqin") {
-                    for (let i = 1; i <= 30; i++) if (!santri.setoranMutqin.has(i)) juzOptions.push({ text: `Juz ${i}`, value: i });
+                    // Add option for "Setengah Juz 30" if score is not yet 100
+                    if (!santri.nilai || santri.nilai < 100) {
+                        juzOptions.push({ text: "Setengah Juz 30 (An-Naba' - At-Tariq)", value: "juz30_setengah" });
+                    }
+                    for (let i = 1; i <= 30; i++) {
+                        if (!santri.mutqinJuz.has(i)) juzOptions.push({ text: `Juz ${i}`, value: i });
+                    }
                 } else { // Ziyadah or Murajaah
                     for (let i = 1; i <= 30; i++) juzOptions.push({ text: `Juz ${i}`, value: i });
                 }
-                App.utils.populateSelect(App.cache.juz, juzOptions, 'Pilih Juz');
-                App.cache.juz.disabled = false;
+                Utils.populateSelect(Cache.juz, juzOptions, 'Pilih Juz');
+                Cache.juz.disabled = false;
                 this.updateSetoranInputs();
             },
-
-            /** Updates the final setoran inputs (halaman/surat) based on juz and jenis. */
             updateSetoranInputs() {
-                const jenis = App.cache.jenis.value;
-                const juz = parseInt(App.cache.juz.value, 10);
+                const jenis = Cache.jenis.value;
+                const juz = Cache.juz.value; // Keep as string for "juz30_setengah" comparison
                 this.resetSetoranInputs();
                 if (!jenis || !juz) return;
 
-                const surahList = App.state.surahData[juz] ? App.state.surahData[juz].list : [];
-                const isSurahBased = (jenis === 'Ziyadah' || jenis === 'Murajaah') && [28, 29, 30].includes(juz) && surahList.length > 0;
+                // For "Setengah Juz 30", no further input is needed.
+                if (juz === "juz30_setengah") return;
+                
+                const juzNum = parseInt(juz, 10);
+                const surahList = Config.surahData[juzNum] ? Config.surahData[juzNum].list : [];
+                const isSurahBased = (jenis === 'Ziyadah' || jenis === 'Murajaah') && [28, 29, 30].includes(juzNum) && surahList.length > 0;
 
                 if (isSurahBased) {
-                    App.cache.suratContainer.classList.remove('hidden');
-                    App.cache.surat.required = true;
-                    App.utils.populateSelect(App.cache.surat, surahList, 'Pilih Surat');
+                    Cache.suratContainer.classList.remove('hidden');
+                    Cache.surat.required = true;
+                    Utils.populateSelect(Cache.surat, surahList, 'Pilih Surat');
                 } else if (jenis === 'Ziyadah' || jenis === 'Murajaah') {
-                    App.cache.halamanContainer.classList.remove('hidden');
-                    App.cache.halaman.required = true;
-                    App.cache.halaman.disabled = false;
+                    Cache.halamanContainer.classList.remove('hidden');
+                    Cache.halaman.required = true;
+                    Cache.halaman.disabled = false;
                 } else if (jenis === 'Mutqin') {
-                    App.cache.halamanContainer.classList.remove('hidden');
-                    App.cache.halaman.disabled = false;
-                    App.cache.halaman.placeholder = 'Min 5 hlm / Kosongkan utk 1 Juz';
-                    App.cache.halaman.min = 5;
-                    App.cache.halaman.required = false; // Not required, can be empty for full juz
+                    Cache.halamanContainer.classList.remove('hidden');
+                    Cache.halaman.disabled = false;
+                    Cache.halaman.placeholder = 'Kosongkan untuk 1 Juz penuh';
+                    Cache.halaman.min = 1;
+                    Cache.halaman.required = false; // Not required, can be empty for full juz
                 }
             },
+        },
 
-            /** Shows a toast notification. */
-            showToast(message, type = 'success') {
-                App.cache.toastMessage.textContent = message;
-                const isSuccess = type === 'success';
-                App.cache.toastIcon.innerHTML = isSuccess 
-                    ? `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`
-                    : `<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`;
-                App.cache.toastIcon.classList.toggle('text-green-400', isSuccess);
-                App.cache.toastIcon.classList.toggle('text-red-400', !isSuccess);
-                App.cache.toast.classList.add('show');
-                setTimeout(() => App.cache.toast.classList.remove('show'), 3000);
-            },
-
-            /** Opens a modal dialog. */
-            openModal(modalId) { 
-                const modal = App.cache[modalId];
-                if (modal) modal.classList.remove('hidden');
-            },
-
-            /** Closes a modal dialog. */
-            closeModal(modalId) { 
-                const modal = App.cache[modalId];
-                if (modal) modal.classList.add('hidden');
-            },
+        // --- General UI Helpers ---
+        renderIconLegends() {
+            const legendItems = [
+                { icon: Utils.getProgramIcon('Tahfizh'), text: 'Program Tahfizh' },
+                { icon: Utils.getProgramIcon('Unggulan'), text: 'Program Unggulan' },
+                { icon: Utils.getClassIcon('2A'), text: 'Kelas 2A' },
+                { icon: Utils.getClassIcon('2B'), text: 'Kelas 2B' },
+                { icon: Utils.getClassIcon('2C'), text: 'Kelas 2C/D' },
+                { icon: Utils.getClassIcon('2G'), text: 'Kelas 2G/H' }
+            ];
+            const legendItemsHTML = legendItems.map(item => `
+                <div class="flex items-center text-xs font-medium text-gray-700 bg-gray-100/80 rounded-full px-3 py-1">
+                    ${item.icon}<span class="ml-2">${item.text}</span>
+                </div>`).join('');
+            const fullLegendHTML = `
+                <div class="p-4 rounded-xl glass-card">
+                    <h4 class="font-bold text-gray-800 text-sm mb-3">Keterangan Ikon</h4>
+                    <div class="flex flex-wrap items-center gap-2">${legendItemsHTML}</div>
+                </div>`;
             
-            /** Switches the visible page. */
-            switchPage(pageId, showSkeleton = true) {
-                if (!pageId) return;
-                
-                this.hideAllContent();
-                if (showSkeleton) this.showSkeleton(pageId);
+            Cache.iconLegendBeranda.innerHTML = fullLegendHTML;
+            Cache.iconLegendRiwayat.innerHTML = fullLegendHTML;
+            Cache.iconLegendRekap.innerHTML = fullLegendHTML;
+        },
+        showToast(message, type = 'success') {
+            Cache.toastMessage.textContent = message;
+            const isSuccess = type === 'success';
+            Cache.toastIcon.innerHTML = isSuccess 
+                ? `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`
+                : `<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+            Cache.toastIcon.classList.toggle('text-green-400', isSuccess);
+            Cache.toastIcon.classList.toggle('text-red-400', !isSuccess);
+            Cache.toast.classList.add('show');
+            setTimeout(() => Cache.toast.classList.remove('show'), 3000);
+        },
+        openModal(modalId) { 
+            const modal = Cache[modalId];
+            if (modal) modal.classList.remove('hidden');
+        },
+        closeModal(modalId) { 
+            const modal = Cache[modalId];
+            if (modal) modal.classList.add('hidden');
+        },
+        switchPage(pageId, showSkeleton = true) {
+            if (!pageId) return;
+            
+            this.hideAllContent();
+            if (showSkeleton) this.showSkeleton(pageId);
 
-                // Use a short timeout to allow the skeleton to render before loading content
-                setTimeout(() => {
-                    const targetPage = document.getElementById(pageId);
-                    if (targetPage) targetPage.classList.remove('hidden');
-                    this.hideAllSkeletons();
-                    
-                    // Update active nav link
-                    App.cache.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
-                    const activeLink = App.cache.mainNav.querySelector(`a[data-page="${pageId}"]`);
-                    if(activeLink) activeLink.classList.add('active');
-                }, 100);
-            },
-
-            /** Switches the visible tab within a container. */
-            switchTab(container, contentSelector, clickedBtn, idPrefix) {
-                container.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                clickedBtn.classList.add('active');
-                
-                const targetTabId = clickedBtn.dataset.tab.replace(/, /g, '');
-                const parentContainer = container.closest('.glass-card, .page-content');
-                parentContainer.querySelectorAll(contentSelector).forEach(content => content.classList.add('hidden'));
-                const targetId = `${idPrefix}-${targetTabId}`;
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    targetElement.classList.remove('hidden');
-                }
-            },
-
-            /** Updates the date and time display on the hero section. */
-            updateDateTime() {
-                const now = new Date();
-                
-                const time = new Intl.DateTimeFormat('id-ID', {
-                    hour: '2-digit', minute: '2-digit'
-                }).format(now).replace(/\./g, ':');
-
-                const gregorianDate = new Intl.DateTimeFormat('id-ID', {
-                    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-                }).format(now);
-
-                const hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                }).format(now);
-
-                // Format: Jam - Tanggal Masehi, Tanggal Hijriah
-                const finalString = `${time} - ${gregorianDate}, ${hijriDate}`;
-                
-                const finalHTML = `
-                    <div class="inline-flex items-center gap-2 bg-white/60 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm border border-white/50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span>${finalString}</span>
-                    </div>
-                `;
-
-                if (App.cache.datetimeContainer) {
-                    App.cache.datetimeContainer.innerHTML = finalHTML;
-                }
-            },
-
-            // Skeleton and content visibility helpers
-            showSkeleton(pageId) {
+            setTimeout(() => {
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) targetPage.classList.remove('hidden');
                 this.hideAllSkeletons();
-                const skeleton = document.getElementById(`skeleton-${pageId}`);
-                if (skeleton) skeleton.classList.remove('hidden');
-            },
-            hideAllSkeletons() { App.cache.skeletonContainers.forEach(s => s.classList.add('hidden')); },
-            hideAllContent() { App.cache.pages.forEach(p => p.classList.add('hidden')); },
+                
+                Cache.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+                const activeLink = Cache.mainNav.querySelector(`a[data-page="${pageId}"]`);
+                if(activeLink) activeLink.classList.add('active');
+            }, 100);
+        },
+        switchTab(container, contentSelector, clickedBtn, idPrefix) {
+            container.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+            
+            const targetTabId = clickedBtn.dataset.tab.replace(/, /g, '');
+            const parentContainer = container.closest('.glass-card, .page-content');
+            parentContainer.querySelectorAll(contentSelector).forEach(content => content.classList.add('hidden'));
+            const targetId = `${idPrefix}-${targetTabId}`;
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.classList.remove('hidden');
+            }
+        },
+        updateDateTime() {
+            const now = new Date();
+            const time = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(now).replace(/\./g, ':');
+            const gregorianDate = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+            const hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+            const finalHTML = `
+                <div class="bg-white/20 backdrop-blur-sm p-2 rounded-lg shadow-inner">
+                    <div class="text-2xl font-bold text-gray-800">${time}</div>
+                </div>
+                <div class="text-xs font-semibold text-gray-600 bg-white/40 px-3 py-1 rounded-full">${gregorianDate}</div>
+                <div class="text-xs font-semibold text-gray-600 bg-white/40 px-3 py-1 rounded-full">${hijriDate}</div>
+            `;
+            if (Cache.datetimeContainer) Cache.datetimeContainer.innerHTML = finalHTML;
+        },
+        showSkeleton(pageId) {
+            this.hideAllSkeletons();
+            const skeleton = document.getElementById(`skeleton-${pageId}`);
+            if (skeleton) skeleton.classList.remove('hidden');
+        },
+        hideAllSkeletons() { Cache.skeletonContainers.forEach(s => s.classList.add('hidden')); },
+        hideAllContent() { Cache.pages.forEach(p => p.classList.add('hidden')); },
+    };
+
+    // -------------------------------------------------------------------
+    // MODULE: EVENT HANDLERS
+    // -------------------------------------------------------------------
+    const Handlers = {
+        async handleFormSubmit(e) {
+            e.preventDefault();
+            const form = Cache.setoranForm;
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Menyimpan...';
+
+            const santriSelect = Cache.namaSantri;
+            const selectedSantriName = santriSelect.options[santriSelect.selectedIndex].text;
+            const formData = new FormData(form);
+            formData.set('namaSantri', selectedSantriName); // Ensure the text name is sent
+
+            const data = await API.postData(formData);
+
+            if (data.result === 'success') {
+                UI.showToast('Setoran berhasil disimpan!', 'success');
+                UI.form.reset();
+                await App.reloadData(); // Reload and re-render
+            }
+
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Simpan Setoran';
+        },
+
+        async handleConfirmDelete() {
+            const password = Cache.passwordInput.value;
+            if (password !== Config.deletePassword) {
+                Cache.passwordError.classList.remove('hidden');
+                return;
+            }
+            Cache.passwordError.classList.add('hidden');
+            
+            const idToDelete = State.setoranIdToDelete;
+            const setoranToDelete = State.allSetoran.find(s => s.id === idToDelete);
+            if (!setoranToDelete) return;
+
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('rowNumber', setoranToDelete.rowNumber);
+            formData.append('password', password); 
+
+            UI.closeModal('passwordConfirmModal');
+            const data = await API.postData(formData);
+
+            if (data.result === 'success') {
+                UI.showToast('Data berhasil dihapus.', 'success');
+                await App.reloadData();
+            } else {
+                UI.showToast(`Gagal menghapus: ${data.error || 'Terjadi kesalahan server.'}`, 'error');
+            }
+        },
+
+        handleNavClick(e) {
+            const link = e.target.closest('.nav-link');
+            if (link && link.dataset.page) {
+                e.preventDefault();
+                UI.switchPage(link.dataset.page);
+            }
+        },
+
+        handleMainContentClick(e) {
+            const target = e.target.closest('.export-pdf-btn, .delete-btn, .quick-access-btn');
+            if (!target) return;
+
+            if (target.matches('.export-pdf-btn')) {
+                Utils.exportRecapToPDF(target.dataset.classGroup);
+            } else if (target.matches('.delete-btn')) {
+                State.setoranIdToDelete = target.dataset.id;
+                UI.openModal('passwordConfirmModal');
+            } else if (target.matches('.quick-access-btn')) {
+                UI.switchPage(target.dataset.targetPage);
+            }
+        },
+
+        handleHistorySearch(e) {
+            clearTimeout(State.searchDebounceTimer);
+            State.searchDebounceTimer = setTimeout(() => {
+                UI.history.renderTable();
+                UI.history.renderSearchSuggestions(e.target.value);
+            }, 300);
+        },
+
+        handleSuggestionClick(e) {
+            if (e.target.matches('.suggestion-item')) {
+                Cache.searchRiwayat.value = e.target.textContent;
+                Cache.suggestionsContainer.classList.add('hidden');
+                UI.history.renderTable();
+            }
+        },
+        
+        handleTabClick(e) {
+            const button = e.target.closest('.rekap-tab-btn');
+            if (button && button.dataset.tab) {
+                UI.switchTab(button.parentElement, '.rekap-tab-content', button, 'rekap-tab');
+            }
+        },
+    };
+
+    // -------------------------------------------------------------------
+    // MODULE: APP (Main Controller)
+    // -------------------------------------------------------------------
+    const App = {
+        /** Initializes the application. */
+        async init() {
+            cacheElements();
+            this.setupEventListeners();
+            
+            UI.showSkeleton('page-beranda');
+            Utils.setCurrentDateTime();
+            UI.updateDateTime();
+            setInterval(UI.updateDateTime, 60000);
+
+            this.processStaticData();
+            await this.reloadData();
+            
+            UI.switchPage('page-beranda', false);
+        },
+
+        /** Sets up all global event listeners. */
+        setupEventListeners() {
+            Cache.setoranForm.addEventListener('submit', Handlers.handleFormSubmit);
+            Cache.nowBtn.addEventListener('click', Utils.setCurrentDateTime);
+            Cache.mainNav.addEventListener('click', Handlers.handleNavClick);
+            Cache.mainContent.addEventListener('click', Handlers.handleMainContentClick);
+            
+            // Form select changes
+            Cache.musyrif.addEventListener('change', UI.form.updateSantriOptions.bind(UI.form));
+            Cache.namaSantri.addEventListener('change', () => { UI.form.updateSantriDetails(); UI.form.updateJenisOptions(); });
+            Cache.jenis.addEventListener('change', UI.form.updateJuzOptions.bind(UI.form));
+            Cache.juz.addEventListener('change', UI.form.updateSetoranInputs.bind(UI.form));
+
+            // Riwayat page filters
+            Cache.searchRiwayat.addEventListener('input', Handlers.handleHistorySearch);
+            Cache.suggestionsContainer.addEventListener('click', Handlers.handleSuggestionClick);
+            [Cache.filterTanggalMulai, Cache.filterTanggalAkhir, Cache.filterProgram].forEach(el => {
+                el.addEventListener('input', () => UI.history.renderTable());
+            });
+            
+            // Rekap page tabs
+            Cache.rekapTabs.addEventListener('click', Handlers.handleTabClick);
+
+            // Modal listeners
+            Cache.cancelPasswordBtn.addEventListener('click', () => UI.closeModal('passwordConfirmModal'));
+            Cache.confirmPasswordBtn.addEventListener('click', Handlers.handleConfirmDelete);
+            Cache.passwordConfirmModal.addEventListener('click', (e) => { 
+                if (e.target === Cache.passwordConfirmModal) UI.closeModal('passwordConfirmModal'); 
+            });
+
+            // Global click listener to hide suggestions
+            document.addEventListener('click', (e) => {
+                if (!Cache.searchRiwayat.contains(e.target) && !Cache.suggestionsContainer.contains(e.target)) {
+                    Cache.suggestionsContainer.classList.add('hidden');
+                }
+            });
+        },
+
+        /** Processes static data from Config into a more usable format in State. */
+        processStaticData() {
+            const santriNameMap = new Map(Config.santriList.map(s => [Utils.normalizeName(s.nama), s.id]));
+            State.santriNameMap = santriNameMap;
+            State.santriData = JSON.parse(JSON.stringify(Config.santriList));
+
+            const tempGroups = {};
+            State.santriData.forEach(santri => {
+                if (!tempGroups[santri.musyrif]) {
+                    tempGroups[santri.musyrif] = { santri: [], musyrif: santri.musyrif, classes: new Set() };
+                }
+                tempGroups[santri.musyrif].santri.push(santri);
+                tempGroups[santri.musyrif].classes.add(santri.kelas);
+            });
+            
+            for (const musyrif in tempGroups) {
+                const group = tempGroups[musyrif];
+                const groupName = (musyrif === 'Muhammad Zhafir Setiaji') ? '2CDGH' : [...group.classes].sort().join(', ');
+                State.classGroups[groupName] = { santri: group.santri, musyrif: group.musyrif };
+            }
+
+            const musyrifList = [...new Set(State.santriData.map(s => s.musyrif))];
+            musyrifList.sort((a, b) => {
+                const order = Config.musyrifSortOrder;
+                const indexA = order.indexOf(a);
+                const indexB = order.indexOf(b);
+                if (indexA > -1 && indexB > -1) return indexA - indexB;
+                if (indexA > -1) return -1;
+                if (indexB > -1) return 1;
+                return a.localeCompare(b);
+            });
+            Utils.populateSelect(Cache.musyrif, musyrifList, 'Pilih Musyrif');
+        },
+
+        /** Fetches new data and re-processes it. */
+        async reloadData() {
+            const dataFromServer = await API.fetchSetoranData();
+            
+            const unmatchedNames = new Set();
+            State.allSetoran = dataFromServer.map(item => {
+                const santriNameFromSheet = item.namaSantri || item['Nama Santri'] || '';
+                const normalizedSheetName = Utils.normalizeName(santriNameFromSheet);
+                const santriId = State.santriNameMap.get(normalizedSheetName);
+                
+                if (!santriId && santriNameFromSheet) {
+                    unmatchedNames.add(santriNameFromSheet.trim());
+                }
+                
+                return {
+                    id: `row-${item.rowNumber}`,
+                    santriId: santriId || null, 
+                    createdAt: item.tanggal,
+                    ...item
+                };
+            }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            if (unmatchedNames.size > 0) {
+                console.warn("PERINGATAN: Nama santri berikut dari spreadsheet tidak dapat ditemukan:", Array.from(unmatchedNames));
+            }
+
+            this.calculateSantriStats();
+            UI.renderAll();
         },
 
         /**
-         * @namespace App.utils
-         * @description Contains helper and utility functions.
+         * REFACTORED: Calculates all santri statistics from scratch based on the new logic.
+         * This ensures data is always in sync.
          */
-        utils: {
-            /** Sets the date-time input to the current time. */
-            setCurrentDateTime() {
-                const now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                App.cache.tanggal.value = now.toISOString().slice(0, 16);
-            },
+        calculateSantriStats() {
+            // 1. Reset all calculated stats for every santri
+            State.santriData.forEach(s => {
+                s.mutqinJuz = new Set();
+                s.nilai = 0;
+                s.isTuntas = false;
+                s.tuntasDate = null;
+                s.ziyadahPages = 0;
+            });
 
-            /** Populates a select element with options. */
-            populateSelect(selectEl, options, placeholder) {
-                selectEl.innerHTML = '';
-                if (placeholder) selectEl.add(new Option(placeholder, ''));
-                options.forEach(opt => {
-                    const option = (typeof opt === 'string') ? new Option(opt, opt) : new Option(opt.text, opt.value);
-                    selectEl.add(option);
-                });
-            },
+            // 2. Process all setoran records for each santri
+            State.santriData.forEach(santri => {
+                const santriSetoran = State.allSetoran.filter(s => s.santriId === santri.id);
+                if (santriSetoran.length === 0) return;
 
-            /** Generates SVG for quality rating stars. */
-            getKualitasSVG(kualitas) {
-                const qualityMap = { 'Mumtaz': 5, 'Jayyid Jiddan': 4, 'Jayyid': 3, 'Maqbul': 2, 'Dhoif': 1 };
-                const stars = qualityMap[kualitas] || 0;
-                const starIcon = `<svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
-                const emptyStarIcon = `<svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
-                return `<div class="flex">${starIcon.repeat(stars)}${emptyStarIcon.repeat(5 - stars)}</div>`;
-            },
+                // --- PRE-CALCULATION PASS ---
+                // Find all key mutqin setoran to populate the mutqinJuz set.
+                const mutqinSetengahJuz = santriSetoran.find(s => s.jenis === 'Mutqin' && String(s.juz) === "juz30_setengah" && new Date(s.createdAt) <= Config.deadlineJuz30Score);
+                const mutqinJuz30 = santriSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 30 && (!s.halaman || parseInt(s.halaman) >= 20));
+                const mutqinJuz29 = santriSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 29 && (!s.halaman || parseInt(s.halaman) >= 20));
 
-            /** Generates HTML for a program icon. */
-            getProgramIcon(program) { 
-                return program === 'Unggulan' 
-                    ? `<span title="Unggulan" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gray-200 text-gray-800 text-xs font-bold">U</span>` 
-                    : `<span title="Tahfizh" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-200 text-purple-800 text-xs font-bold">T</span>`; 
-            },
-            
-            /** Generates HTML for a class icon with color coding. */
-            getClassIcon(className) {
-                if (!className) return '';
-                let colorClass = 'bg-gray-200 text-gray-800';
-                const classInitial = className.charAt(1);
-                if (['A'].includes(classInitial)) colorClass = 'bg-red-100 text-red-800';
-                if (['B'].includes(classInitial)) colorClass = 'bg-yellow-100 text-yellow-800';
-                if (['C', 'D'].includes(classInitial)) colorClass = 'bg-green-100 text-green-800';
-                if (['G', 'H'].includes(classInitial)) colorClass = 'bg-blue-100 text-blue-800';
-                return `<span title="Kelas ${className}" class="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full ${colorClass} text-xs font-bold">${className}</span>`;
-            },
-
-            /** Normalizes a name string for comparison. */
-            normalizeName(name) {
-                if (typeof name !== 'string') return '';
-                return name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
-            },
-
-            /** Exports a recap table to PDF. */
-            exportRecapToPDF(classGroup) {
-                try {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'pt', 'a4');
-                    const group = App.config.dataSources.classGroups[classGroup];
-                    if (!group) return App.ui.showToast('Grup kelas tidak ditemukan.', 'error');
-
-                    doc.autoTable({
-                        head: [['No.', 'Nama Santri', 'Program', 'Skor', 'Keterangan']],
-                        body: group.santri.sort((a, b) => a.nama.localeCompare(b.nama)).map((santri, index) => {
-                            const totalHalaman = App.state.allSetoran.filter(s => s.santriId === santri.id).reduce((sum, s) => sum + App.data.calculatePageValue(s), 0);
-                            const isTuntas = (santri.setoranMutqin?.size || 0) >= 30;
-                            return [ index + 1, santri.nama, santri.program, totalHalaman.toFixed(1), isTuntas ? 'Tuntas' : 'Belum Tuntas' ];
-                        }),
-                        theme: 'grid',
-                        headStyles: { fillColor: [217, 119, 6] },
-                        styles: { font: 'Inter', cellPadding: 6, valign: 'middle' },
-                        columnStyles: {
-                            0: { cellWidth: 30 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 60 },
-                            3: { cellWidth: 40, halign: 'center' }, 4: { cellWidth: 80, halign: 'center' }
-                        },
-                        didParseCell: (data) => { if (data.column.index === 1) data.cell.styles.fontSize = 8; },
-                        didDrawPage: (data) => {
-                            doc.setFontSize(20); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold');
-                            doc.text('Laporan Capaian Tahfizh', data.settings.margin.left, 40);
-                            doc.setFontSize(12); doc.setTextColor(40); doc.setFont('helvetica', 'normal');
-                            doc.text(`Kelas: ${classGroup} | Musyrif: ${group.musyrif}`, data.settings.margin.left, 58);
-                            const pageCount = doc.internal.getNumberOfPages();
-                            doc.setFontSize(8); doc.setTextColor(150);
-                            doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 20);
-                            doc.text(`Dibuat pada: ${new Date().toLocaleString('id-ID')}`, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 20, { align: 'right' });
-                        },
-                        margin: { top: 70, bottom: 40 }
-                    });
-                    doc.save(`rekap_setoran_${classGroup.replace(/, /g, '_')}_${Date.now()}.pdf`);
-                } catch (error) {
-                    console.error("PDF Export Error:", error);
-                    App.ui.showToast('Gagal mengekspor PDF.', 'error');
+                // Populate the mutqinJuz set for progress bars and tuntas checks
+                if (mutqinJuz29) santri.mutqinJuz.add(29);
+                if (mutqinJuz30) santri.mutqinJuz.add(30);
+                
+                // --- NILAI CALCULATION ---
+                if (mutqinSetengahJuz || (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= Config.deadlineJuz30Score)) {
+                    santri.nilai = 100;
+                } else {
+                    const mutqinPagesAfterDeadline = santriSetoran
+                        .filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > Config.deadlineJuz30Score)
+                        .reduce((sum, s) => sum + (parseFloat(s.halaman) || 0), 0);
+                    santri.nilai = mutqinPagesAfterDeadline;
                 }
-            },
+
+                // --- TUNTAS STATUS CALCULATION ---
+                let tuntasRequirementsMet = false;
+                if (santri.program === 'Unggulan') {
+                    if (santri.nilai >= 100) {
+                        tuntasRequirementsMet = true;
+                    }
+                } else if (santri.program === 'Tahfizh') {
+                    const hasRequiredMutqin = santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30);
+                    const deadlineMet = (mutqinJuz29 && new Date(mutqinJuz29.createdAt) <= Config.deadlineTahfizhTuntas) && (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= Config.deadlineTahfizhTuntas);
+                    if (santri.nilai >= 100 && hasRequiredMutqin && deadlineMet) {
+                        tuntasRequirementsMet = true;
+                    }
+                }
+
+                // If tuntas, find the completion date
+                if (tuntasRequirementsMet) {
+                    santri.isTuntas = true;
+                    let completionDates = [];
+                    if (mutqinSetengahJuz) completionDates.push(new Date(mutqinSetengahJuz.createdAt));
+                    if (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= Config.deadlineJuz30Score) completionDates.push(new Date(mutqinJuz30.createdAt));
+                    
+                    if (santri.program === 'Tahfizh') {
+                        if (mutqinJuz29) completionDates.push(new Date(mutqinJuz29.createdAt));
+                        if (mutqinJuz30) completionDates.push(new Date(mutqinJuz30.createdAt));
+                    }
+                    if (completionDates.length > 0) {
+                        santri.tuntasDate = new Date(Math.max(...completionDates));
+                    }
+                }
+
+                // --- POST-TUNTAS SCORE CALCULATION (TAHFIZH ONLY) ---
+                if (santri.isTuntas && santri.program === 'Tahfizh' && santri.tuntasDate) {
+                    let postTuntasScore = 0;
+                    santriSetoran.forEach(setoran => {
+                        const setoranDate = new Date(setoran.createdAt);
+                        if (setoranDate > santri.tuntasDate) {
+                            const pageValue = Utils.calculatePageValue(setoran);
+                            if (setoran.jenis === 'Ziyadah') {
+                                santri.ziyadahPages += pageValue;
+                            }
+                            postTuntasScore += pageValue;
+                        }
+                    });
+                    santri.nilai += postTuntasScore;
+                }
+            });
         }
     };
 
     // Initialize the application when the DOM is fully loaded.
     document.addEventListener('DOMContentLoaded', () => App.init());
+
 </script>
 </body>
 </html>
