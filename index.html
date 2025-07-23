@@ -100,6 +100,25 @@
             padding-top: 0;
             padding-bottom: 0;
         }
+
+        /* Gaya Indikator Progres Lingkaran */
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.8s ease-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        /* PERBAIKAN: Skeleton Loader */
+        #main-content {
+            position: relative;
+        }
+        .skeleton-container {
+            position: absolute;
+            inset: 0;
+            background: #f3f4f6; /* Warna latar belakang agar tidak transparan */
+            z-index: 20;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="text-gray-900">
@@ -125,7 +144,7 @@
                     </a>
                     <a href="#" data-page="page-form" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        <span class="text-xs sm:text-sm">Formulir</span>
+                        <span class="text-xs sm:text-sm">Input</span>
                     </a>
                     <a href="#" data-page="page-riwayat" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
@@ -166,7 +185,7 @@
                         </div>
                         <h2 class="text-xl font-medium text-gray-600 mb-2">Assalamu 'alaikum ustadz,</h2>
                         <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">Selamat Datang di Setor.in</h1>
-                        <p class="mt-4 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">Mencatat setiap langkah, merayakan setiap pencapaian. Mari mudahkan pencatatan setoran hafalan.</p>
+                        <p class="mt-4 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">Catat setiap setoran, rayakan setiap kemajuan. Yuk, buat hafalan jadi lebih tertata dan terpantau!</p>
                         <div id="datetime-container" class="mt-6"></div>
                         <div class="mt-8">
                             <button data-target-page="page-form" class="quick-access-btn group inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
@@ -179,35 +198,38 @@
                     <!-- Kartu Statistik -->
                     <section class="fade-in" style="animation-delay: 100ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Statistik Umum</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
-                                <div class="bg-blue-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
-                                <div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Kartu Santri Aktif -->
+                            <div class="fade-in p-5 rounded-2xl glass-card flex flex-col justify-between bg-gradient-to-br from-blue-100 to-white/50 border-blue-200" style="animation-delay: 200ms;">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-blue-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
                                     <p class="text-sm text-blue-800 font-semibold">Santri Aktif</p>
-                                    <div class="flex items-baseline gap-2">
-                                        <p id="stats-santri-aktif" class="text-2xl font-bold text-blue-900">0 / 0</p>
-                                        <span id="stats-santri-aktif-pct" class="text-xs font-bold text-blue-700"></span>
-                                    </div>
+                                </div>
+                                <div class="text-right mt-4">
+                                    <p id="stats-santri-aktif" class="text-3xl font-bold text-blue-900">0 / 0</p>
+                                    <span id="stats-santri-aktif-pct" class="text-sm font-bold text-blue-700"></span>
                                 </div>
                             </div>
-                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
-                                <div class="bg-green-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                                <div>
+                            <!-- Kartu Sudah Tuntas -->
+                            <div class="fade-in p-5 rounded-2xl glass-card flex flex-col justify-between bg-gradient-to-br from-green-100 to-white/50 border-green-200" style="animation-delay: 300ms;">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-green-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                                     <p class="text-sm text-green-800 font-semibold">Sudah Tuntas</p>
-                                    <div class="flex items-baseline gap-2">
-                                        <p id="stats-santri-tuntas" class="text-2xl font-bold text-green-900">0</p>
-                                        <span id="stats-santri-tuntas-pct" class="text-xs font-bold text-green-700"></span>
-                                    </div>
+                                </div>
+                                <div class="text-right mt-4">
+                                    <p id="stats-santri-tuntas" class="text-3xl font-bold text-green-900">0</p>
+                                    <span id="stats-santri-tuntas-pct" class="text-sm font-bold text-green-700"></span>
                                 </div>
                             </div>
-                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-red-50 to-red-100/50 border-red-200">
-                                <div class="bg-red-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                                <div>
+                             <!-- Kartu Belum Tuntas -->
+                            <div class="fade-in p-5 rounded-2xl glass-card flex flex-col justify-between bg-gradient-to-br from-red-100 to-white/50 border-red-200" style="animation-delay: 400ms;">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-red-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                                     <p class="text-sm text-red-800 font-semibold">Belum Tuntas</p>
-                                    <div class="flex items-baseline gap-2">
-                                        <p id="stats-santri-belum-tuntas" class="text-2xl font-bold text-red-900">0</p>
-                                        <span id="stats-santri-belum-tuntas-pct" class="text-xs font-bold text-red-700"></span>
-                                    </div>
+                                </div>
+                                <div class="text-right mt-4">
+                                    <p id="stats-santri-belum-tuntas" class="text-3xl font-bold text-red-900">0</p>
+                                    <span id="stats-santri-belum-tuntas-pct" class="text-sm font-bold text-red-700"></span>
                                 </div>
                             </div>
                         </div>
@@ -217,14 +239,14 @@
                     <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 200ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Target Ketuntasan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Target 1: Nilai Akademik -->
+                            <!-- Target 1: Ketuntasan Umum -->
                             <div class="p-5 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white shadow-lg flex flex-col justify-between">
                                 <div>
                                     <div class="flex items-center gap-3">
                                         <div class="bg-white/20 p-2 rounded-lg">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                                         </div>
-                                        <h4 class="text-lg font-bold">A. Penilaian Akademik</h4>
+                                        <h4 class="text-lg font-bold">A. Ketuntasan Wajib</h4>
                                     </div>
                                     <p class="text-sm opacity-90 mt-2">Mutqin Setengah Juz 30 (An-Naba' s.d. Ath-Thariq) untuk mendapatkan nilai 100.</p>
                                 </div>
@@ -237,7 +259,7 @@
                                         <div class="bg-white/20 p-2 rounded-lg">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                                         </div>
-                                        <h4 class="text-lg font-bold">B. Ketuntasan Tahfizh</h4>
+                                        <h4 class="text-lg font-bold">B. Ketuntasan Program Tahfizh</h4>
                                     </div>
                                     <p class="text-sm opacity-90 mt-2">Wajib menyelesaikan Mutqin Juz 30 & Juz 29 secara penuh.</p>
                                 </div>
@@ -251,59 +273,29 @@
                          <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Ketuntasan Juz Wajib</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <!-- Progress Unggulan -->
-                            <div id="mutqin-unggulan-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-sky-50 to-sky-100/50 border-sky-200">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-sky-800 mb-1">P. Unggulan (Nilai 100)</h3>
-                                        <p id="mutqin-unggulan-details" class="text-xs text-sky-700"></p>
-                                    </div>
-                                    <div class="bg-sky-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">U</div>
-                                </div>
-                                <div class="flex items-center gap-4 mt-3">
-                                    <div class="w-full bg-sky-200/80 rounded-full h-2.5">
-                                        <div id="mutqin-unggulan-bar" class="bg-sky-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                    </div>
-                                    <span id="mutqin-unggulan-label" class="font-semibold text-sky-800 text-sm">0%</span>
-                                </div>
+                            <div id="mutqin-unggulan-progress-container" class="hidden p-5 rounded-xl glass-card flex flex-col items-center justify-center text-center">
+                                <div id="mutqin-unggulan-circle" class="relative w-28 h-28"></div>
+                                <h3 class="text-lg font-bold text-sky-800 mt-3 mb-1">Santri Unggulan (Setengah Juz 30)</h3>
+                                <p id="mutqin-unggulan-details" class="text-xs text-sky-700"></p>
                             </div>
                             <!-- Progress Tahfizh Juz 30 -->
-                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-green-800 mb-1">P. Tahfizh (Mutqin Juz 30)</h3>
-                                        <p id="mutqin-juz30-details" class="text-xs text-green-700"></p>
-                                    </div>
-                                    <div class="bg-green-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">30</div>
-                                </div>
-                                <div class="flex items-center gap-4 mt-3">
-                                    <div class="w-full bg-green-200/80 rounded-full h-2.5">
-                                        <div id="mutqin-juz30-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                    </div>
-                                    <span id="mutqin-juz30-label" class="font-semibold text-green-800 text-sm">0%</span>
-                                </div>
+                            <div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card flex flex-col items-center justify-center text-center">
+                                <div id="mutqin-juz30-circle" class="relative w-28 h-28"></div>
+                                <h3 class="text-lg font-bold text-green-800 mt-3 mb-1">Santri Tahfizh (Mutqin Juz 30)</h3>
+                                <p id="mutqin-juz30-details" class="text-xs text-green-700"></p>
                             </div>
                             <!-- Progress Tahfizh Juz 29 -->
-                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-amber-800 mb-1">P. Tahfizh (Mutqin Juz 29)</h3>
-                                        <p id="mutqin-juz29-details" class="text-xs text-amber-700"></p>
-                                    </div>
-                                    <div class="bg-amber-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm shadow">29</div>
-                                </div>
-                                <div class="flex items-center gap-4 mt-3">
-                                    <div class="w-full bg-amber-200/80 rounded-full h-2.5">
-                                        <div id="mutqin-juz29-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                    </div>
-                                    <span id="mutqin-juz29-label" class="font-semibold text-amber-800 text-sm">0%</span>
-                                </div>
+                            <div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card flex flex-col items-center justify-center text-center">
+                                <div id="mutqin-juz29-circle" class="relative w-28 h-28"></div>
+                                <h3 class="text-lg font-bold text-amber-800 mt-3 mb-1">Santri Tahfizh (Mutqin Juz 29)</h3>
+                                <p id="mutqin-juz29-details" class="text-xs text-amber-700"></p>
                             </div>
                         </div>
                     </section>
 
                     <!-- Grafik Mingguan -->
                     <section id="weekly-chart-container" class="hidden fade-in" style="animation-delay: 600ms;">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Grafik Setoran Mingguan</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Grafik Setoran Mingguan ini</h3>
                         <div class="p-5 rounded-xl glass-card h-64">
                             <canvas id="weeklyChart"></canvas>
                         </div>
@@ -332,7 +324,7 @@
                 </div>
             </div>
 
-            <!-- SKELETON: Formulir -->
+            <!-- SKELETON: Input -->
             <div id="skeleton-page-form" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-6">
                 <div class="h-12 w-3/4 skeleton rounded-lg"></div>
                 <div class="h-48 skeleton rounded-2xl"></div>
@@ -340,7 +332,7 @@
                 <div class="h-64 skeleton rounded-2xl"></div>
             </div>
             
-            <!-- HALAMAN: Formulir -->
+            <!-- HALAMAN: Input -->
             <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8">
                  <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8 fade-in">
                      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Formulir Setoran Baru</h2>
@@ -579,21 +571,6 @@
         </tr>
     </template>
     
-    <!-- Template untuk Item Aktivitas Terbaru (TIDAK DIGUNAKAN LAGI TAPI DISIMPAN JIKA DIPERLUKAN) -->
-    <template id="recent-activity-template">
-         <div class="flex items-start gap-3">
-            <div class="data-emoji bg-gray-200/80 p-2 text-xl rounded-full mt-1"></div>
-            <div>
-                <p class="text-sm font-semibold text-gray-800 flex items-center">
-                    <span class="data-nama"></span>
-                    <span class="data-program-icon"></span>
-                    <span class="data-kelas-icon"></span>
-                </p>
-                <p class="text-xs text-gray-500 data-detail"></p>
-            </div>
-        </div>
-    </template>
-
     <!-- Template untuk Tab dan Konten Rekap -->
     <template id="rekap-tab-template">
         <button class="rekap-tab-btn flex-shrink-0 snap-center whitespace-nowrap py-2 px-5 text-sm font-medium text-gray-700 rounded-md"></button>
@@ -776,15 +753,16 @@
             'kualitas', 'setoranTableBody', 'history-row-template', 'search-riwayat', 'suggestions-container', 
             'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'stats-santri-aktif', 
             'stats-santri-tuntas', 'stats-santri-belum-tuntas', 'weeklyChart', 
-            'weekly-chart-container', 'mutqin-juz29-progress-container', 'mutqin-juz29-bar', 
-            'mutqin-juz29-label', 'mutqin-juz29-details', 'mutqin-juz30-progress-container', 
-            'mutqin-juz30-bar', 'mutqin-juz30-label', 'mutqin-juz30-details', 'rekap-tabs', 
-            'rekap-content-container', 'toast', 'toast-message', 'toast-icon', 'passwordConfirmModal', 
+            'weekly-chart-container', 'mutqin-juz29-progress-container',
+            'mutqin-juz30-progress-container', 
+            'rekap-tabs', 'rekap-content-container', 'toast', 'toast-message', 'toast-icon', 'passwordConfirmModal', 
             'passwordInput', 'passwordError', 'cancelPasswordBtn', 'confirmPasswordBtn', 
-            'icon-legend-beranda', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap',
-            'recent-activity-template', 'rekap-tab-template', 'rekap-content-template',
-            'mutqin-unggulan-progress-container', 'mutqin-unggulan-bar', 'mutqin-unggulan-label', 'mutqin-unggulan-details',
-            'tuntas-tracking-accordion', 'stats-santri-aktif-pct', 'stats-santri-tuntas-pct', 'stats-santri-belum-tuntas-pct'
+            'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap',
+            'rekap-tab-template', 'rekap-content-template',
+            'mutqin-unggulan-progress-container',
+            'tuntas-tracking-accordion', 'stats-santri-aktif-pct', 'stats-santri-tuntas-pct', 'stats-santri-belum-tuntas-pct',
+            'mutqin-unggulan-circle', 'mutqin-juz30-circle', 'mutqin-juz29-circle',
+            'mutqin-unggulan-details', 'mutqin-juz30-details', 'mutqin-juz29-details'
         ];
         ids.forEach(id => {
             const key = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
@@ -1008,16 +986,39 @@
                 });
             },
             renderMutqinProgress() {
+                const createCircularProgress = (container, percentage, colorClass) => {
+                    const radius = 45;
+                    const circumference = 2 * Math.PI * radius;
+                    const offset = circumference - (percentage / 100) * circumference;
+
+                    container.innerHTML = `
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-gray-200/80" stroke-width="8" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50" />
+                            <circle class="progress-ring-circle ${colorClass}" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50"
+                                style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${circumference};"
+                            />
+                        </svg>
+                        <span class="absolute inset-0 flex items-center justify-center text-2xl font-bold ${colorClass}">${percentage}%</span>
+                    `;
+                    
+                    // Animate the circle
+                    setTimeout(() => {
+                        const circle = container.querySelector('.progress-ring-circle');
+                        if(circle) {
+                            circle.style.strokeDashoffset = offset;
+                        }
+                    }, 100); // Small delay to ensure transition works on load
+                };
+
                 // --- Progress Unggulan ---
                 const unggulanSantri = State.santriData.filter(s => s.program === 'Unggulan');
                 const totalUnggulan = unggulanSantri.length;
                 if (totalUnggulan > 0) {
                     Cache.mutqinUnggulanProgressContainer.classList.remove('hidden');
                     const tuntasUnggulan = unggulanSantri.filter(s => s.nilai >= 100).length;
-                    const pctUnggulan = ((tuntasUnggulan / totalUnggulan) * 100).toFixed(0);
-                    Cache.mutqinUnggulanBar.style.width = `${pctUnggulan}%`;
-                    Cache.mutqinUnggulanLabel.textContent = `${pctUnggulan}%`;
-                    Cache.mutqinUnggulanDetails.textContent = `${tuntasUnggulan} dari ${totalUnggulan} santri telah mencapai nilai 100.`;
+                    const pctUnggulan = Math.round((tuntasUnggulan / totalUnggulan) * 100);
+                    createCircularProgress(Cache.mutqinUnggulanCircle, pctUnggulan, 'text-sky-500');
+                    Cache.mutqinUnggulanDetails.textContent = `${tuntasUnggulan} dari ${totalUnggulan} santri telah tuntas.`;
                 } else {
                     Cache.mutqinUnggulanProgressContainer.classList.add('hidden');
                 }
@@ -1026,19 +1027,16 @@
                 const tahfizhSantri = State.santriData.filter(s => s.program === 'Tahfizh');
                 const totalTahfizh = tahfizhSantri.length;
                 if (totalTahfizh > 0) {
-                    Cache.mutqinJuz29ProgressContainer.classList.remove('hidden');
                     Cache.mutqinJuz30ProgressContainer.classList.remove('hidden');
-
                     const mutqin30 = tahfizhSantri.filter(s => s.mutqinJuz.has(30)).length;
-                    const pct30 = ((mutqin30 / totalTahfizh) * 100).toFixed(0);
-                    Cache.mutqinJuz30Bar.style.width = `${pct30}%`;
-                    Cache.mutqinJuz30Label.textContent = `${pct30}%`;
+                    const pct30 = Math.round((mutqin30 / totalTahfizh) * 100);
+                    createCircularProgress(Cache.mutqinJuz30Circle, pct30, 'text-green-500');
                     Cache.mutqinJuz30Details.textContent = `${mutqin30} dari ${totalTahfizh} santri telah tuntas.`;
 
+                    Cache.mutqinJuz29ProgressContainer.classList.remove('hidden');
                     const mutqin29 = tahfizhSantri.filter(s => s.mutqinJuz.has(29)).length;
-                    const pct29 = ((mutqin29 / totalTahfizh) * 100).toFixed(0);
-                    Cache.mutqinJuz29Bar.style.width = `${pct29}%`;
-                    Cache.mutqinJuz29Label.textContent = `${pct29}%`;
+                    const pct29 = Math.round((mutqin29 / totalTahfizh) * 100);
+                    createCircularProgress(Cache.mutqinJuz29Circle, pct29, 'text-amber-500');
                     Cache.mutqinJuz29Details.textContent = `${mutqin29} dari ${totalTahfizh} santri telah tuntas.`;
                 } else {
                     Cache.mutqinJuz29ProgressContainer.classList.add('hidden');
@@ -1412,6 +1410,7 @@
             this.hideAllContent();
             if (showSkeleton) this.showSkeleton(pageId);
 
+            // Beri sedikit waktu agar skeleton tampil sebelum memuat konten
             setTimeout(() => {
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) targetPage.classList.remove('hidden');
@@ -1420,7 +1419,7 @@
                 Cache.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
                 const activeLink = Cache.mainNav.querySelector(`a[data-page="${pageId}"]`);
                 if(activeLink) activeLink.classList.add('active');
-            }, 100);
+            }, 150); // Sedikit delay
         },
         switchTab(container, contentSelector, clickedBtn, idPrefix) {
             container.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
