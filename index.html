@@ -184,21 +184,30 @@
                                 <div class="bg-blue-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
                                 <div>
                                     <p class="text-sm text-blue-800 font-semibold">Santri Aktif</p>
-                                    <p id="stats-santri-aktif" class="text-2xl font-bold text-blue-900">0 / 0</p>
+                                    <div class="flex items-baseline gap-2">
+                                        <p id="stats-santri-aktif" class="text-2xl font-bold text-blue-900">0 / 0</p>
+                                        <span id="stats-santri-aktif-pct" class="text-xs font-bold text-blue-700"></span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
                                 <div class="bg-green-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                                 <div>
                                     <p class="text-sm text-green-800 font-semibold">Sudah Tuntas</p>
-                                    <p id="stats-santri-tuntas" class="text-2xl font-bold text-green-900">0</p>
+                                    <div class="flex items-baseline gap-2">
+                                        <p id="stats-santri-tuntas" class="text-2xl font-bold text-green-900">0</p>
+                                        <span id="stats-santri-tuntas-pct" class="text-xs font-bold text-green-700"></span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-red-50 to-red-100/50 border-red-200">
                                 <div class="bg-red-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                                 <div>
                                     <p class="text-sm text-red-800 font-semibold">Belum Tuntas</p>
-                                    <p id="stats-santri-belum-tuntas" class="text-2xl font-bold text-red-900">0</p>
+                                    <div class="flex items-baseline gap-2">
+                                        <p id="stats-santri-belum-tuntas" class="text-2xl font-bold text-red-900">0</p>
+                                        <span id="stats-santri-belum-tuntas-pct" class="text-xs font-bold text-red-700"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -226,7 +235,7 @@
                                 <div>
                                     <div class="flex items-center gap-3">
                                         <div class="bg-white/20 p-2 rounded-lg">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14h14V5H5z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 12L5 5m7 7l7 7m-7-7l7-7m-7 7l-7 7" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                                         </div>
                                         <h4 class="text-lg font-bold">B. Ketuntasan Tahfizh</h4>
                                     </div>
@@ -239,7 +248,7 @@
                     
                     <!-- Progres Mutqin -->
                     <section class="fade-in" style="animation-delay: 500ms;">
-                         <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Ketuntasan</h3>
+                         <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Ketuntasan Juz Wajib</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <!-- Progress Unggulan -->
                             <div id="mutqin-unggulan-progress-container" class="hidden p-5 rounded-xl glass-card bg-gradient-to-br from-sky-50 to-sky-100/50 border-sky-200">
@@ -620,7 +629,7 @@
     /**
      * @file Mengelola aplikasi Setor.in.
      * @author Ditulis ulang oleh Gemini
-     * @version 2.5 - Perbaikan UI Beranda
+     * @version 2.6 - Perbaikan UI Lanjutan
      * @description Skrip ini diorganisir ke dalam modul-modul objek untuk kejelasan dan kemudahan pemeliharaan.
      */
 
@@ -775,7 +784,7 @@
             'icon-legend-beranda', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap',
             'recent-activity-template', 'rekap-tab-template', 'rekap-content-template',
             'mutqin-unggulan-progress-container', 'mutqin-unggulan-bar', 'mutqin-unggulan-label', 'mutqin-unggulan-details',
-            'tuntas-tracking-accordion'
+            'tuntas-tracking-accordion', 'stats-santri-aktif-pct', 'stats-santri-tuntas-pct', 'stats-santri-belum-tuntas-pct'
         ];
         ids.forEach(id => {
             const key = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
@@ -944,10 +953,16 @@
                 const santriAktifIds = new Set(State.allSetoran.map(s => s.santriId));
                 const totalSantri = Config.santriList.length;
                 const tuntasCount = State.santriData.filter(s => s.isTuntas).length;
-                
+                const belumTuntasCount = totalSantri - tuntasCount;
+
                 Cache.statsSantriAktif.textContent = `${santriAktifIds.size} / ${totalSantri}`;
                 Cache.statsSantriTuntas.textContent = tuntasCount;
-                Cache.statsSantriBelumTuntas.textContent = totalSantri - tuntasCount;
+                Cache.statsSantriBelumTuntas.textContent = belumTuntasCount;
+
+                // Kalkulasi dan tampilkan persentase
+                Cache.statsSantriAktifPct.textContent = `(${(santriAktifIds.size / totalSantri * 100).toFixed(0)}%)`;
+                Cache.statsSantriTuntasPct.textContent = `(${(tuntasCount / totalSantri * 100).toFixed(0)}%)`;
+                Cache.statsSantriBelumTuntasPct.textContent = `(${(belumTuntasCount / totalSantri * 100).toFixed(0)}%)`;
                 
                 this.renderWeeklySummaryChart();
                 this.renderMutqinProgress();
@@ -1066,7 +1081,7 @@
                             </button>
                         </h2>
                         <div class="accordion-panel border-t border-gray-200/50 bg-white/10">
-                            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="p-4 pb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                                 <div>
                                     <h5 class="font-semibold text-green-700 mb-2">✅ Sudah Tuntas (${tuntasList.length})</h5>
                                     <ul class="space-y-1 list-disc list-inside text-gray-700">
@@ -1193,7 +1208,11 @@
                     const group = State.classGroups[groupName];
                     const contentDiv = contentClone.querySelector('.rekap-tab-content');
                     contentDiv.id = `rekap-tab-${groupName.replace(/, /g, '')}`;
-                    if (index > 0) contentDiv.classList.add('hidden');
+                    
+                    // PERBAIKAN: Hapus kelas 'hidden' untuk tab pertama
+                    if (index === 0) {
+                        contentDiv.classList.remove('hidden');
+                    }
                     
                     contentDiv.querySelector('.data-title').textContent = `Rekap Capaian - Kelas ${groupName}`;
                     contentDiv.querySelector('.data-musyrif').textContent = `Musyrif: ${group.musyrif}`;
@@ -1410,8 +1429,7 @@
             const targetTabId = clickedBtn.dataset.tab.replace(/, /g, '');
             const parentContainer = container.closest('.glass-card, .page-content');
             parentContainer.querySelectorAll(contentSelector).forEach(content => content.classList.add('hidden'));
-            const targetId = `${idPrefix}-${targetTabId}`;
-            const targetElement = document.getElementById(targetId);
+            const targetElement = document.getElementById(`${idPrefix}-${targetTabId}`);
             if (targetElement) {
                 targetElement.classList.remove('hidden');
             }
