@@ -19,7 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        /* General Body Styles */
+        /* Gaya Umum untuk Body */
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(to right top, #d1d5db, #e5e7eb, #f3f4f6, #f9fafb, #ffffff);
@@ -27,12 +27,12 @@
             color: #1f2937;
         }
 
-        /* Utility Classes */
+        /* Kelas Utilitas */
         .page-content.hidden, .skeleton-container.hidden { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* Glassmorphism Styles */
+        /* Gaya Glassmorphism */
         .glass-card, .glass-modal-content {
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(12px);
@@ -55,7 +55,7 @@
         }
         .glass-input::placeholder { color: #6b7280; }
 
-        /* Animations */
+        /* Animasi */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         
@@ -71,7 +71,7 @@
             animation: shimmer 1s linear infinite;
         }
 
-        /* UI Transitions */
+        /* Transisi UI */
         #toast { transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0; transform: translate(-50%, 100px); }
         #toast.show { opacity: 1; transform: translate(-50%, 0); }
         
@@ -80,7 +80,7 @@
         .modal-content { transition: transform 0.3s ease, opacity 0.3s ease; }
         .modal.hidden .modal-content { opacity: 0; transform: translateY(-20px); }
 
-        /* Active State Styles */
+        /* Gaya Status Aktif */
         .tab-btn, .nav-link, .card-hover, .rekap-tab-btn, .time-filter-btn { transition: all 0.3s ease; }
         .tab-btn.active { border-bottom: 3px solid #f59e0b; color: #b45309; }
         .rekap-tab-btn { border-bottom: 2px solid transparent; }
@@ -88,27 +88,36 @@
         .nav-link.active, .nav-link.active svg { color: #f59e0b; }
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07); }
 
-        /* Carousel Styles */
+        /* Gaya Carousel */
         .carousel-container { scroll-snap-type: x mandatory; scroll-padding: 1rem; }
         .carousel-item { scroll-snap-align: start; }
+        
+        /* Gaya Akordeon */
+        .accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
     </style>
 </head>
 <body class="text-gray-900">
 
     <div class="sm:flex min-h-screen">
         <!-- =================================================================
-        NAVIGATION MENU
+         MENU NAVIGASI
         ================================================================== -->
         <nav class="fixed bottom-0 left-0 w-full border-t border-gray-200 sm:relative sm:w-64 sm:flex-shrink-0 sm:border-r sm:border-t-0 z-30 glass-nav">
             <div class="flex sm:flex-col sm:py-4 sm:px-3 h-full">
-                <!-- App Logo -->
+                <!-- Logo Aplikasi -->
                 <div class="hidden sm:flex items-center gap-3 p-3 mb-4">
                     <div class="bg-amber-500 p-2 rounded-lg text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
                     </div>
                     <span class="font-bold text-lg text-gray-900">Setor.in</span>
                 </div>
-                <!-- Nav Links -->
+                <!-- Link Navigasi -->
                 <div id="main-nav" class="flex sm:flex-col w-full">
                     <a href="#" data-page="page-beranda" class="nav-link active flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium text-gray-700 hover:text-amber-600 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
@@ -131,7 +140,7 @@
         </nav>
 
         <!-- =================================================================
-        MAIN CONTENT AREA
+         AREA KONTEN UTAMA
         ================================================================== -->
         <main id="main-content" class="flex-1 pb-20 sm:pb-0 overflow-y-auto">
             
@@ -147,10 +156,10 @@
                 <div class="h-32 skeleton rounded-2xl"></div>
             </div>
 
-            <!-- PAGE: Beranda -->
+            <!-- HALAMAN: Beranda -->
             <div id="page-beranda" class="page-content p-4 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto space-y-8">
-                    <!-- Hero Section -->
+                    <!-- Bagian Hero -->
                     <header class="text-center pt-12 sm:pt-0 pb-8 fade-in">
                         <div class="mx-auto mb-4 w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-3xl shadow-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
@@ -158,7 +167,7 @@
                         <h2 class="text-xl font-medium text-gray-600 mb-2">Assalamu 'alaikum ustadz,</h2>
                         <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">Selamat Datang di Setor.in</h1>
                         <p class="mt-4 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">Mencatat setiap langkah, merayakan setiap pencapaian. Mari mudahkan pencatatan setoran hafalan.</p>
-                        <div id="datetime-container" class="mt-6 flex flex-col items-center justify-center gap-1"></div>
+                        <div id="datetime-container" class="mt-6"></div>
                         <div class="mt-8">
                             <button data-target-page="page-form" class="quick-access-btn group inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
@@ -167,35 +176,35 @@
                         </div>
                     </header>
 
-                    <!-- Stats Cards -->
+                    <!-- Kartu Statistik -->
                     <section class="fade-in" style="animation-delay: 100ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Statistik Umum</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                             <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
-                                <div class="bg-blue-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
+                                <div class="bg-blue-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
                                 <div>
-                                    <p class="text-sm text-blue-800 font-semibold">Total Setoran</p>
-                                    <p id="stats-total-setoran" class="text-2xl font-bold text-blue-900">0</p>
+                                    <p class="text-sm text-blue-800 font-semibold">Santri Aktif</p>
+                                    <p id="stats-santri-aktif" class="text-2xl font-bold text-blue-900">0 / 0</p>
                                 </div>
                             </div>
                             <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
-                                <div class="bg-green-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
+                                <div class="bg-green-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                                 <div>
-                                    <p class="text-sm text-green-800 font-semibold">Santri Aktif</p>
-                                    <div id="stats-santri-aktif" class="text-2xl font-bold text-green-900 flex items-baseline gap-1">0</div>
+                                    <p class="text-sm text-green-800 font-semibold">Sudah Tuntas</p>
+                                    <p id="stats-santri-tuntas" class="text-2xl font-bold text-green-900">0</p>
                                 </div>
                             </div>
-                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
-                                <div class="bg-amber-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg></div>
+                            <div class="p-5 rounded-xl flex items-center gap-4 glass-card bg-gradient-to-br from-red-50 to-red-100/50 border-red-200">
+                                <div class="bg-red-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
                                 <div>
-                                    <p class="text-sm text-amber-800 font-semibold">Total Halaman (Skor)</p>
-                                    <p id="stats-total-halaman" class="text-2xl font-bold text-amber-900">0</p>
+                                    <p class="text-sm text-red-800 font-semibold">Belum Tuntas</p>
+                                    <p id="stats-santri-belum-tuntas" class="text-2xl font-bold text-red-900">0</p>
                                 </div>
                             </div>
                         </div>
                     </section>
-
-                    <!-- Target Ketuntasan Section -->
+                    
+                    <!-- Bagian Target Ketuntasan -->
                     <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 200ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Target Ketuntasan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -228,7 +237,7 @@
                         </div>
                     </section>
                     
-                    <!-- Mutqin Progress -->
+                    <!-- Progres Mutqin -->
                     <section class="fade-in" style="animation-delay: 500ms;">
                          <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Ketuntasan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -283,14 +292,7 @@
                         </div>
                     </section>
 
-                    <!-- Recent Activity -->
-                    <section class="p-5 rounded-xl glass-card fade-in" style="animation-delay: 500ms;">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Aktivitas Terbaru</h3>
-                        <div id="recent-activity-list" class="space-y-3"></div>
-                        <div id="icon-legend-beranda" class="mt-4"></div>
-                    </section>
-
-                    <!-- Weekly Chart -->
+                    <!-- Grafik Mingguan -->
                     <section id="weekly-chart-container" class="hidden fade-in" style="animation-delay: 600ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Grafik Setoran Mingguan</h3>
                         <div class="p-5 rounded-xl glass-card h-64">
@@ -298,11 +300,11 @@
                         </div>
                     </section>
 
-                    <!-- Tuntas Tracking Section -->
+                    <!-- Bagian Pelacakan Tuntas -->
                     <section id="tuntas-tracking-section" class="fade-in" style="animation-delay: 700ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Lacak Ketuntasan per Kelas</h3>
-                        <div id="tuntas-tracking-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Content will be generated by JS -->
+                        <div id="tuntas-tracking-accordion" class="space-y-2">
+                            <!-- Konten akordeon akan digenerate oleh JS -->
                         </div>
                     </section>
                     
@@ -321,7 +323,7 @@
                 </div>
             </div>
 
-            <!-- SKELETON: Form -->
+            <!-- SKELETON: Formulir -->
             <div id="skeleton-page-form" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-6">
                 <div class="h-12 w-3/4 skeleton rounded-lg"></div>
                 <div class="h-48 skeleton rounded-2xl"></div>
@@ -329,7 +331,7 @@
                 <div class="h-64 skeleton rounded-2xl"></div>
             </div>
             
-            <!-- PAGE: Form -->
+            <!-- HALAMAN: Formulir -->
             <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8">
                  <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8 fade-in">
                      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Formulir Setoran Baru</h2>
@@ -337,7 +339,7 @@
                  </div>
                 
                  <form id="setoranForm" class="max-w-2xl mx-auto flex flex-col gap-6">
-                    <!-- Basic Information Card -->
+                    <!-- Kartu Informasi Dasar -->
                     <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 50ms;">
                         <fieldset>
                             <legend class="flex items-center gap-3 text-lg font-semibold text-blue-800 mb-4 border-b border-white/30 pb-3">
@@ -352,7 +354,7 @@
                         </fieldset>
                     </div>
 
-                    <!-- Santri Details Card -->
+                    <!-- Kartu Detail Santri -->
                     <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 150ms;">
                         <fieldset>
                             <legend class="flex items-center gap-3 text-lg font-semibold text-green-800 mb-4 border-b border-white/30 pb-3">
@@ -383,7 +385,7 @@
                         </fieldset>
                     </div>
 
-                    <!-- Setoran Details Card -->
+                    <!-- Kartu Detail Setoran -->
                     <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 250ms;">
                         <fieldset>
                             <legend class="flex items-center gap-3 text-lg font-semibold text-amber-800 mb-4 border-b border-white/30 pb-3">
@@ -421,7 +423,7 @@
                         </fieldset>
                     </div>
 
-                    <!-- Submit Button -->
+                    <!-- Tombol Submit -->
                     <div class="mt-2">
                         <button type="submit" class="w-full group inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
@@ -438,12 +440,12 @@
                 <div class="h-96 skeleton rounded-2xl"></div>
             </div>
 
-            <!-- PAGE: Riwayat -->
+            <!-- HALAMAN: Riwayat -->
             <div id="page-riwayat" class="page-content hidden p-4 sm:p-6 lg:p-8">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8"><h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg> Riwayat Setoran</h2><p class="text-gray-700 mt-2 sm:pl-11">Cari dan filter 50 riwayat setoran terakhir yang tercatat.</p></div>
                     
-                    <!-- Filter Section -->
+                    <!-- Bagian Filter -->
                     <div class="p-4 rounded-xl mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end glass-card">
                         <div class="lg:col-span-2">
                             <label for="search-riwayat" class="text-sm font-medium text-gray-800">Cari Nama Santri</label>
@@ -472,7 +474,7 @@
 
                     <div id="icon-legend-riwayat" class="mb-6"></div>
 
-                    <!-- History Table -->
+                    <!-- Tabel Riwayat -->
                     <div id="content-riwayat" class="rounded-2xl overflow-hidden glass-card overflow-x-auto">
                         <table class="min-w-full">
                             <thead class="glass-nav border-b border-white/30 sticky top-0 z-10">
@@ -497,7 +499,7 @@
                 <div class="h-96 skeleton rounded-2xl"></div>
             </div>
 
-            <!-- PAGE: Rekap -->
+            <!-- HALAMAN: Rekap -->
             <div id="page-rekap" class="page-content hidden p-4 sm:p-6 lg:p-8">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8"><h2 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Rekapitulasi Setoran</h2><p class="text-gray-700 mt-2 sm:pl-11">Pantau perkembangan setiap kelas dan ekspor laporannya.</p></div>
@@ -505,11 +507,11 @@
                     <div id="content-rekap" class="rounded-2xl p-5 glass-card">
                         <div class="flex justify-center border-b border-gray-200/50">
                             <div id="rekap-tabs" class="carousel-container flex space-x-1 overflow-x-auto hide-scrollbar">
-                                <!-- Rekap tabs will be generated here -->
+                                <!-- Tab rekap akan digenerate di sini -->
                             </div>
                         </div>
                         <div id="rekap-content-container" class="mt-6">
-                            <!-- Rekap content will be generated here -->
+                            <!-- Konten rekap akan digenerate di sini -->
                         </div>
                     </div>
                 </div>
@@ -518,9 +520,9 @@
     </div>
 
     <!-- =================================================================
-    MODALS & NOTIFICATIONS
+     MODAL & NOTIFIKASI
     ================================================================== -->
-    <!-- Password Confirmation Modal -->
+    <!-- Modal Konfirmasi Password -->
     <div id="passwordConfirmModal" class="modal fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 hidden">
         <div class="modal-backdrop fixed inset-0" aria-hidden="true"></div>
         <div class="modal-content w-full max-w-sm relative z-50 p-6 rounded-2xl glass-modal-content">
@@ -535,16 +537,16 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Notifikasi Toast -->
     <div id="toast" class="fixed bottom-20 sm:bottom-8 left-1/2 z-50 flex items-center gap-3 bg-gray-900/80 text-white text-sm font-semibold py-3 px-5 rounded-lg border border-gray-700/50 backdrop-blur-sm">
         <svg id="toast-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"></svg>
         <span id="toast-message"></span>
     </div>
 
     <!-- =================================================================
-    HTML TEMPLATES
+     TEMPLATE HTML
     ================================================================== -->
-    <!-- Template for History Table Row -->
+    <!-- Template untuk Baris Tabel Riwayat -->
     <template id="history-row-template">
         <tr class="hover:bg-gray-100/50 transition-colors">
             <td class="px-6 py-4 whitespace-nowrap">
@@ -568,7 +570,7 @@
         </tr>
     </template>
     
-    <!-- Template for Recent Activity Item -->
+    <!-- Template untuk Item Aktivitas Terbaru (TIDAK DIGUNAKAN LAGI TAPI DISIMPAN JIKA DIPERLUKAN) -->
     <template id="recent-activity-template">
          <div class="flex items-start gap-3">
             <div class="data-emoji bg-gray-200/80 p-2 text-xl rounded-full mt-1"></div>
@@ -583,7 +585,7 @@
         </div>
     </template>
 
-    <!-- Template for Rekap Tab and Content -->
+    <!-- Template untuk Tab dan Konten Rekap -->
     <template id="rekap-tab-template">
         <button class="rekap-tab-btn flex-shrink-0 snap-center whitespace-nowrap py-2 px-5 text-sm font-medium text-gray-700 rounded-md"></button>
     </template>
@@ -616,14 +618,14 @@
 
 <script>
     /**
-     * @file Manages the Setor.in application.
-     * @author Refactored by Gemini
-     * @version 2.4 - Robust Calculation Fix
-     * @description This script is organized into modular objects for better maintainability and clarity.
+     * @file Mengelola aplikasi Setor.in.
+     * @author Ditulis ulang oleh Gemini
+     * @version 2.5 - Perbaikan UI Beranda
+     * @description Skrip ini diorganisir ke dalam modul-modul objek untuk kejelasan dan kemudahan pemeliharaan.
      */
 
     // -------------------------------------------------------------------
-    // MODULE: CONFIGURATION & STATIC DATA
+    // MODUL: KONFIGURASI & DATA STATIS
     // -------------------------------------------------------------------
     const Config = {
         scriptURL: 'https://script.google.com/macros/s/AKfycbyl2FCcGUtolkJIDsoiTYFKeKp8IQwHT0V3z8n1pOHH9CLiyvYZTBaimrojILJM_A-HLg/exec',
@@ -741,11 +743,11 @@
     };
 
     // -------------------------------------------------------------------
-    // MODULE: APPLICATION STATE
+    // MODUL: STATE APLIKASI
     // -------------------------------------------------------------------
     const State = {
         allSetoran: [],
-        santriData: [], // This will be processed data from Config.santriList
+        santriData: [], // Ini akan menjadi data yang diproses dari Config.santriList
         classGroups: {},
         setoranIdToDelete: null,
         weeklyChart: null,
@@ -753,18 +755,18 @@
     };
 
     // -------------------------------------------------------------------
-    // MODULE: DOM ELEMENT CACHE
+    // MODUL: CACHE ELEMEN DOM
     // -------------------------------------------------------------------
     const Cache = {};
 
-    /** Caches all necessary DOM elements for faster access. */
+    /** Menyimpan semua elemen DOM yang diperlukan ke dalam cache untuk akses yang lebih cepat. */
     function cacheElements() {
         const ids = [
             'main-nav', 'main-content', 'setoranForm', 'tanggal', 'nowBtn', 'musyrif', 'namaSantri', 'santriId', 
             'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 
             'kualitas', 'setoranTableBody', 'history-row-template', 'search-riwayat', 'suggestions-container', 
-            'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'stats-total-setoran', 
-            'stats-santri-aktif', 'stats-total-halaman', 'recent-activity-list', 'weeklyChart', 
+            'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'stats-santri-aktif', 
+            'stats-santri-tuntas', 'stats-santri-belum-tuntas', 'weeklyChart', 
             'weekly-chart-container', 'mutqin-juz29-progress-container', 'mutqin-juz29-bar', 
             'mutqin-juz29-label', 'mutqin-juz29-details', 'mutqin-juz30-progress-container', 
             'mutqin-juz30-bar', 'mutqin-juz30-label', 'mutqin-juz30-details', 'rekap-tabs', 
@@ -773,7 +775,7 @@
             'icon-legend-beranda', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap',
             'recent-activity-template', 'rekap-tab-template', 'rekap-content-template',
             'mutqin-unggulan-progress-container', 'mutqin-unggulan-bar', 'mutqin-unggulan-label', 'mutqin-unggulan-details',
-            'tuntas-tracking-container'
+            'tuntas-tracking-accordion'
         ];
         ids.forEach(id => {
             const key = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
@@ -784,30 +786,30 @@
     }
     
     // -------------------------------------------------------------------
-    // MODULE: API (Data Fetching)
+    // MODUL: API (Pengambilan Data)
     // -------------------------------------------------------------------
     const API = {
-        /** Fetches all setoran data from the Google Apps Script backend. */
+        /** Mengambil semua data setoran dari backend Google Apps Script. */
         async fetchSetoranData() {
             try {
                 const response = await fetch(Config.scriptURL);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return await response.json();
             } catch (error) {
-                console.error('Failed to load setoran data:', error);
+                console.error('Gagal memuat data setoran:', error);
                 UI.showToast('Gagal memuat riwayat setoran.', 'error');
-                return []; // Return empty array on failure
+                return [];
             }
         },
 
-        /** Posts form data to the backend. */
+        /** Mengirim data formulir ke backend. */
         async postData(formData) {
             try {
                 const response = await fetch(Config.scriptURL, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return await response.json();
             } catch (error) {
-                console.error('Failed to post data:', error);
+                console.error('Gagal mengirim data:', error);
                 UI.showToast(`Gagal: ${error.message}`, 'error');
                 return { result: 'error', error: error.message };
             }
@@ -815,17 +817,17 @@
     };
 
     // -------------------------------------------------------------------
-    // MODULE: UTILITIES
+    // MODUL: UTILITAS (Fungsi Bantuan)
     // -------------------------------------------------------------------
     const Utils = {
-        /** Sets the date-time input to the current local time. */
+        /** Mengatur input tanggal-waktu ke waktu lokal saat ini. */
         setCurrentDateTime() {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             Cache.tanggal.value = now.toISOString().slice(0, 16);
         },
 
-        /** Populates a select element with options. */
+        /** Mengisi elemen select dengan opsi. */
         populateSelect(selectEl, options, placeholder) {
             selectEl.innerHTML = '';
             if (placeholder) selectEl.add(new Option(placeholder, ''));
@@ -835,13 +837,13 @@
             });
         },
 
-        /** Normalizes a name string for reliable comparison. */
+        /** Menormalkan string nama untuk perbandingan yang andal. */
         normalizeName(name) {
             if (typeof name !== 'string') return '';
             return name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
         },
 
-        /** Generates SVG for quality rating stars. */
+        /** Menghasilkan SVG untuk bintang peringkat kualitas. */
         getKualitasSVG(kualitas) {
             const qualityMap = { 'Mumtaz': 5, 'Jayyid Jiddan': 4, 'Jayyid': 3, 'Maqbul': 2, 'Dhoif': 1 };
             const stars = qualityMap[kualitas] || 0;
@@ -850,14 +852,14 @@
             return `<div class="flex">${starIcon.repeat(stars)}${emptyStarIcon.repeat(5 - stars)}</div>`;
         },
 
-        /** Generates HTML for a program icon. */
+        /** Menghasilkan HTML untuk ikon program. */
         getProgramIcon(program) {
             return program === 'Unggulan' 
                 ? `<span title="Unggulan" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gray-200 text-gray-800 text-xs font-bold">U</span>` 
                 : `<span title="Tahfizh" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-200 text-purple-800 text-xs font-bold">T</span>`;
         },
         
-        /** Generates HTML for a class icon with color coding. */
+        /** Menghasilkan HTML untuk ikon kelas dengan kode warna. */
         getClassIcon(className) {
             if (!className) return '';
             let colorClass = 'bg-gray-200 text-gray-800';
@@ -869,9 +871,8 @@
             return `<span title="Kelas ${className}" class="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full ${colorClass} text-xs font-bold">${className}</span>`;
         },
 
-        /** Calculates the page value (score) for a setoran. */
+        /** Menghitung nilai halaman (skor) untuk sebuah setoran. */
         calculatePageValue(setoran) {
-            // This specific Mutqin is handled by the juz30Score logic, so it shouldn't add to the general page score.
             if (setoran.jenis === 'Mutqin' && String(setoran.juz) === "juz30_setengah") return 0;
             if (setoran.jenis === 'Mutqin' && (!setoran.halaman || parseInt(setoran.halaman, 10) >= 20)) return 20;
             if (setoran.halaman) return parseFloat(setoran.halaman) || 0;
@@ -879,7 +880,7 @@
             return 0;
         },
 
-        /** Exports a recap table to PDF. */
+        /** Mengekspor tabel rekap ke PDF. */
         exportRecapToPDF(classGroup) {
             try {
                 const { jsPDF } = window.jspdf;
@@ -920,65 +921,37 @@
                 });
                 doc.save(`rekap_setoran_${classGroup.replace(/, /g, '_')}_${Date.now()}.pdf`);
             } catch (error) {
-                console.error("PDF Export Error:", error);
+                console.error("Kesalahan Ekspor PDF:", error);
                 UI.showToast('Gagal mengekspor PDF.', 'error');
             }
         },
     };
 
     // -------------------------------------------------------------------
-    // MODULE: UI (Rendering and DOM Manipulation)
+    // MODUL: UI (Render dan Manipulasi DOM)
     // -------------------------------------------------------------------
     const UI = {
-        /** Renders all major UI components based on the current state. */
+        /** Merender semua komponen UI utama berdasarkan state saat ini. */
         renderAll() {
             this.beranda.render();
             this.history.renderTable();
             this.rekap.renderAll();
-            this.renderIconLegends();
         },
 
-        // --- Sub-module for Beranda Page ---
+        // --- Sub-modul untuk Halaman Beranda ---
         beranda: {
             render() {
-                const totalHalaman = State.allSetoran.reduce((sum, s) => sum + Utils.calculatePageValue(s), 0);
-                const santriAktifIds = new Set(State.allSetoran.map(s => s.namaSantri));
-
-                Cache.statsTotalSetoran.textContent = State.allSetoran.length;
-                Cache.statsSantriAktif.textContent = santriAktifIds.size;
-                Cache.statsTotalHalaman.textContent = totalHalaman.toFixed(1);
+                const santriAktifIds = new Set(State.allSetoran.map(s => s.santriId));
+                const totalSantri = Config.santriList.length;
+                const tuntasCount = State.santriData.filter(s => s.isTuntas).length;
                 
-                this.renderRecentActivity();
+                Cache.statsSantriAktif.textContent = `${santriAktifIds.size} / ${totalSantri}`;
+                Cache.statsSantriTuntas.textContent = tuntasCount;
+                Cache.statsSantriBelumTuntas.textContent = totalSantri - tuntasCount;
+                
                 this.renderWeeklySummaryChart();
                 this.renderMutqinProgress();
                 this.renderTuntasTracking();
-            },
-            renderRecentActivity() {
-                const recentActivities = State.allSetoran.slice(0, 5);
-                const container = Cache.recentActivityList;
-                const template = Cache.recentActivityTemplate;
-                container.innerHTML = '';
-
-                if (recentActivities.length === 0) {
-                    container.innerHTML = `<p class="text-sm text-gray-500">Belum ada aktivitas.</p>`;
-                    return;
-                }
-                
-                const fragment = document.createDocumentFragment();
-                recentActivities.forEach(setoran => {
-                    const santri = State.santriData.find(s => s.id === setoran.santriId);
-                    const clone = template.content.cloneNode(true);
-                    
-                    clone.querySelector('.data-nama').textContent = setoran.namaSantri;
-                    clone.querySelector('.data-emoji').textContent = Config.santriEmojis[setoran.namaSantri.charCodeAt(0) % Config.santriEmojis.length];
-                    clone.querySelector('.data-detail').textContent = `Menyetor ${setoran.jenis} ${setoran.halaman ? `${setoran.halaman} halaman` : setoran.surat}`;
-                    if (santri) {
-                        clone.querySelector('.data-program-icon').innerHTML = Utils.getProgramIcon(santri.program);
-                        clone.querySelector('.data-kelas-icon').innerHTML = Utils.getClassIcon(santri.kelas);
-                    }
-                    fragment.appendChild(clone);
-                });
-                container.appendChild(fragment);
             },
             renderWeeklySummaryChart() {
                 if (State.allSetoran.length === 0) {
@@ -1058,42 +1031,64 @@
                 }
             },
             renderTuntasTracking() {
-                const container = Cache.tuntasTrackingContainer;
+                const container = Cache.tuntasTrackingAccordion;
                 container.innerHTML = '';
                 const fragment = document.createDocumentFragment();
 
                 for (const groupName in State.classGroups) {
                     const group = State.classGroups[groupName];
-                    const card = document.createElement('div');
-                    card.className = 'glass-card rounded-xl p-4';
+                    const tuntasCount = group.santri.filter(s => s.isTuntas).length;
+                    const totalCount = group.santri.length;
+                    const belumTuntasCount = totalCount - tuntasCount;
+                    const percentage = totalCount > 0 ? ((tuntasCount / totalCount) * 100).toFixed(0) : 0;
+
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'glass-card rounded-lg overflow-hidden';
 
                     const tuntasList = group.santri.filter(s => s.isTuntas).map(s => s.nama).sort();
                     const belumTuntasList = group.santri.filter(s => !s.isTuntas).map(s => s.nama).sort();
 
-                    card.innerHTML = `
-                        <h4 class="font-bold text-lg text-gray-800 border-b border-gray-300/50 pb-2 mb-3">Kelas ${groupName}</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                            <div>
-                                <h5 class="font-semibold text-green-700 mb-2">✅ Sudah Tuntas (${tuntasList.length})</h5>
-                                <ul class="space-y-1 list-disc list-inside text-gray-700">
-                                    ${tuntasList.length > 0 ? tuntasList.map(nama => `<li>${nama}</li>`).join('') : '<li class="list-none text-gray-500">Belum ada</li>'}
-                                </ul>
-                            </div>
-                            <div>
-                                <h5 class="font-semibold text-red-700 mb-2">❌ Belum Tuntas (${belumTuntasList.length})</h5>
-                                <ul class="space-y-1 list-disc list-inside text-gray-700">
-                                    ${belumTuntasList.length > 0 ? belumTuntasList.map(nama => `<li>${nama}</li>`).join('') : '<li class="list-none text-gray-500">Semua tuntas</li>'}
-                                </ul>
+                    accordionItem.innerHTML = `
+                        <h2 class="accordion-header">
+                            <button type="button" class="accordion-button flex items-center justify-between w-full p-4 font-semibold text-left text-gray-800 transition-colors hover:bg-white/20">
+                                <span class="font-bold text-gray-900">Kelas ${groupName}</span>
+                                <div class="flex items-center gap-2 sm:gap-4">
+                                    <div class="hidden sm:flex items-center gap-2">
+                                        <div class="w-24 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                                        </div>
+                                        <span class="text-xs font-semibold text-gray-700">${percentage}%</span>
+                                    </div>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-800">Tuntas: ${tuntasCount}</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Belum: ${belumTuntasCount}</span>
+                                    <svg class="accordion-chevron w-4 h-4 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </button>
+                        </h2>
+                        <div class="accordion-panel border-t border-gray-200/50 bg-white/10">
+                            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <h5 class="font-semibold text-green-700 mb-2">✅ Sudah Tuntas (${tuntasList.length})</h5>
+                                    <ul class="space-y-1 list-disc list-inside text-gray-700">
+                                        ${tuntasList.length > 0 ? tuntasList.map(nama => `<li>${nama}</li>`).join('') : '<li class="list-none text-gray-500">Belum ada</li>'}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-700 mb-2">❌ Belum Tuntas (${belumTuntasList.length})</h5>
+                                    <ul class="space-y-1 list-disc list-inside text-gray-700">
+                                        ${belumTuntasList.length > 0 ? belumTuntasList.map(nama => `<li>${nama}</li>`).join('') : '<li class="list-none text-gray-500">Semua tuntas</li>'}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     `;
-                    fragment.appendChild(card);
+                    fragment.appendChild(accordionItem);
                 }
                 container.appendChild(fragment);
             }
         },
 
-        // --- Sub-module for Riwayat Page ---
+        // --- Sub-modul untuk Halaman Riwayat ---
         history: {
             getFilteredData() {
                 const searchTerm = Cache.searchRiwayat.value.toLowerCase();
@@ -1114,7 +1109,7 @@
             },
             renderTable() {
                 const filteredSetoran = this.getFilteredData();
-                const itemsToRender = filteredSetoran.slice(0, 50); // Limit to 50 items
+                const itemsToRender = filteredSetoran.slice(0, 50);
                 const tableBody = Cache.setoranTableBody;
                 const template = Cache.historyRowTemplate;
                 tableBody.innerHTML = '';
@@ -1130,7 +1125,6 @@
                     const clone = template.content.cloneNode(true);
                     
                     let juzText = '';
-                    // Use string comparison for the special value
                     if (String(setoran.juz) === "juz30_setengah") {
                         juzText = "Setengah Juz 30";
                     } else {
@@ -1173,7 +1167,7 @@
             },
         },
 
-        // --- Sub-module for Rekap Page ---
+        // --- Sub-modul untuk Halaman Rekap ---
         rekap: {
             renderAll() {
                 const sortedGroupNames = Object.keys(State.classGroups).sort((a,b) => a.localeCompare(b));
@@ -1188,7 +1182,6 @@
                 const contentFragment = document.createDocumentFragment();
 
                 sortedGroupNames.forEach((groupName, index) => {
-                    // Render Tab
                     const tabClone = tabTemplate.content.cloneNode(true);
                     const tabButton = tabClone.querySelector('button');
                     tabButton.dataset.tab = groupName.replace(/, /g, '');
@@ -1196,7 +1189,6 @@
                     if (index === 0) tabButton.classList.add('active');
                     tabsFragment.appendChild(tabClone);
 
-                    // Render Content
                     const contentClone = contentTemplate.content.cloneNode(true);
                     const group = State.classGroups[groupName];
                     const contentDiv = contentClone.querySelector('.rekap-tab-content');
@@ -1231,7 +1223,7 @@
             },
         },
         
-        // --- Sub-module for Form ---
+        // --- Sub-modul untuk Formulir ---
         form: {
             reset() {
                 Cache.setoranForm.reset();
@@ -1287,7 +1279,6 @@
                 const santri = State.santriData.find(s => s.id === Cache.namaSantri.value);
                 if (santri) {
                     const jenisOptions = [];
-                    // Ziyadah is available for Unggulan, or for Tahfizh *after* they are tuntas.
                     if (santri.program === "Unggulan" || (santri.program === "Tahfizh" && santri.isTuntas)) {
                         jenisOptions.push("Ziyadah");
                     }
@@ -1311,14 +1302,13 @@
                 }
                 let juzOptions = [];
                 if (jenis === "Mutqin") {
-                    // Add option for "Setengah Juz 30" if score is not yet 100
                     if (!santri.nilai || santri.nilai < 100) {
                         juzOptions.push({ text: "Setengah Juz 30 (An-Naba' - At-Tariq)", value: "juz30_setengah" });
                     }
                     for (let i = 1; i <= 30; i++) {
                         if (!santri.mutqinJuz.has(i)) juzOptions.push({ text: `Juz ${i}`, value: i });
                     }
-                } else { // Ziyadah or Murajaah
+                } else {
                     for (let i = 1; i <= 30; i++) juzOptions.push({ text: `Juz ${i}`, value: i });
                 }
                 Utils.populateSelect(Cache.juz, juzOptions, 'Pilih Juz');
@@ -1327,11 +1317,10 @@
             },
             updateSetoranInputs() {
                 const jenis = Cache.jenis.value;
-                const juz = Cache.juz.value; // Keep as string for "juz30_setengah" comparison
+                const juz = Cache.juz.value;
                 this.resetSetoranInputs();
                 if (!jenis || !juz) return;
 
-                // For "Setengah Juz 30", no further input is needed.
                 if (juz === "juz30_setengah") return;
                 
                 const juzNum = parseInt(juz, 10);
@@ -1351,12 +1340,12 @@
                     Cache.halaman.disabled = false;
                     Cache.halaman.placeholder = 'Kosongkan untuk 1 Juz penuh';
                     Cache.halaman.min = 1;
-                    Cache.halaman.required = false; // Not required, can be empty for full juz
+                    Cache.halaman.required = false;
                 }
             },
         },
 
-        // --- General UI Helpers ---
+        // --- Bantuan UI Umum ---
         renderIconLegends() {
             const legendItems = [
                 { icon: Utils.getProgramIcon('Tahfizh'), text: 'Program Tahfizh' },
@@ -1376,7 +1365,6 @@
                     <div class="flex flex-wrap items-center gap-2">${legendItemsHTML}</div>
                 </div>`;
             
-            Cache.iconLegendBeranda.innerHTML = fullLegendHTML;
             Cache.iconLegendRiwayat.innerHTML = fullLegendHTML;
             Cache.iconLegendRekap.innerHTML = fullLegendHTML;
         },
@@ -1430,15 +1418,15 @@
         },
         updateDateTime() {
             const now = new Date();
-            const time = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(now).replace(/\./g, ':');
+            const time = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).format(now).replace(/\./g, ':');
             const gregorianDate = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
             const hijriDate = new Intl.DateTimeFormat('id-ID-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
             const finalHTML = `
-                <div class="bg-white/20 backdrop-blur-sm p-2 rounded-lg shadow-inner">
-                    <div class="text-2xl font-bold text-gray-800">${time}</div>
+                <div class="text-center space-y-1">
+                    <p class="text-2xl font-bold text-gray-800">${time}</p>
+                    <p class="text-xs font-semibold text-gray-600">${gregorianDate}</p>
+                    <p class="text-xs font-semibold text-gray-500">${hijriDate}</p>
                 </div>
-                <div class="text-xs font-semibold text-gray-600 bg-white/40 px-3 py-1 rounded-full">${gregorianDate}</div>
-                <div class="text-xs font-semibold text-gray-600 bg-white/40 px-3 py-1 rounded-full">${hijriDate}</div>
             `;
             if (Cache.datetimeContainer) Cache.datetimeContainer.innerHTML = finalHTML;
         },
@@ -1452,7 +1440,7 @@
     };
 
     // -------------------------------------------------------------------
-    // MODULE: EVENT HANDLERS
+    // MODUL: HANDLERS (Penanganan Event)
     // -------------------------------------------------------------------
     const Handlers = {
         async handleFormSubmit(e) {
@@ -1465,14 +1453,14 @@
             const santriSelect = Cache.namaSantri;
             const selectedSantriName = santriSelect.options[santriSelect.selectedIndex].text;
             const formData = new FormData(form);
-            formData.set('namaSantri', selectedSantriName); // Ensure the text name is sent
+            formData.set('namaSantri', selectedSantriName);
 
             const data = await API.postData(formData);
 
             if (data.result === 'success') {
                 UI.showToast('Setoran berhasil disimpan!', 'success');
                 UI.form.reset();
-                await App.reloadData(); // Reload and re-render
+                await App.reloadData();
             }
 
             submitButton.disabled = false;
@@ -1516,7 +1504,7 @@
         },
 
         handleMainContentClick(e) {
-            const target = e.target.closest('.export-pdf-btn, .delete-btn, .quick-access-btn');
+            const target = e.target.closest('.export-pdf-btn, .delete-btn, .quick-access-btn, .accordion-button');
             if (!target) return;
 
             if (target.matches('.export-pdf-btn')) {
@@ -1526,6 +1514,20 @@
                 UI.openModal('passwordConfirmModal');
             } else if (target.matches('.quick-access-btn')) {
                 UI.switchPage(target.dataset.targetPage);
+            } else if (target.matches('.accordion-button')) {
+                const panel = target.closest('.accordion-header').nextElementSibling;
+                const chevron = target.querySelector('.accordion-chevron');
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                    panel.style.paddingTop = null;
+                    panel.style.paddingBottom = null;
+                    chevron.classList.remove('rotate-180');
+                } else {
+                    panel.style.paddingTop = '1rem';
+                    panel.style.paddingBottom = '1rem';
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                    chevron.classList.add('rotate-180');
+                }
             }
         },
 
@@ -1554,10 +1556,10 @@
     };
 
     // -------------------------------------------------------------------
-    // MODULE: APP (Main Controller)
+    // MODUL: APP (Kontroler Utama)
     // -------------------------------------------------------------------
     const App = {
-        /** Initializes the application. */
+        /** Menginisialisasi aplikasi. */
         async init() {
             cacheElements();
             this.setupEventListeners();
@@ -1573,37 +1575,32 @@
             UI.switchPage('page-beranda', false);
         },
 
-        /** Sets up all global event listeners. */
+        /** Mengatur semua event listener global. */
         setupEventListeners() {
             Cache.setoranForm.addEventListener('submit', Handlers.handleFormSubmit);
             Cache.nowBtn.addEventListener('click', Utils.setCurrentDateTime);
             Cache.mainNav.addEventListener('click', Handlers.handleNavClick);
             Cache.mainContent.addEventListener('click', Handlers.handleMainContentClick);
             
-            // Form select changes
             Cache.musyrif.addEventListener('change', UI.form.updateSantriOptions.bind(UI.form));
             Cache.namaSantri.addEventListener('change', () => { UI.form.updateSantriDetails(); UI.form.updateJenisOptions(); });
             Cache.jenis.addEventListener('change', UI.form.updateJuzOptions.bind(UI.form));
             Cache.juz.addEventListener('change', UI.form.updateSetoranInputs.bind(UI.form));
 
-            // Riwayat page filters
             Cache.searchRiwayat.addEventListener('input', Handlers.handleHistorySearch);
             Cache.suggestionsContainer.addEventListener('click', Handlers.handleSuggestionClick);
             [Cache.filterTanggalMulai, Cache.filterTanggalAkhir, Cache.filterProgram].forEach(el => {
                 el.addEventListener('input', () => UI.history.renderTable());
             });
             
-            // Rekap page tabs
             Cache.rekapTabs.addEventListener('click', Handlers.handleTabClick);
 
-            // Modal listeners
             Cache.cancelPasswordBtn.addEventListener('click', () => UI.closeModal('passwordConfirmModal'));
             Cache.confirmPasswordBtn.addEventListener('click', Handlers.handleConfirmDelete);
             Cache.passwordConfirmModal.addEventListener('click', (e) => { 
                 if (e.target === Cache.passwordConfirmModal) UI.closeModal('passwordConfirmModal'); 
             });
 
-            // Global click listener to hide suggestions
             document.addEventListener('click', (e) => {
                 if (!Cache.searchRiwayat.contains(e.target) && !Cache.suggestionsContainer.contains(e.target)) {
                     Cache.suggestionsContainer.classList.add('hidden');
@@ -1611,7 +1608,7 @@
             });
         },
 
-        /** Processes static data from Config into a more usable format in State. */
+        /** Memproses data statis dari Config ke format yang lebih berguna di State. */
         processStaticData() {
             const santriNameMap = new Map(Config.santriList.map(s => [Utils.normalizeName(s.nama), s.id]));
             State.santriNameMap = santriNameMap;
@@ -1645,7 +1642,7 @@
             Utils.populateSelect(Cache.musyrif, musyrifList, 'Pilih Musyrif');
         },
 
-        /** Fetches new data and re-processes it. */
+        /** Mengambil data baru dan memprosesnya ulang. */
         async reloadData() {
             const dataFromServer = await API.fetchSetoranData();
             
@@ -1676,11 +1673,10 @@
         },
 
         /**
-         * REFACTORED: Calculates all santri statistics from scratch based on the new logic.
-         * This ensures data is always in sync.
+         * DITULIS ULANG: Menghitung semua statistik santri dari awal berdasarkan logika baru.
+         * Ini memastikan data selalu sinkron.
          */
         calculateSantriStats() {
-            // 1. Reset all calculated stats for every santri
             State.santriData.forEach(s => {
                 s.mutqinJuz = new Set();
                 s.nilai = 0;
@@ -1689,22 +1685,17 @@
                 s.ziyadahPages = 0;
             });
 
-            // 2. Process all setoran records for each santri
             State.santriData.forEach(santri => {
                 const santriSetoran = State.allSetoran.filter(s => s.santriId === santri.id);
                 if (santriSetoran.length === 0) return;
 
-                // --- PRE-CALCULATION PASS ---
-                // Find all key mutqin setoran to populate the mutqinJuz set.
                 const mutqinSetengahJuz = santriSetoran.find(s => s.jenis === 'Mutqin' && String(s.juz) === "juz30_setengah" && new Date(s.createdAt) <= Config.deadlineJuz30Score);
                 const mutqinJuz30 = santriSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 30 && (!s.halaman || parseInt(s.halaman) >= 20));
                 const mutqinJuz29 = santriSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 29 && (!s.halaman || parseInt(s.halaman) >= 20));
 
-                // Populate the mutqinJuz set for progress bars and tuntas checks
                 if (mutqinJuz29) santri.mutqinJuz.add(29);
                 if (mutqinJuz30) santri.mutqinJuz.add(30);
                 
-                // --- NILAI CALCULATION ---
                 if (mutqinSetengahJuz || (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= Config.deadlineJuz30Score)) {
                     santri.nilai = 100;
                 } else {
@@ -1714,7 +1705,6 @@
                     santri.nilai = mutqinPagesAfterDeadline;
                 }
 
-                // --- TUNTAS STATUS CALCULATION ---
                 let tuntasRequirementsMet = false;
                 if (santri.program === 'Unggulan') {
                     if (santri.nilai >= 100) {
@@ -1728,7 +1718,6 @@
                     }
                 }
 
-                // If tuntas, find the completion date
                 if (tuntasRequirementsMet) {
                     santri.isTuntas = true;
                     let completionDates = [];
@@ -1744,7 +1733,6 @@
                     }
                 }
 
-                // --- POST-TUNTAS SCORE CALCULATION (TAHFIZH ONLY) ---
                 if (santri.isTuntas && santri.program === 'Tahfizh' && santri.tuntasDate) {
                     let postTuntasScore = 0;
                     santriSetoran.forEach(setoran => {
@@ -1763,7 +1751,7 @@
         }
     };
 
-    // Initialize the application when the DOM is fully loaded.
+    // Inisialisasi aplikasi ketika DOM sudah sepenuhnya dimuat.
     document.addEventListener('DOMContentLoaded', () => App.init());
 
 </script>
