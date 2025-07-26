@@ -105,17 +105,44 @@
             transform-origin: 50% 50%;
         }
         
-        /* PERBAIKAN: Skeleton Loader */
+        /* Skeleton Loader */
         #main-content {
             position: relative;
         }
         .skeleton-container {
             position: absolute;
             inset: 0;
-            background: #f8fafc; /* Warna latar belakang agar tidak transparan */
+            background: #f8fafc;
             z-index: 20;
             overflow: hidden;
         }
+
+        /* Fitur Sortir Tabel */
+        .sortable .sort-icon {
+            opacity: 0.5;
+            display: inline-block;
+            width: 1em;
+            text-align: center;
+        }
+        .sortable:hover .sort-icon {
+            opacity: 1;
+        }
+        .sortable .sort-icon::after {
+            content: '↕';
+            color: #9ca3af;
+        }
+        .sortable[data-sort-dir="asc"] .sort-icon::after {
+            content: '↑';
+            opacity: 1;
+        }
+        .sortable[data-sort-dir="desc"] .sort-icon::after {
+            content: '↓';
+            opacity: 1;
+        }
+        .sortable[data-sort-dir] .sort-icon {
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body class="text-gray-900">
@@ -163,11 +190,7 @@
             <!-- SKELETON: Beranda -->
             <div id="skeleton-page-beranda" class="skeleton-container hidden p-4 sm:p-6 lg:p-8 space-y-8">
                 <div class="h-40 skeleton rounded-2xl"></div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div class="h-28 skeleton rounded-2xl"></div>
-                    <div class="h-28 skeleton rounded-2xl"></div>
-                    <div class="h-28 skeleton rounded-2xl"></div>
-                </div>
+                <div class="h-40 skeleton rounded-2xl"></div>
                 <div class="h-48 skeleton rounded-2xl"></div>
                 <div class="h-32 skeleton rounded-2xl"></div>
             </div>
@@ -175,58 +198,78 @@
             <!-- HALAMAN: Beranda -->
             <div id="page-beranda" class="page-content p-4 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto space-y-8">
-                    <!-- Bagian Hero -->
-                    <header class="text-center pt-12 sm:pt-0 pb-8 fade-in">
-                        <div class="mx-auto mb-4 w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-3xl shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-                        </div>
-                        <h2 class="text-xl font-medium text-gray-600 mb-2">Assalamu 'alaikum ustadz,</h2>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">Selamat Datang di Setor.in</h1>
-                        <p class="mt-4 text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">Catat setiap setoran, rayakan setiap kemajuan. Yuk, buat hafalan jadi lebih tertata dan terpantau!</p>
-                        <div id="datetime-container" class="mt-6"></div>
-                        <div class="mt-8">
-                            <button data-target-page="page-form" class="group inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                                Input Setoran Baru
-                            </button>
-                        </div>
-                    </header>
+                    
+                    <!-- PERUBAHAN: Hero Section diganti dengan Bento Grid -->
+                    <header class="fade-in">
+                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Welcome Card -->
+                            <div class="md:col-span-2 lg:col-span-2 lg:row-span-2 bg-gradient-to-br from-amber-400 to-orange-500 text-white p-6 rounded-2xl flex flex-col justify-between transition-transform hover:scale-105 duration-300">
+                                <div>
+                                    <h2 class="text-lg font-medium opacity-90 mb-2">Assalamu 'alaikum ustadz,</h2>
+                                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Selamat Datang di Setor.in</h1>
+                                    <p class="mt-4 text-base opacity-90 max-w-md">Catat setiap setoran, rayakan setiap kemajuan. Yuk, buat hafalan jadi lebih tertata dan terpantau!</p>
+                                </div>
+                                <div class="flex items-center gap-3 mt-6">
+                                    <div class="bg-white/20 p-2 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                                    </div>
+                                    <span class="font-bold text-lg">Setor.in</span>
+                                </div>
+                            </div>
 
-                    <!-- Kartu Statistik -->
+                            <!-- Input Setoran Card -->
+                             <button data-target-page="page-form" class="lg:col-span-2 bg-gray-800 text-white p-6 rounded-2xl text-left flex flex-col justify-between group transition-transform hover:scale-105 duration-300">
+                                <h3 class="text-2xl font-bold">Input Setoran Baru</h3>
+                                <div class="flex justify-end">
+                                    <div class="bg-amber-500 p-3 rounded-full group-hover:rotate-12 transition-transform duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <!-- Waktu & Tanggal Card -->
+                            <div id="datetime-container" class="lg:col-span-2 bg-white/50 border border-gray-200/80 p-6 rounded-2xl flex items-center justify-center transition-transform hover:scale-105 duration-300">
+                                <!-- Konten akan di-render oleh JS -->
+                            </div>
+                         </div>
+                    </header>
+                    
+                    <!-- PERUBAHAN: Layout Statistik Umum Baru -->
                     <section class="fade-in" style="animation-delay: 100ms;">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Statistik Umum</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Kartu Santri Aktif -->
-                            <div class="fade-in p-5 rounded-2xl glass-card flex flex-col justify-between bg-gradient-to-br from-blue-100 to-white/50 border-blue-200" style="animation-delay: 200ms;">
-                                <div class="flex items-center gap-4">
-                                    <div class="bg-blue-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
-                                    <p class="text-sm text-blue-800 font-semibold">Santri Aktif</p>
+                        <div class="glass-card rounded-2xl p-4 sm:p-6 flex flex-col lg:flex-row gap-4 sm:gap-6">
+                            <!-- Statistik Utama: Santri Aktif -->
+                            <div class="flex-1 bg-blue-50/50 rounded-xl p-5 flex items-center justify-between gap-4 border border-blue-200/50">
+                                <div>
+                                    <p class="text-sm text-blue-800 font-semibold flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                        Santri Aktif
+                                    </p>
+                                    <p id="stats-santri-aktif" class="text-3xl sm:text-4xl font-bold text-blue-900 mt-2">0 / 0</p>
                                 </div>
-                                <div class="text-right mt-4">
-                                    <p id="stats-santri-aktif" class="text-2xl sm:text-3xl font-bold text-blue-900">0 / 0</p>
-                                    <span id="stats-santri-aktif-pct" class="text-sm font-bold text-blue-700"></span>
+                                <div class="text-right">
+                                    <span id="stats-santri-aktif-pct" class="text-2xl font-bold text-blue-700">0%</span>
                                 </div>
                             </div>
-                            <!-- Kartu Sudah Tuntas -->
-                            <div class="fade-in p-5 rounded-2xl glass-card flex flex-col justify-between bg-gradient-to-br from-green-100 to-white/50 border-green-200" style="animation-delay: 300ms;">
-                                <div class="flex items-center gap-4">
+                            <!-- Statistik Tambahan -->
+                            <div class="flex flex-col sm:flex-row lg:flex-col gap-4 sm:gap-6">
+                                <!-- Sudah Tuntas -->
+                                <div class="flex-1 bg-green-50/50 rounded-xl p-4 flex items-center gap-4 border border-green-200/50">
                                     <div class="bg-green-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                                    <p class="text-sm text-green-800 font-semibold">Sudah Tuntas</p>
+                                    <div>
+                                        <p class="text-sm text-green-800 font-semibold">Sudah Tuntas</p>
+                                        <p id="stats-santri-tuntas" class="text-2xl font-bold text-green-900">0</p>
+                                        <span id="stats-santri-tuntas-pct" class="text-xs font-bold text-green-700"></span>
+                                    </div>
                                 </div>
-                                <div class="text-right mt-4">
-                                    <p id="stats-santri-tuntas" class="text-2xl sm:text-3xl font-bold text-green-900">0</p>
-                                    <span id="stats-santri-tuntas-pct" class="text-sm font-bold text-green-700"></span>
-                                </div>
-                            </div>
-                             <!-- Kartu Belum Tuntas -->
-                            <div class="fade-in p-5 rounded-2xl glass-card flex flex-col justify-between bg-gradient-to-br from-red-100 to-white/50 border-red-200" style="animation-delay: 400ms;">
-                                <div class="flex items-center gap-4">
+                                <!-- Belum Tuntas -->
+                                <div class="flex-1 bg-red-50/50 rounded-xl p-4 flex items-center gap-4 border border-red-200/50">
                                     <div class="bg-red-500 text-white p-3 rounded-lg shadow-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                                    <p class="text-sm text-red-800 font-semibold">Belum Tuntas</p>
-                                </div>
-                                <div class="text-right mt-4">
-                                    <p id="stats-santri-belum-tuntas" class="text-2xl sm:text-3xl font-bold text-red-900">0</p>
-                                    <span id="stats-santri-belum-tuntas-pct" class="text-sm font-bold text-red-700"></span>
+                                    <div>
+                                        <p class="text-sm text-red-800 font-semibold">Belum Tuntas</p>
+                                        <p id="stats-santri-belum-tuntas" class="text-2xl font-bold text-red-900">0</p>
+                                        <span id="stats-santri-belum-tuntas-pct" class="text-xs font-bold text-red-700"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -445,8 +488,8 @@
                     
                     <!-- Bagian Filter -->
                     <!-- PERUBAHAN: Mengubah grid menjadi 5 kolom dan menambahkan filter kelas -->
-                    <div class="p-4 rounded-xl mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end glass-card">
-                        <div class="lg:col-span-2">
+                    <div class="p-4 rounded-xl mb-6 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 items-end glass-card">
+                        <div class="lg:col-span-1">
                             <label for="search-riwayat" class="text-sm font-medium text-gray-800">Cari Nama Santri</label>
                             <div class="relative">
                                 <input type="search" id="search-riwayat" placeholder="Ketik nama..." class="w-full mt-1 p-2 rounded-lg glass-input" autocomplete="off">
@@ -601,11 +644,12 @@
                 <table class="min-w-full divide-y divide-gray-200/80">
                     <thead class="bg-gray-100/80">
                         <tr>
+                            <!-- PENAMBAHAN: Fitur Sortir di Header Tabel Rekap -->
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ziyadah (hlm)</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                            <th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="nama">Nama <span class="sort-icon"></span></th>
+                            <th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="nilai">Nilai <span class="sort-icon"></span></th>
+                            <th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="ziyadah">Ziyadah (hlm) <span class="sort-icon"></span></th>
+                            <th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="keterangan">Keterangan <span class="sort-icon"></span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200/80 data-table-body"></tbody>
@@ -618,9 +662,10 @@
     /**
      * @file Mengelola aplikasi Setor.in.
      * @author Ditulis ulang oleh Gemini
-     * @version 2.9 - Perbaikan Filter & Input Surat
-     * @description Skrip ini diorganisir ke dalam modul-modul objek untuk kejelasan dan kemudahan pemeliharaan.
-     * Versi ini memperbaiki bug pada input surat dan menambahkan filter kelas pada halaman riwayat.
+     * @version 3.0 - Perubahan Layout & Fitur Sortir
+     * @description Skrip ini diorganisir ke dalam modul-modul objek.
+     * Versi ini mengubah layout statistik, menambahkan fitur sortir tabel rekap,
+     * memperbaiki bug input surat, dan menambahkan filter kelas.
      */
 
     // -------------------------------------------------------------------
@@ -949,8 +994,7 @@
                 Cache.statsSantriTuntas.textContent = tuntasCount;
                 Cache.statsSantriBelumTuntas.textContent = belumTuntasCount;
 
-                // Kalkulasi dan tampilkan persentase
-                Cache.statsSantriAktifPct.textContent = `(${(santriAktifIds.size / totalSantri * 100).toFixed(0)}%)`;
+                Cache.statsSantriAktifPct.textContent = `${totalSantri > 0 ? (santriAktifIds.size / totalSantri * 100).toFixed(0) : 0}%`;
                 Cache.statsSantriTuntasPct.textContent = `(${(tuntasCount / totalSantri * 100).toFixed(0)}%)`;
                 Cache.statsSantriBelumTuntasPct.textContent = `(${(belumTuntasCount / totalSantri * 100).toFixed(0)}%)`;
                 
@@ -1013,16 +1057,14 @@
                         <span class="absolute inset-0 flex items-center justify-center text-2xl font-bold ${colorClass}">${percentage}%</span>
                     `;
                     
-                    // Animate the circle
                     setTimeout(() => {
                         const circle = container.querySelector('.progress-ring-circle');
                         if(circle) {
                             circle.style.strokeDashoffset = offset;
                         }
-                    }, 100); // Small delay to ensure transition works on load
+                    }, 100);
                 };
 
-                // --- Progress Unggulan ---
                 const unggulanSantri = State.santriData.filter(s => s.program === 'Unggulan');
                 const totalUnggulan = unggulanSantri.length;
                 if (totalUnggulan > 0) {
@@ -1035,7 +1077,6 @@
                     Cache.mutqinUnggulanProgressContainer.classList.add('hidden');
                 }
 
-                // --- Progress Tahfizh ---
                 const tahfizhSantri = State.santriData.filter(s => s.program === 'Tahfizh');
                 const totalTahfizh = tahfizhSantri.length;
                 if (totalTahfizh > 0) {
@@ -1118,7 +1159,7 @@
             getFilteredData() {
                 const searchTerm = Cache.searchRiwayat.value.toLowerCase();
                 const programFilter = Cache.filterProgram.value;
-                const classFilter = Cache.filterKelas.value; // PENAMBAHAN: Ambil nilai filter kelas
+                const classFilter = Cache.filterKelas.value;
                 const startDate = Cache.filterTanggalMulai.value ? new Date(Cache.filterTanggalMulai.value) : null;
                 const endDate = Cache.filterTanggalAkhir.value ? new Date(Cache.filterTanggalAkhir.value) : null;
                 if(startDate) startDate.setHours(0,0,0,0);
@@ -1128,7 +1169,6 @@
                     const setoranDate = new Date(s.createdAt);
                     const santri = State.santriData.find(st => st.id === s.santriId);
                     
-                    // PENAMBAHAN: Logika untuk filter kelas
                     const classMatch = (classFilter === 'Semua') || 
                                        (santri && (
                                            classFilter === '2CDGH'
@@ -1138,7 +1178,7 @@
 
                     return s.namaSantri.toLowerCase().includes(searchTerm) &&
                            (programFilter === 'Semua' || (santri && santri.program === programFilter)) &&
-                           classMatch && // PERUBAHAN: Terapkan filter kelas
+                           classMatch &&
                            (!startDate || setoranDate >= startDate) &&
                            (!endDate || setoranDate <= endDate);
                 });
@@ -1209,13 +1249,15 @@
                 const sortedGroupNames = Object.keys(State.classGroups).sort((a,b) => a.localeCompare(b));
                 const tabsContainer = Cache.rekapTabs;
                 const contentContainer = Cache.rekapContentContainer;
-                const tabTemplate = Cache.rekapTabTemplate;
-                const contentTemplate = Cache.rekapContentTemplate;
                 tabsContainer.innerHTML = '';
                 contentContainer.innerHTML = '';
 
+                if (sortedGroupNames.length === 0) return;
+
                 const tabsFragment = document.createDocumentFragment();
                 const contentFragment = document.createDocumentFragment();
+                const contentTemplate = Cache.rekapContentTemplate;
+                const tabTemplate = Cache.rekapTabTemplate;
 
                 sortedGroupNames.forEach((groupName, index) => {
                     const tabClone = tabTemplate.content.cloneNode(true);
@@ -1224,42 +1266,86 @@
                     tabButton.textContent = `Kelas ${groupName}`;
                     
                     const contentClone = contentTemplate.content.cloneNode(true);
-                    const group = State.classGroups[groupName];
                     const contentDiv = contentClone.querySelector('.rekap-tab-content');
                     contentDiv.id = `rekap-tab-${groupName.replace(/, /g, '')}`;
+                    
+                    const group = State.classGroups[groupName];
+                    contentDiv.querySelector('.data-title').textContent = `Rekap Capaian - Kelas ${groupName}`;
+                    contentDiv.querySelector('.data-musyrif').textContent = `Musyrif: ${group.musyrif}`;
+                    contentDiv.querySelector('.data-timestamp').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+                    contentDiv.querySelector('.export-pdf-btn').dataset.classGroup = groupName;
                     
                     if (index === 0) {
                         tabButton.classList.add('active');
                         contentDiv.classList.remove('hidden');
                     }
                     
-                    contentDiv.querySelector('.data-title').textContent = `Rekap Capaian - Kelas ${groupName}`;
-                    contentDiv.querySelector('.data-musyrif').textContent = `Musyrif: ${group.musyrif}`;
-                    contentDiv.querySelector('.data-timestamp').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
-                    contentDiv.querySelector('.export-pdf-btn').dataset.classGroup = groupName;
-                    
-                    const tableBody = contentDiv.querySelector('.data-table-body');
-                    group.santri.sort((a,b) => a.nama.localeCompare(b.nama)).forEach((santri, idx) => {
-                        const isTuntas = santri.isTuntas;
-                        const keterangan = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span>`;
-                        const row = tableBody.insertRow();
-                        row.className = 'hover:bg-gray-50/50';
-                        row.innerHTML = `
-                            <td class="px-4 py-2 text-gray-800">${idx + 1}</td>
-                            <td class="px-4 py-2 text-sm text-gray-800"><div class="flex items-center">${santri.nama}${Utils.getProgramIcon(santri.program)}${Utils.getClassIcon(santri.kelas)}</div></td>
-                            <td class="px-4 py-2 font-medium text-gray-800 text-center">${santri.nilai}</td>
-                            <td class="px-4 py-2 font-medium text-gray-800 text-center">${santri.program === 'Tahfizh' ? santri.ziyadahPages.toFixed(1) : '-'}</td>
-                            <td class="px-4 py-2 text-center">${keterangan}</td>
-                        `;
-                    });
-
                     tabsFragment.appendChild(tabClone);
                     contentFragment.appendChild(contentClone);
                 });
 
                 tabsContainer.appendChild(tabsFragment);
                 contentContainer.appendChild(contentFragment);
+
+                // Initial render for all tables
+                sortedGroupNames.forEach(groupName => {
+                    this.renderSingleRekapTable(groupName, true);
+                });
             },
+            
+            renderSingleRekapTable(groupName, isInitialRender = false) {
+                const group = State.classGroups[groupName];
+                if (!group) return;
+
+                const tabId = groupName.replace(/, /g, '');
+                const contentDiv = document.getElementById(`rekap-tab-${tabId}`);
+                if (!contentDiv) return;
+
+                if (isInitialRender && !group.sortState) {
+                    group.sortState = { column: 'nama', dir: 'asc' };
+                }
+
+                const { column, dir } = group.sortState;
+                group.santri.sort((a, b) => {
+                    let valA, valB;
+                    switch (column) {
+                        case 'nama': valA = a.nama; valB = b.nama; break;
+                        case 'nilai': valA = a.nilai; valB = b.nilai; break;
+                        case 'ziyadah':
+                            valA = a.program === 'Tahfizh' ? a.ziyadahPages : -1;
+                            valB = b.program === 'Tahfizh' ? b.ziyadahPages : -1;
+                            break;
+                        case 'keterangan': valA = a.isTuntas; valB = b.isTuntas; break;
+                        default: return 0;
+                    }
+                    if (valA < valB) return dir === 'asc' ? -1 : 1;
+                    if (valA > valB) return dir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                contentDiv.querySelectorAll('th.sortable').forEach(th => {
+                    th.removeAttribute('data-sort-dir');
+                    if (th.dataset.sort === column) {
+                        th.setAttribute('data-sort-dir', dir);
+                    }
+                });
+
+                const tableBody = contentDiv.querySelector('.data-table-body');
+                tableBody.innerHTML = '';
+                group.santri.forEach((santri, idx) => {
+                    const isTuntas = santri.isTuntas;
+                    const keterangan = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span>`;
+                    const row = tableBody.insertRow();
+                    row.className = 'hover:bg-gray-50/50';
+                    row.innerHTML = `
+                        <td class="px-4 py-2 text-gray-800">${idx + 1}</td>
+                        <td class="px-4 py-2 text-sm text-gray-800"><div class="flex items-center">${santri.nama}${Utils.getProgramIcon(santri.program)}${Utils.getClassIcon(santri.kelas)}</div></td>
+                        <td class="px-4 py-2 font-medium text-gray-800 text-center">${santri.nilai}</td>
+                        <td class="px-4 py-2 font-medium text-gray-800 text-center">${santri.program === 'Tahfizh' ? santri.ziyadahPages.toFixed(1) : '-'}</td>
+                        <td class="px-4 py-2 text-center">${keterangan}</td>
+                    `;
+                });
+            }
         },
         
         // --- Sub-modul untuk Formulir ---
@@ -1369,7 +1455,7 @@
                 if (isSurahBased) {
                     Cache.suratContainer.classList.remove('hidden');
                     Cache.surat.required = true;
-                    Cache.surat.disabled = false; // PERBAIKAN: Mengaktifkan dropdown surat
+                    Cache.surat.disabled = false; 
                     Utils.populateSelect(Cache.surat, surahList, 'Pilih Surat');
                 } else if (jenis === 'Ziyadah' || jenis === 'Murajaah') {
                     Cache.halamanContainer.classList.remove('hidden');
@@ -1544,7 +1630,7 @@
 
         handleMainContentClick(e) {
             const target = e.target;
-            const button = target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .rekap-tab-btn');
+            const button = target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .rekap-tab-btn, .sortable');
             if (!button) return;
 
             if (button.matches('.export-pdf-btn')) {
@@ -1570,6 +1656,21 @@
                 }
             } else if (button.matches('.rekap-tab-btn')) {
                  UI.switchTab(button.parentElement, '.rekap-tab-content', button, 'rekap-tab');
+            } else if (button.matches('.sortable')) {
+                const column = button.dataset.sort;
+                const rekapContent = button.closest('.rekap-tab-content');
+                const tabId = rekapContent.id.replace('rekap-tab-', '');
+                const groupName = Object.keys(State.classGroups).find(name => name.replace(/, /g, '') === tabId);
+                
+                const group = State.classGroups[groupName];
+                if (!group) return;
+
+                if (!group.sortState) group.sortState = { column: 'nama', dir: 'asc' };
+                
+                const newDir = (group.sortState.column === column && group.sortState.dir === 'asc') ? 'desc' : 'asc';
+                group.sortState = { column, dir: newDir };
+                
+                UI.rekap.renderSingleRekapTable(groupName);
             }
         },
 
@@ -1625,7 +1726,6 @@
             Cache.searchRiwayat.addEventListener('input', Handlers.handleHistorySearch);
             Cache.suggestionsContainer.addEventListener('click', Handlers.handleSuggestionClick);
             
-            // PERUBAHAN: Menambahkan filter kelas ke event listener
             [Cache.filterTanggalMulai, Cache.filterTanggalAkhir, Cache.filterProgram, Cache.filterKelas].forEach(el => {
                 el.addEventListener('input', () => UI.history.renderTable());
             });
