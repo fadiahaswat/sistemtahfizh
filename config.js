@@ -8,7 +8,7 @@ const AppConfig = {
     
     // Deadline
     deadlineJuz30Score: new Date('2026-01-03T23:59:59'),
-    deadlineTahfizhTuntas: new Date('2025-09-30T23:59:59'),
+    deadlineTahfizhTuntas: new Date('2025-12-30T23:59:59'),
     
     // Mengambil data dari file data-hafalan.js (HAFALAN_DATA harus di-load sebelumnya di HTML)
     hafalanData: HAFALAN_DATA,
