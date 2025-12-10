@@ -1047,26 +1047,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOM.cancelPasswordBtn.addEventListener('click', () => DOM.passwordConfirmModal.classList.add('hidden'));
         DOM.confirmPasswordBtn.addEventListener('click', async () => {
-            if (DOM.passwordInput.value !== AppConfig.deletePassword) {
-                DOM.passwordError.classList.remove('hidden');
-                return;
+            // 1. Ambil input password dari user
+            const inputPass = DOM.passwordInput.value;
+            
+            // (Opsional) Validasi kosong di client
+            if (!inputPass) {
+                 DOM.passwordError.textContent = "Masukkan kata sandi.";
+                 DOM.passwordError.classList.remove('hidden');
+                 return;
             }
+
+            // Reset pesan error
             DOM.passwordError.classList.add('hidden');
+            
             const setoran = State.allSetoran.find(s => s.id === State.setoranIdToDelete);
             if (!setoran) return;
 
+            // 2. Beri feedback visual bahwa sedang memproses (Loading)
+            const originalText = DOM.confirmPasswordBtn.textContent;
+            DOM.confirmPasswordBtn.textContent = "Memverifikasi...";
+            DOM.confirmPasswordBtn.disabled = true;
+            DOM.cancelPasswordBtn.disabled = true;
+
+            // 3. Siapkan data kiriman
             const formData = new FormData();
             formData.append('action', 'delete');
             formData.append('rowNumber', setoran.rowNumber);
-            formData.append('password', DOM.passwordInput.value);
-            
-            DOM.passwordConfirmModal.classList.add('hidden');
-            const data = await Utils.postData(formData);
-            if (data.result === 'success') {
-                UI.showToast('Data berhasil dihapus.');
-                await Core.reloadData();
-            } else {
-                UI.showToast(`Gagal menghapus: ${data.error || 'Terjadi kesalahan'}`, 'error');
+            formData.append('password', inputPass); // Kirim tebakan password ke server
+
+            try {
+                // 4. Kirim ke Google Apps Script
+                const data = await Utils.postData(formData);
+                
+                // 5. Cek Jawaban Server
+                if (data.result === 'success') {
+                    // SUKSES: Server bilang password benar & data dihapus
+                    UI.showToast('Data berhasil dihapus.');
+                    DOM.passwordConfirmModal.classList.add('hidden'); // Tutup modal
+                    DOM.passwordInput.value = ''; // Bersihkan input
+                    await Core.reloadData(); // Refresh data
+                } else {
+                    // GAGAL: Server bilang error (bisa password salah atau error lain)
+                    if (data.error === 'Kata sandi salah.') {
+                        // Tampilkan error khusus password di modal (seperti sebelumnya)
+                        DOM.passwordError.textContent = "Kata sandi salah.";
+                        DOM.passwordError.classList.remove('hidden');
+                    } else {
+                        // Error lain (misal server down), tutup modal & pakai Toast
+                        DOM.passwordConfirmModal.classList.add('hidden');
+                        UI.showToast(`Gagal: ${data.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                UI.showToast('Terjadi kesalahan koneksi.', 'error');
+            } finally {
+                // 6. Kembalikan tombol ke kondisi semula (selesai loading)
+                DOM.confirmPasswordBtn.textContent = originalText;
+                DOM.confirmPasswordBtn.disabled = false;
+                DOM.cancelPasswordBtn.disabled = false;
             }
         });
         
@@ -1143,4 +1182,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
