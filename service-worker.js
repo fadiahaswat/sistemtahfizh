@@ -5,14 +5,9 @@ const ASSETS_TO_CACHE = [
   './style.css',
   './app.js',
   './config.js',
-  './data-hafalan.js',
-  // HAPUS ATAU COMMENT BARIS DI BAWAH INI:
-  // 'https://cdn.tailwindcss.com',
-  // 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
-  // 'https://cdn.jsdelivr.net/npm/chart.js'
+  './data-hafalan.js'
 ];
 
-// 1. Install Service Worker & Cache File
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -22,7 +17,6 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. Activate & Hapus Cache Lama
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -33,18 +27,29 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Fetch Strategy: Stale-While-Revalidate
-// (Pakai cache dulu biar cepat, tapi tetap cek server untuk update di background)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
+      // Jika ada di cache, kembalikan. Jika tidak, fetch jaringan.
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request).then((networkResponse) => {
+        // Cek validitas response
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
+        }
+
+        // PENTING: Clone response SEBELUM digunakan/dikembalikan
+        const responseToCache = networkResponse.clone();
+
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
+          cache.put(event.request, responseToCache);
         });
+
         return networkResponse;
       });
-      return cachedResponse || fetchPromise;
     })
   );
 });
