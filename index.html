@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Core.updateMusyrifList(); 
         },
         calculateSantriStats: () => {
-            const santriStatsMap = new Map(AppConfig.santriList.map(s => [s.id, { ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0 }]));
+            const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0 }]));
             
             for (const setoran of State.allSetoran) {
                 if (santriStatsMap.has(setoran.santriId)) {
@@ -1209,6 +1209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
