@@ -5,48 +5,115 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const State = {
         allSetoran: [],
-        rawSantriList: [], // Menyimpan data santri mentah dari server
-        santriData: [],    // Data santri yang sudah diolah (nilai, status tuntas, dll)
+        rawSantriList: [], 
+        santriData: [],    
         classGroups: {},
         setoranIdToDelete: null,
         searchDebounceTimer: null,
         santriNameMap: new Map(),
-        chartInstance: null // Menyimpan instance Chart.js agar bisa di-update/destroy
+        chartInstance: null 
     };
 
     // ==========================================
-    // 2. DOM CACHING
+    // 2. DOM CACHING (DIPERBAIKI)
     // ==========================================
     const DOM = {};
     function cacheDOMElements() {
-        const ids = [
-            // Navigasi & Halaman
-            'main-nav', 'main-content', 
-            // Halaman Input
-            'setoran-form', 'tanggal', 'now-btn', 'musyrif', 'nama-santri', 'santri-id', 'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 'kualitas', 'submit-button', 'submit-button-text', 'submit-button-icon', 'submit-spinner',
-            // Halaman Riwayat
-            'setoran-table-body', 'history-row-template', 'search-riwayat', 'suggestions-container', 'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'filter-kelas',
-            // Halaman Beranda (Statistik)
-            'stats-santri-aktif', 'stats-santri-tuntas', 'stats-santri-belum-tuntas', 'mutqin-juz29-progress-container', 'mutqin-juz30-progress-container', 'mutqin-unggulan-progress-container', 'tuntas-tracking-accordion', 'mutqin-unggulan-circle', 'mutqin-juz30-circle', 'mutqin-juz29-circle', 'mutqin-unggulan-details', 'mutqin-juz30-details', 'mutqin-juz29-details', 'peringkat-section', 'tahfizh-tuntas-tracking-section', 'datetime-container',
-            // Halaman Rekap
-            'rekap-select', 'rekap-content-container', 'rekap-content-template',
-            // Modal & Toast
-            'toast', 'toast-message', 'toast-icon', 'password-confirm-modal', 'password-input', 'password-error', 'cancel-password-btn', 'confirm-password-btn', 'help-button', 'help-modal', 'close-help-modal',
-            // --- BARU: Modal Detail Santri ---
-            'student-detail-modal', 'close-detail-modal', 'detail-nama', 'detail-info', 'progress-chart', 'juz-visual-container'
-        ];
+        // Format: { propName: 'html-id' }
+        // Ini memetakan ID di HTML ke nama variabel di JS agar konsisten
+        const elementMapping = {
+            // -- Halaman & Nav --
+            mainNav: 'main-nav',
+            mainContent: 'main-content',
+            
+            // -- Form Input --
+            setoranForm: 'setoranForm',       // ID di HTML: setoranForm
+            tanggal: 'tanggal',
+            nowBtn: 'nowBtn',                 // ID di HTML: nowBtn
+            musyrif: 'musyrif',
+            namaSantri: 'namaSantri',         // ID di HTML: namaSantri
+            santriId: 'santriId',             // ID di HTML: santriId
+            kelas: 'kelas',
+            program: 'program',
+            jenis: 'jenis',
+            juz: 'juz',
+            halamanContainer: 'halaman-container',
+            halaman: 'halaman',
+            suratContainer: 'surat-container',
+            surat: 'surat',
+            kualitas: 'kualitas',
+            submitButton: 'submit-button',
+            submitButtonText: 'submit-button-text',
+            submitButtonIcon: 'submit-button-icon',
+            submitSpinner: 'submit-spinner',
 
-        ids.forEach(id => {
-            // Mengubah kebab-case (id-html) menjadi camelCase (properti JS)
-            // Contoh: 'student-detail-modal' -> DOM.studentDetailModal
-            const propName = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
+            // -- Riwayat --
+            setoranTableBody: 'setoranTableBody', // ID di HTML: setoranTableBody
+            historyRowTemplate: 'history-row-template',
+            searchRiwayat: 'search-riwayat',
+            suggestionsContainer: 'suggestions-container',
+            filterTanggalMulai: 'filter-tanggal-mulai',
+            filterTanggalAkhir: 'filter-tanggal-akhir',
+            filterProgram: 'filter-program',
+            filterKelas: 'filter-kelas',
+
+            // -- Statistik Beranda --
+            statsSantriAktif: 'stats-santri-aktif',
+            statsSantriTuntas: 'stats-santri-tuntas',
+            statsSantriBelumTuntas: 'stats-santri-belum-tuntas',
+            mutqinJuz29ProgressContainer: 'mutqin-juz29-progress-container',
+            mutqinJuz30ProgressContainer: 'mutqin-juz30-progress-container',
+            mutqinUnggulanProgressContainer: 'mutqin-unggulan-progress-container',
+            tuntasTrackingAccordion: 'tuntas-tracking-accordion',
+            
+            mutqinUnggulanCircle: 'mutqin-unggulan-circle',
+            mutqinJuz30Circle: 'mutqin-juz30-circle',
+            mutqinJuz29Circle: 'mutqin-juz29-circle',
+            mutqinUnggulanDetails: 'mutqin-unggulan-details',
+            mutqinJuz30Details: 'mutqin-juz30-details',
+            mutqinJuz29Details: 'mutqin-juz29-details',
+            
+            peringkatSection: 'peringkat-section',
+            tahfizhTuntasTrackingSection: 'tahfizh-tuntas-tracking-section',
+            datetimeContainer: 'datetime-container',
+
+            // -- Rekap --
+            rekapSelect: 'rekap-select',
+            rekapContentContainer: 'rekap-content-container',
+            rekapContentTemplate: 'rekap-content-template',
+
+            // -- Modals & Toast --
+            toast: 'toast',
+            toastMessage: 'toast-message',
+            toastIcon: 'toast-icon',
+            
+            passwordConfirmModal: 'passwordConfirmModal', // ID di HTML: camelCase
+            passwordInput: 'passwordInput',
+            passwordError: 'passwordError',
+            cancelPasswordBtn: 'cancelPasswordBtn',
+            confirmPasswordBtn: 'confirmPasswordBtn',
+            
+            helpButton: 'help-button',
+            helpModal: 'helpModal',
+            closeHelpModal: 'closeHelpModal',
+
+            // -- Modal Detail Santri (BARU) --
+            studentDetailModal: 'studentDetailModal',
+            closeDetailModal: 'closeDetailModal',
+            detailNama: 'detail-nama',
+            detailInfo: 'detail-info',
+            progressChart: 'progressChart',
+            juzVisualContainer: 'juz-visual-container'
+        };
+
+        for (const [propName, id] of Object.entries(elementMapping)) {
             const element = document.getElementById(id);
             if (element) {
                 DOM[propName] = element;
             } else {
-                console.warn(`Elemen dengan ID '${id}' tidak ditemukan.`);
+                console.warn(`Elemen dengan ID '${id}' tidak ditemukan di HTML.`);
             }
-        });
+        }
         
         DOM.pages = document.querySelectorAll('.page-content');
         DOM.skeletonContainers = document.querySelectorAll('.skeleton-container');
@@ -160,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         renderMutqinProgress: () => {
             const createProgress = (container, circleEl, detailsEl, santriList, color, checkFn) => {
-                if (!container) return; // Guard clause
+                if (!container) return;
                 if (santriList.length > 0) {
                     container.classList.remove('hidden');
                     const tuntasCount = santriList.filter(checkFn).length;
