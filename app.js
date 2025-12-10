@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // ==========================================
+    // 1. STATE MANAGEMENT
+    // ==========================================
     const State = {
         allSetoran: [],
         rawSantriList: [], // Menyimpan data santri mentah dari server
@@ -7,21 +10,51 @@ document.addEventListener('DOMContentLoaded', () => {
         classGroups: {},
         setoranIdToDelete: null,
         searchDebounceTimer: null,
-        santriNameMap: new Map() 
+        santriNameMap: new Map(),
+        chartInstance: null // Menyimpan instance Chart.js agar bisa di-update/destroy
     };
 
+    // ==========================================
+    // 2. DOM CACHING
+    // ==========================================
     const DOM = {};
     function cacheDOMElements() {
-        const ids = ['main-nav', 'main-content', 'setoranForm', 'tanggal', 'nowBtn', 'musyrif', 'namaSantri', 'santriId', 'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 'kualitas', 'setoranTableBody', 'history-row-template', 'search-riwayat', 'suggestions-container', 'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'filter-kelas', 'stats-santri-aktif', 'stats-santri-tuntas', 'stats-santri-belum-tuntas', 'mutqin-juz29-progress-container', 'mutqin-juz30-progress-container', 'rekap-select', 'rekap-content-container', 'toast', 'toast-message', 'toast-icon', 'passwordConfirmModal', 'passwordInput', 'passwordError', 'cancelPasswordBtn', 'confirmPasswordBtn', 'icon-legend-riwayat', 'datetime-container', 'icon-legend-rekap', 'rekap-content-template', 'mutqin-unggulan-progress-container', 'tuntas-tracking-accordion', 'mutqin-unggulan-circle', 'mutqin-juz30-circle', 'mutqin-juz29-circle', 'mutqin-unggulan-details', 'mutqin-juz30-details', 'mutqin-juz29-details', 'peringkat-section', 'tahfizh-tuntas-tracking-section', 'help-button', 'helpModal', 'closeHelpModal', 'submit-button', 'submit-button-text', 'submit-button-icon', 'submit-spinner','studentDetailModal', 'closeDetailModal', 'detail-nama', 'detail-info', 'progressChart', 'juz-visual-container'];
+        const ids = [
+            // Navigasi & Halaman
+            'main-nav', 'main-content', 
+            // Halaman Input
+            'setoran-form', 'tanggal', 'now-btn', 'musyrif', 'nama-santri', 'santri-id', 'kelas', 'program', 'jenis', 'juz', 'halaman-container', 'halaman', 'surat-container', 'surat', 'kualitas', 'submit-button', 'submit-button-text', 'submit-button-icon', 'submit-spinner',
+            // Halaman Riwayat
+            'setoran-table-body', 'history-row-template', 'search-riwayat', 'suggestions-container', 'filter-tanggal-mulai', 'filter-tanggal-akhir', 'filter-program', 'filter-kelas',
+            // Halaman Beranda (Statistik)
+            'stats-santri-aktif', 'stats-santri-tuntas', 'stats-santri-belum-tuntas', 'mutqin-juz29-progress-container', 'mutqin-juz30-progress-container', 'mutqin-unggulan-progress-container', 'tuntas-tracking-accordion', 'mutqin-unggulan-circle', 'mutqin-juz30-circle', 'mutqin-juz29-circle', 'mutqin-unggulan-details', 'mutqin-juz30-details', 'mutqin-juz29-details', 'peringkat-section', 'tahfizh-tuntas-tracking-section', 'datetime-container',
+            // Halaman Rekap
+            'rekap-select', 'rekap-content-container', 'rekap-content-template',
+            // Modal & Toast
+            'toast', 'toast-message', 'toast-icon', 'password-confirm-modal', 'password-input', 'password-error', 'cancel-password-btn', 'confirm-password-btn', 'help-button', 'help-modal', 'close-help-modal',
+            // --- BARU: Modal Detail Santri ---
+            'student-detail-modal', 'close-detail-modal', 'detail-nama', 'detail-info', 'progress-chart', 'juz-visual-container'
+        ];
+
         ids.forEach(id => {
-            // Mengubah kebab-case menjadi camelCase untuk nama properti DOM
+            // Mengubah kebab-case (id-html) menjadi camelCase (properti JS)
+            // Contoh: 'student-detail-modal' -> DOM.studentDetailModal
             const propName = id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
-            DOM[propName] = document.getElementById(id);
+            const element = document.getElementById(id);
+            if (element) {
+                DOM[propName] = element;
+            } else {
+                console.warn(`Elemen dengan ID '${id}' tidak ditemukan.`);
+            }
         });
+        
         DOM.pages = document.querySelectorAll('.page-content');
         DOM.skeletonContainers = document.querySelectorAll('.skeleton-container');
     }
 
+    // ==========================================
+    // 3. UTILITIES & API
+    // ==========================================
     const Utils = {
         fetchSetoranData: async () => {
             try {
@@ -62,136 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // ==========================================
+    // 4. UI MANAGERS
+    // ==========================================
     const UI = {
-        // ... di dalam const UI = { ... }
-
-// Fungsi Membuka Modal Detail
-openDetailModal: (santriId) => {
-    const santri = State.santriData.find(s => s.id === santriId);
-    if (!santri) return;
-
-    // 1. Isi Info Dasar
-    DOM.detailNama.textContent = santri.nama;
-    DOM.detailInfo.textContent = `${santri.kelas} - ${santri.program} | Musyrif: ${santri.musyrif}`;
-
-    // 2. Render Grafik
-    UI.renderChart(santri);
-
-    // 3. Render Balok Juz
-    UI.renderJuzBlocks(santri);
-
-    // Tampilkan Modal
-    DOM.studentDetailModal.classList.remove('hidden');
-},
-
-// Fungsi Render Grafik Chart.js
-renderChart: (santri) => {
-    const ctx = DOM.progressChart.getContext('2d');
-
-    // Hapus chart lama jika ada
-    if (window.mySantriChart) window.mySantriChart.destroy();
-
-    // Olah Data: Group by Bulan
-    const monthlyData = {};
-    santri.setoran.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-    santri.setoran.forEach(s => {
-        const date = new Date(s.createdAt);
-        const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
-
-        // Hitung nilai halaman (convert surat ke estimasi halaman jika perlu)
-        let pages = parseFloat(s.halaman) || 0;
-        if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) {
-            pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0;
-        }
-
-        // Kita hitung Kumulatif (Akumulasi)
-        if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
-        monthlyData[monthKey] += pages;
-    });
-
-    const labels = Object.keys(monthlyData);
-    // Buat data kumulatif (semakin naik)
-    let accumulator = 0;
-    const dataPoints = Object.values(monthlyData).map(val => {
-        accumulator += val;
-        return accumulator.toFixed(1);
-    });
-
-    // Buat Chart Baru
-    window.mySantriChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Total Halaman Hafalan',
-                data: dataPoints,
-                borderColor: '#f59e0b', // Amber-500
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: '#d97706'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-},
-
-// Fungsi Render Visual Balok
-renderJuzBlocks: (santri) => {
-    const container = DOM.juzVisualContainer;
-    container.innerHTML = '';
-
-    // Tentukan Juz mana yang mau ditampilkan (Prioritas: 30, 29, 28...)
-    // Atau tampilkan Juz yang sudah ada setorannya
-    const targetJuzs = [30, 29, 28, 1]; // Sesuaikan dengan kebutuhan
-
-    targetJuzs.forEach(juzNum => {
-        // Hitung total halaman yang sudah disetor di Juz ini
-        const setoranJuz = santri.setoran.filter(s => s.juz == juzNum);
-        let totalPagesDone = 0;
-
-        setoranJuz.forEach(s => {
-            if (s.jenis === 'Mutqin') {
-                totalPagesDone = 20; // Langsung penuh
-            } else {
-                let pages = parseFloat(s.halaman) || 0;
-                if (!pages && s.surat) {
-                    pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0;
-                }
-                totalPagesDone += pages;
-            }
-        });
-
-        // Cap maksimal 20 halaman
-        const maxPages = 20;
-        const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
-        const percentage = Math.round((totalPagesDone / maxPages) * 100);
-
-        // Buat HTML Wrapper Juz
-        const juzWrapper = document.createElement('div');
-        juzWrapper.className = 'mb-4';
-        juzWrapper.innerHTML = `
-            <div class="flex justify-between text-sm mb-1">
-                <span class="font-bold text-gray-700">Juz ${juzNum}</span>
-                <span class="text-xs text-gray-500">${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)</span>
-            </div>
-            <div class="grid grid-cols-10 gap-1">
-                ${Array(20).fill(0).map((_, i) => {
-                    // Jika index < filledBlocks, warnai hijau
-                    const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-gray-200';
-                    return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
-                }).join('')}
-            </div>
-        `;
-        container.appendChild(juzWrapper);
-    });
-}
         showToast: (message, type = 'success') => {
             DOM.toastMessage.textContent = message;
             const isSuccess = type === 'success';
@@ -239,7 +146,7 @@ renderJuzBlocks: (santri) => {
         },
         renderBeranda: () => {
             const santriAktifIds = new Set(State.allSetoran.map(s => s.santriId));
-            const totalSantri = State.rawSantriList.length; // Menggunakan rawSantriList
+            const totalSantri = State.rawSantriList.length;
             const tuntasCount = State.santriData.filter(s => s.isTuntas).length;
 
             DOM.statsSantriAktif.textContent = `${santriAktifIds.size} / ${totalSantri}`;
@@ -253,6 +160,7 @@ renderJuzBlocks: (santri) => {
         },
         renderMutqinProgress: () => {
             const createProgress = (container, circleEl, detailsEl, santriList, color, checkFn) => {
+                if (!container) return; // Guard clause
                 if (santriList.length > 0) {
                     container.classList.remove('hidden');
                     const tuntasCount = santriList.filter(checkFn).length;
@@ -544,7 +452,11 @@ renderJuzBlocks: (santri) => {
             tableBody.innerHTML = group.santri.map((santri, idx) => `
                 <tr class="hover:bg-[var(--hover-bg)]">
                     <td class="px-4 py-2">${idx + 1}</td>
-                    <td class="px-4 py-2 text-sm">${santri.nama}</td>
+                    <td class="px-4 py-2 font-medium text-gray-900">
+                        <button class="detail-santri-btn hover:text-amber-600 hover:underline text-left" data-id="${santri.id}">
+                            ${santri.nama}
+                        </button>
+                    </td>
                     <td class="px-4 py-2 font-medium text-center">${santri.nilaiTampil}</td>
                     <td class="px-4 py-2 font-medium text-center">${santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-'}</td>
                     <td class="px-4 py-2 text-center"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${santri.isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${santri.isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span></td>
@@ -596,9 +508,142 @@ renderJuzBlocks: (santri) => {
                 console.error("PDF Export Error:", error);
                 UI.showToast('Gagal mengekspor PDF. Pastikan library jsPDF termuat.', 'error');
             }
+        },
+
+        // --- FITUR BARU: MODAL DETAIL, CHART, & VISUAL BALOK ---
+
+        openDetailModal: (santriId) => {
+            const santri = State.santriData.find(s => s.id === santriId);
+            if (!santri) return;
+    
+            // 1. Isi Info Dasar
+            DOM.detailNama.textContent = santri.nama;
+            DOM.detailInfo.textContent = `${santri.kelas} - ${santri.program} | Musyrif: ${santri.musyrif}`;
+            
+            // 2. Render Grafik
+            UI.renderChart(santri);
+    
+            // 3. Render Balok Juz
+            UI.renderJuzBlocks(santri);
+    
+            // Tampilkan Modal
+            DOM.studentDetailModal.classList.remove('hidden');
+        },
+    
+        renderChart: (santri) => {
+            const ctx = DOM.progressChart.getContext('2d');
+            
+            // Hapus chart lama jika ada
+            if (State.chartInstance) {
+                State.chartInstance.destroy();
+            }
+    
+            // Olah Data: Group by Bulan
+            const monthlyData = {};
+            // Urutkan setoran berdasarkan tanggal (terlama ke terbaru)
+            const sortedSetoran = [...santri.setoran].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            
+            sortedSetoran.forEach(s => {
+                const date = new Date(s.createdAt);
+                const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
+                
+                // Hitung nilai halaman (convert surat ke estimasi halaman jika perlu)
+                let pages = parseFloat(s.halaman) || 0;
+                if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) {
+                    pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0;
+                }
+                
+                // Kita hitung Kumulatif (Akumulasi)
+                if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
+                monthlyData[monthKey] += pages;
+            });
+    
+            const labels = Object.keys(monthlyData);
+            // Buat data kumulatif (semakin naik)
+            let accumulator = 0;
+            const dataPoints = Object.values(monthlyData).map(val => {
+                accumulator += val;
+                return accumulator.toFixed(1);
+            });
+    
+            // Buat Chart Baru
+            State.chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Halaman Hafalan',
+                        data: dataPoints,
+                        borderColor: '#f59e0b', // Amber-500
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#d97706',
+                        pointBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
+                }
+            });
+        },
+    
+        renderJuzBlocks: (santri) => {
+            const container = DOM.juzVisualContainer;
+            container.innerHTML = '';
+    
+            // Tentukan Juz mana yang mau ditampilkan (Prioritas: 30, 29, 28...)
+            const targetJuzs = [30, 29, 28, 1]; 
+            
+            targetJuzs.forEach(juzNum => {
+                // Hitung total halaman yang sudah disetor di Juz ini
+                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum);
+                let totalPagesDone = 0;
+                
+                setoranJuz.forEach(s => {
+                    if (s.jenis === 'Mutqin') {
+                        totalPagesDone = 20; // Langsung penuh
+                    } else {
+                        let pages = parseFloat(s.halaman) || 0;
+                        if (!pages && s.surat) {
+                            pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0;
+                        }
+                        totalPagesDone += pages;
+                    }
+                });
+    
+                // Cap maksimal 20 halaman
+                const maxPages = 20;
+                const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
+                const percentage = Math.min(Math.round((totalPagesDone / maxPages) * 100), 100);
+    
+                // Buat HTML Wrapper Juz
+                const juzWrapper = document.createElement('div');
+                juzWrapper.className = 'mb-4';
+                juzWrapper.innerHTML = `
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-bold text-gray-700">Juz ${juzNum}</span>
+                        <span class="text-xs text-gray-500">${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)</span>
+                    </div>
+                    <div class="grid grid-cols-10 gap-1">
+                        ${Array(20).fill(0).map((_, i) => {
+                            // Jika index < filledBlocks, warnai hijau
+                            const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-gray-200';
+                            return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
+                        }).join('')}
+                    </div>
+                `;
+                container.appendChild(juzWrapper);
+            });
         }
     };
 
+    // ==========================================
+    // 5. CORE LOGIC
+    // ==========================================
     const Core = {
         reloadData: async () => {
             // 1. Ambil Paket Data Lengkap dari Server
@@ -744,62 +789,9 @@ renderJuzBlocks: (santri) => {
         }
     };
 
-    function validateForm() {
-        let isValid = true;
-        document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
-        
-        const requiredFields = [
-            { id: 'tanggal', message: 'Tanggal tidak boleh kosong.' },
-            { id: 'musyrif', message: 'Musyrif harus dipilih.' },
-            { id: 'namaSantri', message: 'Nama santri harus dipilih.' },
-            { id: 'jenis', message: 'Jenis setoran harus dipilih.' },
-            { id: 'juz', message: 'Juz harus dipilih.' }
-        ];
-
-        requiredFields.forEach(field => {
-            const input = DOM[field.id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase())];
-            if (!input.value) {
-                const errorEl = input.nextElementSibling;
-                if (errorEl && errorEl.classList.contains('form-error')) {
-                    errorEl.textContent = field.message;
-                    errorEl.style.display = 'block';
-                }
-                isValid = false;
-            }
-        });
-
-        if (DOM.halaman.required && !DOM.halaman.value) {
-            DOM.halaman.nextElementSibling.style.display = 'block';
-            isValid = false;
-        }
-        if (DOM.surat.required && !DOM.surat.value) {
-            DOM.surat.nextElementSibling.style.display = 'block';
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    async function main() {
-        cacheDOMElements();
-        setupEventListeners();
-        UI.switchPage('page-beranda');
-
-        UI.updateDateTime();
-        setInterval(UI.updateDateTime, 1000);
-
-        // State.santriNameMap akan diisi di Core.reloadData()
-        
-        // Populate musyrif dropdown awal bisa kosong, nanti diupdate setelah data load
-        // Tapi kita bisa isi list musyrif default dari config jika mau
-        // Untuk sekarang biarkan kosong atau Loading...
-        
-        await Core.reloadData();
-        
-        UI.switchPage('page-beranda', false);
-    }
-
-    // Panggil fungsi setup event listeners
+    // ==========================================
+    // 6. EVENT LISTENERS
+    // ==========================================
     function setupEventListeners() {
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -894,6 +886,17 @@ renderJuzBlocks: (santri) => {
             DOM.rekapContentContainer.querySelectorAll('.rekap-tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById(`rekap-tab-${selectedId}`).classList.remove('hidden');
         });
+
+        // Event Listener untuk Tombol Detail Santri di Tabel Rekap (Delegation)
+        DOM.rekapContentContainer.addEventListener('click', e => {
+            if (e.target.matches('.detail-santri-btn')) {
+                UI.openDetailModal(e.target.dataset.id);
+            }
+        });
+
+        // Event Listener Tutup Modal Detail
+        DOM.closeDetailModal.addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
+        DOM.studentDetailModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
 
         DOM.musyrif.addEventListener('change', () => {
             const musyrifValue = DOM.musyrif.value;
@@ -1063,6 +1066,55 @@ renderJuzBlocks: (santri) => {
         DOM.helpButton.addEventListener('click', () => DOM.helpModal.classList.remove('hidden'));
         DOM.closeHelpModal.addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
         DOM.helpModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
+    }
+
+    function validateForm() {
+        let isValid = true;
+        document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
+        
+        const requiredFields = [
+            { id: 'tanggal', message: 'Tanggal tidak boleh kosong.' },
+            { id: 'musyrif', message: 'Musyrif harus dipilih.' },
+            { id: 'namaSantri', message: 'Nama santri harus dipilih.' },
+            { id: 'jenis', message: 'Jenis setoran harus dipilih.' },
+            { id: 'juz', message: 'Juz harus dipilih.' }
+        ];
+
+        requiredFields.forEach(field => {
+            const input = DOM[field.id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase())];
+            if (!input.value) {
+                const errorEl = input.nextElementSibling;
+                if (errorEl && errorEl.classList.contains('form-error')) {
+                    errorEl.textContent = field.message;
+                    errorEl.style.display = 'block';
+                }
+                isValid = false;
+            }
+        });
+
+        if (DOM.halaman.required && !DOM.halaman.value) {
+            DOM.halaman.nextElementSibling.style.display = 'block';
+            isValid = false;
+        }
+        if (DOM.surat.required && !DOM.surat.value) {
+            DOM.surat.nextElementSibling.style.display = 'block';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    async function main() {
+        cacheDOMElements();
+        setupEventListeners();
+        UI.switchPage('page-beranda');
+
+        UI.updateDateTime();
+        setInterval(UI.updateDateTime, 1000);
+
+        await Core.reloadData();
+        
+        UI.switchPage('page-beranda', false);
     }
 
     // Jalankan aplikasi
