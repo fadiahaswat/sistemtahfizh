@@ -135,11 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchSetoranData: async () => {
             try {
                 const response = await fetch(AppConfig.scriptURL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                // Simpan data terbaru ke LocalStorage
+                localStorage.setItem('cachedData', JSON.stringify(data)); 
+                return data;
             } catch (error) {
-                console.error('Gagal memuat data setoran:', error);
-                UI.showToast('Gagal memuat riwayat setoran.', 'error');
+                console.warn('Mengambil data offline dari cache...');
+                const cached = localStorage.getItem('cachedData');
+                if (cached) return JSON.parse(cached); // Gunakan data lama jika offline
+                
+                UI.showToast('Gagal memuat data (Offline & Cache kosong).', 'error');
                 return [];
             }
         },
