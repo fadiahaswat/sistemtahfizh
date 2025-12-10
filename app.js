@@ -1013,6 +1013,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildClassGroups: () => {
             const tempGroups = {};
+            
+            // 1. Kelompokkan santri berdasarkan Musyrif
             State.santriData.forEach(s => {
                 if (!tempGroups[s.musyrif]) {
                     tempGroups[s.musyrif] = { santri: [], musyrif: s.musyrif, classes: new Set() };
@@ -1022,11 +1024,25 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             State.classGroups = {};
+            
+            // 2. Buat nama grup (Label)
             for (const musyrif in tempGroups) {
                 const group = tempGroups[musyrif];
-                const groupName = (musyrif === 'Muhammad Zhafir Setiaji') ? '2CDGH' : [...group.classes].sort().join(', ');
+                let groupName;
+
+                // [PERBAIKAN] Cek apakah ada nama khusus di config.js?
+                // Gunakan Optional Chaining (?.) untuk keamanan jika config belum ada
+                if (AppConfig.classGroupOverrides && AppConfig.classGroupOverrides[musyrif]) {
+                    groupName = AppConfig.classGroupOverrides[musyrif];
+                } else {
+                    // Jika tidak ada di config, otomatis gabungkan nama kelas (contoh: "1A, 1B")
+                    groupName = [...group.classes].sort().join(', ');
+                }
+
                 State.classGroups[groupName] = { santri: group.santri, musyrif: group.musyrif };
             }
+
+            // Grup statis tambahan
             State.classGroups['Khusus Tahfizh'] = { santri: State.santriData.filter(s => s.program === 'Tahfizh'), musyrif: 'Semua Musyrif' };
             State.classGroups['Seluruh Santri'] = { santri: State.santriData, musyrif: 'Semua Musyrif' };
         },
