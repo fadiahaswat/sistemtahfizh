@@ -764,9 +764,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 musyrif: s.Musyrif || s.musyrif
             }));
 
-            // Buat Map Nama -> ID (untuk pencarian cepat)
-            State.santriNameMap = new Map(State.rawSantriList.map(s => [Utils.normalizeName(s.nama), s.id]));
-
             // 3. Simpan Data Setoran
             State.allSetoran = response.setoran.map(item => ({
                 id: `row-${item.rowNumber}`,
@@ -782,8 +779,12 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.renderAll();
             
             // Update dropdown musyrif agar dinamis sesuai data yang ada di sheet
-            Core.updateMusyrifList(); 
-        },
+            Core.updateMusyrifList: () => {
+             // Ambil list musyrif unik dari data santri
+             const musyrifSet = new Set(State.rawSantriList.map(s => s.musyrif).filter(Boolean));
+             
+             // Update dropdown
+        
         calculateSantriStats: () => {
             const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0 }]));
             
@@ -1209,6 +1210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
