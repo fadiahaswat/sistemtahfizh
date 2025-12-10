@@ -744,18 +744,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const Core = {
-        reloadData: async () => {
-            const dataFromServer = await Utils.fetchSetoranData();
-            State.allSetoran = dataFromServer.map(item => ({
+    reloadData: async () => {
+            // 1. Ambil Paket Data Lengkap dari Server
+            const response = await Utils.fetchSetoranData(); // Ini sekarang me-return { setoran: [], santri: [] }
+            
+            // Cek jika ada error atau data kosong
+            if (!response || !response.setoran) {
+                console.error("Gagal format data server");
+                return;
+            }
+
+            // 2. Simpan Data Santri dari Sheet ke State
+            // Mapping nama kolom dari Sheet (header) ke property yang dipakai aplikasi
+            State.rawSantriList = (response.santri || []).map(s => ({
+                id: s.ID || s.id, // Sesuaikan dengan header di Sheet Anda
+                nama: s.Nama || s.NamaSantri || s.nama, 
+                kelas: s.Kelas || s.kelas,
+                program: s.Program || s.program,
+                musyrif: s.Musyrif || s.musyrif
+            }));
+
+            // Buat Map Nama -> ID (untuk pencarian cepat)
+            State.santriNameMap = new Map(State.rawSantriList.map(s => [Utils.normalizeName(s.nama), s.id]));
+
+            // 3. Simpan Data Setoran
+            State.allSetoran = response.setoran.map(item => ({
                 id: `row-${item.rowNumber}`,
+                // Cari ID santri berdasarkan Nama yang ada di data setoran
                 santriId: State.santriNameMap.get(Utils.normalizeName(item.namaSantri || '')) || null,
-                createdAt: item.tanggal,
+                createdAt: item.tanggal, // Pastikan kolom di Sheet setoran bernama 'tanggal'
                 ...item
             }));
+
+            // 4. Hitung Statistik & Render
             Core.calculateSantriStats();
             Core.buildClassGroups();
             UI.renderAll();
+            
+            // Update dropdown musyrif agar dinamis sesuai data yang ada di sheet
+            Core.updateMusyrifList(); 
         },
         calculateSantriStats: () => {
             const santriStatsMap = new Map(AppConfig.santriList.map(s => [s.id, { ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0 }]));
@@ -1182,6 +1209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
