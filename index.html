@@ -744,9 +744,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    reloadData: async () => {
+    const Core = {
+        reloadData: async () => {
             // 1. Ambil Paket Data Lengkap dari Server
-            const response = await Utils.fetchSetoranData(); // Ini sekarang me-return { setoran: [], santri: [] }
+            const response = await Utils.fetchSetoranData(); 
             
             // Cek jika ada error atau data kosong
             if (!response || !response.setoran) {
@@ -755,21 +756,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 2. Simpan Data Santri dari Sheet ke State
-            // Mapping nama kolom dari Sheet (header) ke property yang dipakai aplikasi
             State.rawSantriList = (response.santri || []).map(s => ({
-                id: s.ID || s.id, // Sesuaikan dengan header di Sheet Anda
+                id: s.ID || s.id, 
                 nama: s.Nama || s.NamaSantri || s.nama, 
                 kelas: s.Kelas || s.kelas,
                 program: s.Program || s.program,
                 musyrif: s.Musyrif || s.musyrif
             }));
 
+            // Buat Map Nama -> ID (untuk pencarian cepat)
+            State.santriNameMap = new Map(State.rawSantriList.map(s => [Utils.normalizeName(s.nama), s.id]));
+
             // 3. Simpan Data Setoran
             State.allSetoran = response.setoran.map(item => ({
                 id: `row-${item.rowNumber}`,
-                // Cari ID santri berdasarkan Nama yang ada di data setoran
                 santriId: State.santriNameMap.get(Utils.normalizeName(item.namaSantri || '')) || null,
-                createdAt: item.tanggal, // Pastikan kolom di Sheet setoran bernama 'tanggal'
+                createdAt: item.tanggal, 
                 ...item
             }));
 
@@ -778,13 +780,10 @@ document.addEventListener('DOMContentLoaded', () => {
             Core.buildClassGroups();
             UI.renderAll();
             
-            // Update dropdown musyrif agar dinamis sesuai data yang ada di sheet
-            Core.updateMusyrifList: () => {
-             // Ambil list musyrif unik dari data santri
-             const musyrifSet = new Set(State.rawSantriList.map(s => s.musyrif).filter(Boolean));
-             
-             // Update dropdown
-        
+            // 5. Update dropdown musyrif (Panggil fungsinya, jangan didefinisikan di sini)
+            Core.updateMusyrifList(); 
+        },
+
         calculateSantriStats: () => {
             const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0 }]));
             
@@ -862,6 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             State.santriData = Array.from(santriStatsMap.values());
         },
+
         buildClassGroups: () => {
             const tempGroups = {};
             State.santriData.forEach(s => {
@@ -880,9 +880,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             State.classGroups['Khusus Tahfizh'] = { santri: State.santriData.filter(s => s.program === 'Tahfizh'), musyrif: 'Semua Musyrif' };
             State.classGroups['Seluruh Santri'] = { santri: State.santriData, musyrif: 'Semua Musyrif' };
+        },
+
+        updateMusyrifList: () => {
+             const musyrifSet = new Set(State.rawSantriList.map(s => s.musyrif).filter(Boolean));
+             const musyrifList = [...musyrifSet].sort();
+             Utils.populateSelect(DOM.musyrif, musyrifList, 'Pilih Musyrif');
         }
     };
-
+    
     function setupEventListeners() {
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1210,6 +1216,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
