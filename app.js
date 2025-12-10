@@ -11,28 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
         setoranIdToDelete: null,
         searchDebounceTimer: null,
         santriNameMap: new Map(),
-        chartInstance: null 
+        chartInstance: null,
+        // STATE BARU: Interval untuk hitung mundur jadwal perpulangan
+        countdownInterval: null 
     };
 
     // ==========================================
-    // 2. DOM CACHING (DIPERBAIKI)
+    // 2. DOM CACHING
     // ==========================================
     const DOM = {};
     function cacheDOMElements() {
-        // Format: { propName: 'html-id' }
-        // Ini memetakan ID di HTML ke nama variabel di JS agar konsisten
         const elementMapping = {
             // -- Halaman & Nav --
             mainNav: 'main-nav',
             mainContent: 'main-content',
             
             // -- Form Input --
-            setoranForm: 'setoranForm',       // ID di HTML: setoranForm
+            setoranForm: 'setoranForm',
             tanggal: 'tanggal',
-            nowBtn: 'nowBtn',                 // ID di HTML: nowBtn
+            nowBtn: 'nowBtn',
             musyrif: 'musyrif',
-            namaSantri: 'namaSantri',         // ID di HTML: namaSantri
-            santriId: 'santriId',             // ID di HTML: santriId
+            namaSantri: 'namaSantri',
+            santriId: 'santriId',
             kelas: 'kelas',
             program: 'program',
             jenis: 'jenis',
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitSpinner: 'submit-spinner',
 
             // -- Riwayat --
-            setoranTableBody: 'setoranTableBody', // ID di HTML: setoranTableBody
+            setoranTableBody: 'setoranTableBody',
             historyRowTemplate: 'history-row-template',
             searchRiwayat: 'search-riwayat',
             suggestionsContainer: 'suggestions-container',
@@ -61,11 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
             statsSantriAktif: 'stats-santri-aktif',
             statsSantriTuntas: 'stats-santri-tuntas',
             statsSantriBelumTuntas: 'stats-santri-belum-tuntas',
+            
+            // -- Progres Mutqin (Visual) --
             mutqinJuz29ProgressContainer: 'mutqin-juz29-progress-container',
             mutqinJuz30ProgressContainer: 'mutqin-juz30-progress-container',
             mutqinUnggulanProgressContainer: 'mutqin-unggulan-progress-container',
-            tuntasTrackingAccordion: 'tuntas-tracking-accordion',
-            
             mutqinUnggulanCircle: 'mutqin-unggulan-circle',
             mutqinJuz30Circle: 'mutqin-juz30-circle',
             mutqinJuz29Circle: 'mutqin-juz29-circle',
@@ -73,9 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
             mutqinJuz30Details: 'mutqin-juz30-details',
             mutqinJuz29Details: 'mutqin-juz29-details',
             
+            // -- Section Beranda Lainnya --
             peringkatSection: 'peringkat-section',
+            tuntasTrackingAccordion: 'tuntas-tracking-accordion',
             tahfizhTuntasTrackingSection: 'tahfizh-tuntas-tracking-section',
             datetimeContainer: 'datetime-container',
+            
+            // -- FITUR BARU: Section Jadwal Perpulangan --
+            jadwalPerpulanganSection: 'jadwal-perpulangan-section',
 
             // -- Rekap --
             rekapSelect: 'rekap-select',
@@ -86,24 +91,28 @@ document.addEventListener('DOMContentLoaded', () => {
             toast: 'toast',
             toastMessage: 'toast-message',
             toastIcon: 'toast-icon',
-            
-            passwordConfirmModal: 'passwordConfirmModal', // ID di HTML: camelCase
+            passwordConfirmModal: 'passwordConfirmModal',
             passwordInput: 'passwordInput',
             passwordError: 'passwordError',
             cancelPasswordBtn: 'cancelPasswordBtn',
             confirmPasswordBtn: 'confirmPasswordBtn',
-            
             helpButton: 'help-button',
             helpModal: 'helpModal',
             closeHelpModal: 'closeHelpModal',
 
-            // -- Modal Detail Santri (BARU) --
+            // -- Modal Detail Santri (Lama) --
             studentDetailModal: 'studentDetailModal',
             closeDetailModal: 'closeDetailModal',
             detailNama: 'detail-nama',
             detailInfo: 'detail-info',
             progressChart: 'progressChart',
-            juzVisualContainer: 'juz-visual-container'
+            juzVisualContainer: 'juz-visual-container',
+
+            // -- FITUR BARU: Halaman Analisis --
+            santriSelectAnalisis: 'santri-select-analisis',
+            analisisContentContainer: 'analisis-content-container',
+            analisisDashboardTemplate: 'analisis-dashboard-template',
+            analisisPromptTemplate: 'analisis-prompt-template'
         };
 
         for (const [propName, id] of Object.entries(elementMapping)) {
@@ -210,6 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.renderBeranda();
             UI.renderHistoryTable();
             UI.renderRekap();
+            // BARU: Render halaman Analisis (Dropdown)
+            UI.renderAnalisisPage();
         },
         renderBeranda: () => {
             const santriAktifIds = new Set(State.allSetoran.map(s => s.santriId));
@@ -220,11 +231,150 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.statsSantriTuntas.textContent = tuntasCount;
             DOM.statsSantriBelumTuntas.textContent = totalSantri - tuntasCount;
 
+            UI.renderJadwalPerpulangan(); // BARU: Render Countdown
             UI.renderMutqinProgress();
             UI.renderTuntasTracking();
             UI.renderPeringkatNew();
             UI.renderTahfizhTuntasTrackingNew();
         },
+
+        // --- FITUR BARU: JADWAL PERPULANGAN (COUNTDOWN) ---
+        renderJadwalPerpulangan: () => {
+            if (State.countdownInterval) clearInterval(State.countdownInterval);
+            const now = new Date();
+            // Mengambil konfigurasi dari AppConfig (pastikan config.js sudah diupdate)
+            const nextPeriod = AppConfig.perpulanganPeriods.find(p => now < p.deadline);
+            
+            DOM.jadwalPerpulanganSection.innerHTML = `
+                <h3 class="section-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Jadwal Perpulangan Terdekat
+                </h3>
+                <div id="jadwal-content-container"></div>`;
+            
+            const cont = DOM.jadwalPerpulanganSection.querySelector('#jadwal-content-container');
+            
+            if (nextPeriod) {
+                const monthName = nextPeriod.deadline.toLocaleString('id-ID', { month: 'long' });
+                const deadlineStr = nextPeriod.deadline.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const targetsHtml = nextPeriod.required.map(t => `<div class="flex items-center gap-2 bg-white/80 py-1 px-3 rounded-full text-sm shadow-sm border border-gray-200/80"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span class="font-medium text-gray-700">${t.replace(/_/g, ' ')}</span></div>`).join('');
+                
+                cont.innerHTML = `
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div class="text-center">
+                                <h4 class="text-lg font-bold text-gray-800">Waktu Tersisa Menuju Perpulangan ${monthName}</h4>
+                                <p class="text-sm text-gray-500 mb-4">Deadline: ${deadlineStr} WIB</p>
+                                <div id="countdown-timer" class="flex justify-center gap-3 text-center"></div>
+                            </div>
+                            <div class="border-t md:border-t-0 md:border-l border-[var(--card-border)] pt-6 md:pt-0 md:pl-6">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="bg-green-100 text-green-700 p-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg></div>
+                                    <h4 class="text-lg font-bold">Target Hafalan</h4>
+                                </div>
+                                <div class="flex flex-wrap gap-2">${targetsHtml}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                const timerEl = cont.querySelector('#countdown-timer');
+                const updateCountdown = () => {
+                    const now = new Date().getTime();
+                    const dist = nextPeriod.deadline.getTime() - now;
+                    if (dist < 0) {
+                        timerEl.innerHTML = '<p class="font-bold text-lg text-red-600">Waktu Habis</p>';
+                        clearInterval(State.countdownInterval);
+                        return;
+                    }
+                    const d = Math.floor(dist / 864e5), h = Math.floor(dist % 864e5 / 36e5), m = Math.floor(dist % 36e5 / 6e4), s = Math.floor(dist % 6e4 / 1e3);
+                    timerEl.innerHTML = [d, h, m, s].map((val, i) => `<div class="bg-sky-100/50 text-sky-800 p-3 rounded-lg w-16 shadow-inner"><div class="text-3xl font-bold">${String(val).padStart(2, '0')}</div><div class="text-xs font-semibold opacity-70">${['Hari', 'Jam', 'Menit', 'Detik'][i]}</div></div>`).join('');
+                };
+                State.countdownInterval = setInterval(updateCountdown, 1000);
+                updateCountdown();
+            } else {
+                cont.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center font-semibold text-gray-600">Semua jadwal perpulangan telah selesai.</div>';
+            }
+        },
+
+        // --- FITUR BARU: HALAMAN ANALISIS ---
+        renderAnalisisPage: () => {
+            // Populate dropdown santri
+            if (!DOM.santriSelectAnalisis) return;
+            const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
+            Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
+            DOM.analisisContentContainer.innerHTML = DOM.analisisPromptTemplate.innerHTML;
+        },
+
+        renderSantriDashboard: (sId) => {
+            const s = State.santriData.find(s => s.id === sId);
+            if (!s) return;
+            
+            const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
+            
+            // Isi Data Profil
+            dash.querySelector('[data-name]').textContent = s.nama;
+            dash.querySelector('[data-kelas-text]').innerHTML = `Kelas ${s.kelas}`;
+            dash.querySelector('[data-program-text]').innerHTML = `${s.program}`;
+            
+            // Badge Status Tuntas
+            const statusBadge = dash.querySelector('[data-status-badge]');
+            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
+            statusBadge.className = `mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block ${s.isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`;
+            
+            // Badge Perpulangan
+            const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
+            if (s.statusPerpulangan === 'Boleh Pulang') {
+                perpulanganBadge.textContent = 'Boleh Pulang';
+                perpulanganBadge.className = 'mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block bg-green-100 text-green-800';
+            } else {
+                perpulanganBadge.textContent = 'Belum Boleh Pulang';
+                perpulanganBadge.className = 'mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block bg-red-100 text-red-800';
+            }
+            
+            // Nilai & Statistik
+            dash.querySelector('[data-nilai]').textContent = s.nilaiTampil;
+            dash.querySelector('[data-ziyadah]').textContent = s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)} hlm` : '-';
+            dash.querySelector('[data-total-setoran]').textContent = s.setoranCount;
+            
+            // Progres Juz Wajib
+            const progItems = [
+                { juz: 'Setengah Juz 30', done: s.nilai >= 100 },
+                { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true },
+                { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }
+            ];
+            
+            dash.querySelector('[data-progres-juz]').innerHTML = progItems
+                .filter(item => !item.tahfizhOnly || s.program === 'Tahfizh')
+                .map(item => `<div class="flex items-center justify-between p-3 bg-white/50 rounded-lg"><span class="font-medium text-sm">${item.juz}</span>${item.done ? '<span class="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Selesai</span>' : '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Proses</span>'}</div>`)
+                .join('');
+            
+            // Progres Ziyadah (Jika Tahfizh & Tuntas)
+            const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
+            if (s.program === 'Tahfizh' && s.isTuntas) {
+                ziyadahSect.classList.remove('hidden');
+                const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
+                const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
+                
+                ziyadahCont.innerHTML = allJuz.map(j => {
+                    const compPages = s.ziyadahProgress[j] || 0;
+                    if (compPages <= 0) return '';
+                    const totalPages = AppConfig.hafalanData.juzPageCounts[j];
+                    const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0;
+                    return `<div><div class="flex justify-between mb-1 text-sm"><span class="font-medium">Juz ${j}</span><span>${compPages.toFixed(1)} / ${totalPages} hlm</span></div><div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full" style="width: ${pct}%"></div></div></div>`;
+                }).join('');
+            }
+            
+            // Tabel Aktivitas
+            const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
+            const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            aktivitasCont.innerHTML = allActivities.length > 0 
+                ? allActivities.map(s => `<tr class="hover:bg-[var(--hover-bg)]"><td class="p-3"><p class="font-semibold text-sm">${s.jenis} ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p><p class="text-xs text-[var(--subtle-text)]">${s.halaman ? `${s.halaman} hlm` : s.surat}</p></td><td class="p-3 text-right text-xs text-[var(--subtle-text)]">${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</td></tr>`).join('') 
+                : '<tr><td class="p-4 text-center text-gray-500">Belum ada aktivitas.</td></tr>';
+            
+            DOM.analisisContentContainer.innerHTML = '';
+            DOM.analisisContentContainer.appendChild(dash);
+        },
+
         renderMutqinProgress: () => {
             const createProgress = (container, circleEl, detailsEl, santriList, color, checkFn) => {
                 if (!container) return;
@@ -577,63 +727,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // --- FITUR BARU: MODAL DETAIL, CHART, & VISUAL BALOK ---
-
+        // --- FITUR BARU: MODAL DETAIL, CHART, & VISUAL BALOK (Legacy) ---
         openDetailModal: (santriId) => {
             const santri = State.santriData.find(s => s.id === santriId);
             if (!santri) return;
-    
-            // 1. Isi Info Dasar
             DOM.detailNama.textContent = santri.nama;
             DOM.detailInfo.textContent = `${santri.kelas} - ${santri.program} | Musyrif: ${santri.musyrif}`;
-            
-            // 2. Render Grafik
             UI.renderChart(santri);
-    
-            // 3. Render Balok Juz
             UI.renderJuzBlocks(santri);
-    
-            // Tampilkan Modal
             DOM.studentDetailModal.classList.remove('hidden');
         },
     
         renderChart: (santri) => {
             const ctx = DOM.progressChart.getContext('2d');
-            
-            // Hapus chart lama jika ada
-            if (State.chartInstance) {
-                State.chartInstance.destroy();
-            }
-    
-            // Olah Data: Group by Bulan
+            if (State.chartInstance) State.chartInstance.destroy();
             const monthlyData = {};
-            // Urutkan setoran berdasarkan tanggal (terlama ke terbaru)
             const sortedSetoran = [...santri.setoran].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-            
             sortedSetoran.forEach(s => {
                 const date = new Date(s.createdAt);
                 const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
-                
-                // Hitung nilai halaman (convert surat ke estimasi halaman jika perlu)
                 let pages = parseFloat(s.halaman) || 0;
                 if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) {
                     pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0;
                 }
-                
-                // Kita hitung Kumulatif (Akumulasi)
                 if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
                 monthlyData[monthKey] += pages;
             });
-    
             const labels = Object.keys(monthlyData);
-            // Buat data kumulatif (semakin naik)
             let accumulator = 0;
             const dataPoints = Object.values(monthlyData).map(val => {
                 accumulator += val;
                 return accumulator.toFixed(1);
             });
-    
-            // Buat Chart Baru
             State.chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -641,7 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     datasets: [{
                         label: 'Total Halaman Hafalan',
                         data: dataPoints,
-                        borderColor: '#f59e0b', // Amber-500
+                        borderColor: '#f59e0b',
                         backgroundColor: 'rgba(245, 158, 11, 0.1)',
                         tension: 0.4,
                         fill: true,
@@ -661,18 +786,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderJuzBlocks: (santri) => {
             const container = DOM.juzVisualContainer;
             container.innerHTML = '';
-    
-            // Tentukan Juz mana yang mau ditampilkan (Prioritas: 30, 29, 28...)
             const targetJuzs = [30, 29, 28, 1]; 
-            
             targetJuzs.forEach(juzNum => {
-                // Hitung total halaman yang sudah disetor di Juz ini
                 const setoranJuz = santri.setoran.filter(s => s.juz == juzNum);
                 let totalPagesDone = 0;
-                
                 setoranJuz.forEach(s => {
                     if (s.jenis === 'Mutqin') {
-                        totalPagesDone = 20; // Langsung penuh
+                        totalPagesDone = 20; 
                     } else {
                         let pages = parseFloat(s.halaman) || 0;
                         if (!pages && s.surat) {
@@ -681,13 +801,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         totalPagesDone += pages;
                     }
                 });
-    
-                // Cap maksimal 20 halaman
                 const maxPages = 20;
                 const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
                 const percentage = Math.min(Math.round((totalPagesDone / maxPages) * 100), 100);
-    
-                // Buat HTML Wrapper Juz
                 const juzWrapper = document.createElement('div');
                 juzWrapper.className = 'mb-4';
                 juzWrapper.innerHTML = `
@@ -697,7 +813,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="grid grid-cols-10 gap-1">
                         ${Array(20).fill(0).map((_, i) => {
-                            // Jika index < filledBlocks, warnai hijau
                             const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-gray-200';
                             return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
                         }).join('')}
@@ -713,16 +828,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const Core = {
         reloadData: async () => {
-            // 1. Ambil Paket Data Lengkap dari Server
             const response = await Utils.fetchSetoranData(); 
-            
-            // Cek jika ada error atau data kosong
             if (!response || !response.setoran) {
                 console.error("Gagal format data server");
                 return;
             }
-
-            // 2. Simpan Data Santri dari Sheet ke State
             State.rawSantriList = (response.santri || []).map(s => ({
                 id: s.ID || s.id, 
                 nama: s.Nama || s.NamaSantri || s.nama, 
@@ -730,29 +840,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 program: s.Program || s.program,
                 musyrif: s.Musyrif || s.musyrif
             }));
-
-            // Buat Map Nama -> ID (untuk pencarian cepat)
             State.santriNameMap = new Map(State.rawSantriList.map(s => [Utils.normalizeName(s.nama), s.id]));
-
-            // 3. Simpan Data Setoran
             State.allSetoran = response.setoran.map(item => ({
                 id: `row-${item.rowNumber}`,
                 santriId: State.santriNameMap.get(Utils.normalizeName(item.namaSantri || '')) || null,
                 createdAt: item.tanggal, 
                 ...item
             }));
-
-            // 4. Hitung Statistik & Render
             Core.calculateSantriStats();
             Core.buildClassGroups();
             UI.renderAll();
-            
-            // 5. Update dropdown musyrif (Panggil fungsinya)
             Core.updateMusyrifList(); 
         },
 
+        // --- FITUR BARU: LOGIKA PERPULANGAN ---
+        checkPerpulanganStatus: (s) => {
+            // Prioritas 1: Sudah Mutqin Setengah Juz 30 (Nilai 100)
+            const hasMutqinSetengahJuz = s.setoran.some(set => set.jenis === 'Mutqin' && String(set.juz) === "juz30_setengah");
+            if (hasMutqinSetengahJuz) return 'Boleh Pulang';
+            
+            // Prioritas 2: Mutqin Juz 30 Full
+            const hasMutqinJuz30 = s.setoran.some(set => set.jenis === 'Mutqin' && set.juz == 30);
+            if (hasMutqinJuz30) return 'Boleh Pulang';
+            
+            const now = new Date();
+            let latestAchievedPeriod = null;
+            
+            // Cek setiap periode di AppConfig
+            if (AppConfig.perpulanganPeriods) {
+                for (const period of AppConfig.perpulanganPeriods) {
+                    let conditionMet = false;
+                    if (period.type === 'surat') {
+                        conditionMet = period.required.every(requiredSurah => 
+                            s.setoran.some(set => set.surat === requiredSurah && new Date(set.createdAt) <= period.deadline)
+                        );
+                    } else if (period.type === 'mutqin') {
+                        conditionMet = s.setoran.some(set => set.jenis === 'Mutqin' && period.required.includes(String(set.juz)) && new Date(set.createdAt) <= period.deadline);
+                    }
+                    
+                    if (conditionMet) {
+                        latestAchievedPeriod = period;
+                    }
+                }
+            }
+            
+            if (latestAchievedPeriod) {
+                const resetDate = new Date(latestAchievedPeriod.deadline);
+                resetDate.setDate(resetDate.getDate() + 1);
+                if (now < resetDate) {
+                    return 'Boleh Pulang';
+                }
+            }
+            return 'Belum Boleh Pulang';
+        },
+
         calculateSantriStats: () => {
-            const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0 }]));
+            const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { 
+                ...s, 
+                mutqinJuz: new Set(), 
+                nilai: 0, 
+                nilaiTampil: 0, 
+                isTuntas: false, 
+                tuntasDate: null, 
+                ziyadahPages: 0, 
+                unggulanPages: 0, 
+                setoran: [], 
+                setoranCount: 0,
+                // --- PROPERTI BARU ---
+                ziyadahProgress: {}, 
+                statusPerpulangan: 'Belum Boleh Pulang'
+            }]));
             
             for (const setoran of State.allSetoran) {
                 if (santriStatsMap.has(setoran.santriId)) {
@@ -772,15 +929,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mutqinJuz29) santri.mutqinJuz.add(29);
                 if (mutqinJuz30) santri.mutqinJuz.add(30);
 
+                // --- LOGIKA SKOR BARU (SCORING TIERS) ---
                 if (mutqinSetengahJuz || (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineJuz30Score)) {
                     santri.nilai = 100;
                 } else {
-                    santri.nilai = santri.setoran
-                        .filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score)
-                        .reduce((sum, s) => {
-                            const pageCount = parseFloat(s.halaman) || AppConfig.hafalanData.juzPageCounts[s.juz] || 0;
-                            return sum + pageCount;
-                        }, 0);
+                    // Cek sistem poin otomatis berdasarkan surat (dari Config)
+                    const setoranSurahs = new Set(santri.setoran.filter(set => set.juz == 30 && set.surat).map(set => set.surat));
+                    let score = 0;
+                    if (AppConfig.scoringTiers) {
+                        for (const tier of AppConfig.scoringTiers) {
+                            if (tier.required.every(surah => setoranSurahs.has(surah))) {
+                                score = tier.score;
+                                break;
+                            }
+                        }
+                    }
+                    // Fallback jika tidak masuk tier tapi ada progres halaman
+                    if (score === 0) {
+                        score = santri.setoran
+                            .filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score)
+                            .reduce((sum, s) => {
+                                const pageCount = parseFloat(s.halaman) || AppConfig.hafalanData.juzPageCounts[s.juz] || 0;
+                                return sum + pageCount;
+                            }, 0);
+                    }
+                    santri.nilai = score;
                 }
 
                 let tuntas = false;
@@ -799,32 +972,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (mutqinSetengahJuz) completionDates.push(new Date(mutqinSetengahJuz.createdAt));
                     if (mutqinJuz30) completionDates.push(new Date(mutqinJuz30.createdAt));
                     if (mutqinJuz29) completionDates.push(new Date(mutqinJuz29.createdAt));
+                    
                     if (completionDates.length > 0) {
                         santri.tuntasDate = new Date(Math.max(...completionDates));
                         santri.setoran.forEach(setoran => {
+                            // Hitung Ziyadah Progress per Juz (Baru)
                             if (new Date(setoran.createdAt) > santri.tuntasDate) {
                                 const pageValue = (setoran.halaman ? parseFloat(setoran.halaman) : AppConfig.hafalanData.surahData[setoran.juz]?.pages[setoran.surat]) || 0;
                                 if (setoran.jenis === 'Ziyadah') {
                                     santri.ziyadahPages += pageValue;
+                                    santri.ziyadahProgress[setoran.juz] = (santri.ziyadahProgress[setoran.juz] || 0) + pageValue;
                                 }
                             }
                         });
                     }
                 }
                 santri.nilaiTampil = Math.min(100, santri.nilai);
+                
+                // Hitung ulang halaman unggulan
                 santri.unggulanPages = santri.setoran.reduce((sum, s) => {
                     let pageCount = 0;
-                    if (s.halaman) {
-                        pageCount = parseFloat(s.halaman);
-                    } else if (s.juz === 'juz30_setengah') {
-                        pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah'];
-                    } else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) {
-                        pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat];
-                    } else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) {
-                        pageCount = AppConfig.hafalanData.juzPageCounts[s.juz];
-                    }
+                    if (s.halaman) pageCount = parseFloat(s.halaman);
+                    else if (s.juz === 'juz30_setengah') pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah'];
+                    else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat];
+                    else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz];
                     return sum + pageCount;
                 }, 0);
+
+                // --- HITUNG STATUS PERPULANGAN (BARU) ---
+                santri.statusPerpulangan = Core.checkPerpulanganStatus(santri);
             });
             State.santriData = Array.from(santriStatsMap.values());
         },
@@ -902,6 +1078,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
+            const tabBtn = e.target.closest('.analisis-tab');
+
+            // Navigasi Internal
+            if (button && button.matches('[data-target-page]')) {
+                UI.switchPage(button.dataset.targetPage);
+                return;
+            }
+
+            // Tab Analisis (Ringkasan vs Aktivitas)
+            if (tabBtn) {
+                const targetId = tabBtn.dataset.target;
+                tabBtn.parentElement.querySelectorAll('.analisis-tab').forEach(t => t.classList.remove('active', 'text-amber-600', 'border-amber-500'));
+                tabBtn.classList.add('active', 'text-amber-600', 'border-amber-500');
+                DOM.analisisContentContainer.querySelectorAll('.analisis-tab-content').forEach(c => c.classList.add('hidden'));
+                const targetPanel = DOM.analisisContentContainer.querySelector(`#${targetId}`);
+                if(targetPanel) targetPanel.classList.remove('hidden');
+                return;
+            }
+
             if (!button) return;
 
             if (button.matches('.export-pdf-btn')) {
@@ -909,8 +1104,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (button.matches('.delete-btn')) {
                 State.setoranIdToDelete = button.dataset.id;
                 DOM.passwordConfirmModal.classList.remove('hidden');
-            } else if (button.matches('[data-target-page]')) {
-                UI.switchPage(button.dataset.targetPage);
             } else if (button.matches('.accordion-button')) {
                 const panel = button.closest('h2').nextElementSibling;
                 panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`;
@@ -947,6 +1140,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 300);
             }
         });
+
+        // Dropdown Halaman Analisis
+        if (DOM.santriSelectAnalisis) {
+            DOM.santriSelectAnalisis.addEventListener('change', (e) => {
+                if (e.target.value) {
+                    UI.renderSantriDashboard(e.target.value);
+                } else {
+                    DOM.analisisContentContainer.innerHTML = DOM.analisisPromptTemplate.innerHTML;
+                }
+            });
+        }
 
         DOM.rekapSelect.addEventListener('change', (e) => {
             const selectedId = e.target.value;
@@ -1068,53 +1272,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOM.cancelPasswordBtn.addEventListener('click', () => DOM.passwordConfirmModal.classList.add('hidden'));
         DOM.confirmPasswordBtn.addEventListener('click', async () => {
-            // 1. Ambil input password dari user
             const inputPass = DOM.passwordInput.value;
-            
-            // (Opsional) Validasi kosong di client
             if (!inputPass) {
                  DOM.passwordError.textContent = "Masukkan kata sandi.";
                  DOM.passwordError.classList.remove('hidden');
                  return;
             }
-
-            // Reset pesan error
             DOM.passwordError.classList.add('hidden');
-            
             const setoran = State.allSetoran.find(s => s.id === State.setoranIdToDelete);
             if (!setoran) return;
 
-            // 2. Beri feedback visual bahwa sedang memproses (Loading)
             const originalText = DOM.confirmPasswordBtn.textContent;
             DOM.confirmPasswordBtn.textContent = "Memverifikasi...";
             DOM.confirmPasswordBtn.disabled = true;
             DOM.cancelPasswordBtn.disabled = true;
 
-            // 3. Siapkan data kiriman
             const formData = new FormData();
             formData.append('action', 'delete');
             formData.append('rowNumber', setoran.rowNumber);
-            formData.append('password', inputPass); // Kirim tebakan password ke server
+            formData.append('password', inputPass);
 
             try {
-                // 4. Kirim ke Google Apps Script
                 const data = await Utils.postData(formData);
-                
-                // 5. Cek Jawaban Server
                 if (data.result === 'success') {
-                    // SUKSES: Server bilang password benar & data dihapus
                     UI.showToast('Data berhasil dihapus.');
-                    DOM.passwordConfirmModal.classList.add('hidden'); // Tutup modal
-                    DOM.passwordInput.value = ''; // Bersihkan input
-                    await Core.reloadData(); // Refresh data
+                    DOM.passwordConfirmModal.classList.add('hidden');
+                    DOM.passwordInput.value = '';
+                    await Core.reloadData();
                 } else {
-                    // GAGAL: Server bilang error (bisa password salah atau error lain)
                     if (data.error === 'Kata sandi salah.') {
-                        // Tampilkan error khusus password di modal (seperti sebelumnya)
                         DOM.passwordError.textContent = "Kata sandi salah.";
                         DOM.passwordError.classList.remove('hidden');
                     } else {
-                        // Error lain (misal server down), tutup modal & pakai Toast
                         DOM.passwordConfirmModal.classList.add('hidden');
                         UI.showToast(`Gagal: ${data.error}`, 'error');
                     }
@@ -1123,7 +1312,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(error);
                 UI.showToast('Terjadi kesalahan koneksi.', 'error');
             } finally {
-                // 6. Kembalikan tombol ke kondisi semula (selesai loading)
                 DOM.confirmPasswordBtn.textContent = originalText;
                 DOM.confirmPasswordBtn.disabled = false;
                 DOM.cancelPasswordBtn.disabled = false;
@@ -1184,6 +1372,5 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.switchPage('page-beranda', false);
     }
 
-    // Jalankan aplikasi
     main();
 });
