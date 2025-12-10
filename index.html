@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-gray-900">
     <div class="sm:flex min-h-screen">
@@ -45,12 +46,13 @@
                         <span class="text-xs sm:text-sm">Rekap</span>
                     </a>
                 </div>
-                </div>
+            </div>
         </nav>
 
         <main id="main-content" class="flex-1 pb-20 sm:pb-0 overflow-y-auto">
             <div id="skeleton-page-beranda" class="skeleton-container p-8 space-y-8"><div class="h-40 skeleton rounded-2xl"></div><div class="h-40 skeleton rounded-2xl"></div><div class="h-48 skeleton rounded-2xl"></div><div class="h-32 skeleton rounded-2xl"></div></div>
             <div id="skeleton-page-analisis" class="skeleton-container hidden p-8 space-y-6"><div class="h-12 w-full skeleton rounded-lg"></div><div class="h-64 skeleton rounded-2xl"></div><div class="h-48 skeleton rounded-2xl"></div></div>
+
             <div id="page-beranda" class="page-content p-4 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto space-y-8">
                     <header class="fade-in">
@@ -96,10 +98,32 @@
                     
                     <section id="jadwal-perpulangan-section" class="fade-in" style="animation-delay: 200ms;"></section>
 
-                    <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 200ms;"></section>
-                    <section class="fade-in" style="animation-delay: 500ms;"></section>
+                    <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 300ms;">
+                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div id="mutqin-unggulan-progress-container" class="glass-card p-6 rounded-2xl hidden flex flex-col items-center text-center">
+                                <h4 class="font-bold text-gray-700 mb-4">Mutqin 30 Juz (Unggulan)</h4>
+                                <div id="mutqin-unggulan-circle" class="relative w-32 h-32"></div>
+                                <p id="mutqin-unggulan-details" class="mt-4 text-sm text-gray-500"></p>
+                            </div>
+                            <div id="mutqin-juz30-progress-container" class="glass-card p-6 rounded-2xl hidden flex flex-col items-center text-center">
+                                <h4 class="font-bold text-gray-700 mb-4">Mutqin Juz 30 (Tahfizh)</h4>
+                                <div id="mutqin-juz30-circle" class="relative w-32 h-32"></div>
+                                <p id="mutqin-juz30-details" class="mt-4 text-sm text-gray-500"></p>
+                            </div>
+                            <div id="mutqin-juz29-progress-container" class="glass-card p-6 rounded-2xl hidden flex flex-col items-center text-center">
+                                <h4 class="font-bold text-gray-700 mb-4">Mutqin Juz 29 (Tahfizh)</h4>
+                                <div id="mutqin-juz29-circle" class="relative w-32 h-32"></div>
+                                <p id="mutqin-juz29-details" class="mt-4 text-sm text-gray-500"></p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="fade-in" style="animation-delay: 500ms;">
+                        <div id="tuntas-tracking-accordion" class="space-y-3"></div>
+                    </section>
+
                     <section id="peringkat-section" class="fade-in" style="animation-delay: 600ms;"></section>
-                    <section id="tuntas-tracking-section" class="fade-in" style="animation-delay: 700ms;"></section>
+                    
                     <section id="tahfizh-tuntas-tracking-section" class="fade-in" style="animation-delay: 800ms;"></section>
                 </div>
             </div>
@@ -121,9 +145,141 @@
                 </div>
             </div>
 
-            <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8"> </div>
-             <div id="page-riwayat" class="page-content hidden p-4 sm:p-6 lg:p-8"> </div>
-             <div id="page-rekap" class="page-content hidden p-4 sm:p-6 lg:p-8"> </div>
+            <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                <div class="max-w-2xl mx-auto glass-card rounded-2xl p-6 sm:p-8 fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Input Setoran</h2>
+                        <button id="help-button" class="text-amber-500 hover:text-amber-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                    </div>
+
+                    <form id="setoranForm" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Waktu Setoran</label>
+                            <div class="flex gap-2">
+                                <input type="datetime-local" id="tanggal" name="tanggal" class="glass-input w-full p-3 rounded-lg" required>
+                                <button type="button" id="nowBtn" class="bg-amber-100 text-amber-700 px-4 py-2 rounded-lg font-medium hover:bg-amber-200 transition-colors text-sm">Sekarang</button>
+                            </div>
+                            <p class="form-error"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Musyrif</label>
+                                <select id="musyrif" name="musyrif" class="glass-input w-full p-3 rounded-lg" required></select>
+                                <p class="form-error"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Nama Santri</label>
+                                <select id="namaSantri" class="glass-input w-full p-3 rounded-lg" required disabled></select>
+                                <p class="form-error"></p>
+                                <input type="hidden" id="santriId" name="santriId">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-5 bg-gray-50/50 p-3 rounded-lg border border-gray-200/50">
+                            <div>
+                                <label class="block text-xs text-gray-500 uppercase tracking-wide">Kelas</label>
+                                <input type="text" id="kelas" name="kelas" class="w-full bg-transparent font-semibold text-gray-700 outline-none" readonly tabindex="-1">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 uppercase tracking-wide">Program</label>
+                                <input type="text" id="program" name="program" class="w-full bg-transparent font-semibold text-gray-700 outline-none" readonly tabindex="-1">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Jenis Setoran</label>
+                                <select id="jenis" name="jenis" class="glass-input w-full p-3 rounded-lg" required disabled></select>
+                                <p class="form-error"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Juz</label>
+                                <select id="juz" name="juz" class="glass-input w-full p-3 rounded-lg" required disabled></select>
+                                <p class="form-error"></p>
+                            </div>
+                        </div>
+
+                        <div id="halaman-container" class="hidden">
+                            <label class="block text-sm font-medium mb-1">Jumlah Halaman</label>
+                            <input type="number" step="0.1" id="halaman" name="halaman" class="glass-input w-full p-3 rounded-lg" placeholder="Contoh: 1 atau 0.5">
+                            <p class="form-error text-xs text-gray-500 mt-1">Gunakan titik untuk desimal (misal 0.5)</p>
+                        </div>
+
+                        <div id="surat-container" class="hidden">
+                            <label class="block text-sm font-medium mb-1">Nama Surat</label>
+                            <select id="surat" name="surat" class="glass-input w-full p-3 rounded-lg"></select>
+                            <p class="form-error"></p>
+                        </div>
+                        
+                        <input type="hidden" id="kualitas" name="kualitas" value="Lancar">
+
+                        <button type="submit" id="submit-button" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2 mt-8">
+                            <span id="submit-spinner" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                            <span id="submit-button-text">Simpan Setoran</span>
+                            <svg id="submit-button-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+             <div id="page-riwayat" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                <div class="max-w-6xl mx-auto space-y-6 fade-in">
+                    <h2 class="text-2xl font-bold mb-4">Riwayat Setoran</h2>
+                    
+                    <div class="glass-card p-4 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="relative col-span-1 md:col-span-4">
+                            <input type="text" id="search-riwayat" placeholder="Cari nama santri..." class="glass-input w-full p-3 pl-10 rounded-lg">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <div id="suggestions-container" class="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
+                        </div>
+                        
+                        <input type="date" id="filter-tanggal-mulai" class="glass-input p-2 rounded-lg text-sm">
+                        <input type="date" id="filter-tanggal-akhir" class="glass-input p-2 rounded-lg text-sm">
+                        
+                        <select id="filter-program" class="glass-input p-2 rounded-lg text-sm">
+                            <option value="Semua">Semua Program</option>
+                            <option value="Tahfizh">Tahfizh</option>
+                            <option value="Unggulan">Unggulan</option>
+                        </select>
+                        
+                        <select id="filter-kelas" class="glass-input p-2 rounded-lg text-sm">
+                            <option value="Semua">Semua Kelas</option>
+                            <option value="2CDGH">2C, 2D, 2G, 2H</option>
+                            <option value="2A">2A</option>
+                            <option value="2B">2B</option>
+                        </select>
+                    </div>
+
+                    <div class="glass-card rounded-xl overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-amber-500/10 text-amber-900 uppercase text-xs font-bold">
+                                    <tr>
+                                        <th class="p-4">Nama Santri</th>
+                                        <th class="p-4">Setoran</th>
+                                        <th class="p-4">Tanggal</th>
+                                        <th class="p-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="setoranTableBody" class="divide-y divide-gray-100 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div id="page-rekap" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                <div class="max-w-7xl mx-auto fade-in">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold">Rekapitulasi</h2>
+                        <select id="rekap-select" class="glass-input p-2 rounded-lg w-full sm:w-64"></select>
+                    </div>
+                    <div id="rekap-content-container"></div>
+                </div>
+             </div>
 
         </main>
     </div>
@@ -213,6 +369,117 @@
             <p class="mt-1 text-sm text-[var(--subtle-text)]">Silakan pilih nama santri di atas untuk melihat laporan progres hafalannya.</p>
         </div>
     </template>
+
+    <template id="history-row-template">
+        <tr class="hover:bg-amber-50/50 transition-colors group">
+            <td class="p-4">
+                <div class="font-bold text-gray-800 data-nama"></div>
+                <div class="flex items-center mt-1">
+                    <span class="data-program-icon"></span>
+                    <span class="data-kelas-icon"></span>
+                </div>
+            </td>
+            <td class="p-4">
+                <div class="font-medium text-amber-600 data-jenis"></div>
+                <div class="text-xs text-gray-500 mt-0.5"><span class="data-juz-text"></span> - <span class="data-unit"></span></div>
+            </td>
+            <td class="p-4 text-gray-500 data-tanggal"></td>
+            <td class="p-4 text-center">
+                <button class="delete-btn text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors" title="Hapus">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            </td>
+        </tr>
+    </template>
+
+    <template id="rekap-content-template">
+        <div class="rekap-tab-content space-y-4 animate-fadeIn">
+            <div class="glass-card p-6 rounded-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                <h3 class="text-xl font-bold mb-2 data-title"></h3>
+                <p class="text-sm text-gray-600 mb-1 data-musyrif"></p>
+                <p class="text-xs text-gray-400 data-timestamp"></p>
+                <button class="export-pdf-btn absolute top-6 right-6 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    Export PDF
+                </button>
+            </div>
+            
+            <div class="glass-card rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 font-semibold text-gray-500">No</th>
+                                <th class="px-4 py-3 font-semibold text-gray-500 cursor-pointer sortable hover:text-amber-600" data-sort="nama">Nama Santri <span class="sort-icon"></span></th>
+                                <th class="px-4 py-3 font-semibold text-gray-500 text-center cursor-pointer sortable hover:text-amber-600" data-sort="nilai">Nilai <span class="sort-icon"></span></th>
+                                <th class="px-4 py-3 font-semibold text-gray-500 text-center cursor-pointer sortable hover:text-amber-600" data-sort="ziyadah">Ziyadah <span class="sort-icon"></span></th>
+                                <th class="px-4 py-3 font-semibold text-gray-500 text-center cursor-pointer sortable hover:text-amber-600" data-sort="keterangan">Ket <span class="sort-icon"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 data-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl rounded-full px-6 py-3 flex items-center gap-3 z-50 pointer-events-none">
+        <div id="toast-icon" class="w-6 h-6"></div>
+        <span id="toast-message" class="font-medium text-sm text-gray-800"></span>
+    </div>
+
+    <div id="passwordConfirmModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="modal-content bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Konfirmasi Hapus</h3>
+            <p class="text-gray-500 text-sm mb-4">Masukkan kata sandi admin untuk menghapus data ini.</p>
+            <input type="password" id="passwordInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all mb-2" placeholder="Kata Sandi">
+            <p id="passwordError" class="text-red-500 text-xs hidden mb-2"></p>
+            <div class="flex justify-end gap-3 mt-4">
+                <button id="cancelPasswordBtn" class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Batal</button>
+                <button id="confirmPasswordBtn" class="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30">Hapus Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentDetailModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="modal-content relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            <div class="sticky top-0 bg-white z-10 p-6 border-b border-gray-100 flex justify-between items-center">
+                <div>
+                    <h3 id="detail-nama" class="text-xl font-bold text-gray-900">Nama Santri</h3>
+                    <p id="detail-info" class="text-sm text-gray-500"></p>
+                </div>
+                <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 bg-gray-100 p-2 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-3">Grafik Halaman per Bulan</h4>
+                    <div class="h-64 w-full bg-gray-50 rounded-xl p-2 border border-gray-100">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-3">Visualisasi Hafalan (Blok)</h4>
+                    <div id="juz-visual-container" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="helpModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="modal-content bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold mb-2">Bantuan</h3>
+            <p class="text-gray-600 text-sm mb-4">
+                Pilih <strong>Mutqin</strong> jika santri menyetorkan hafalan penuh 1 Juz atau Setengah Juz 30.<br><br>
+                Pilih <strong>Ziyadah/Murajaah</strong> untuk setoran harian (per halaman/surat).
+            </p>
+            <button id="closeHelpModal" class="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200">Tutup</button>
+        </div>
+    </div>
     
     <script>
         if ('serviceWorker' in navigator) {
@@ -227,5 +494,3 @@
     
     </body>
 </html>
-
-
