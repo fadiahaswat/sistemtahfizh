@@ -3,6 +3,14 @@
 const AppConfig = {
     // URL Web App Google Apps Script Anda
     scriptURL: 'https://script.google.com/macros/s/AKfycbyl2FCcGUtolkJIDsoiTYFKeKp8IQwHT0V3z8n1pOHH9CLiyvYZTBaimrojILJM_A-HLg/exec',
+
+    // [BARU] Konfigurasi Nama Grup Kelas Khusus
+    // Format: 'Nama Musyrif': 'Nama Tampilan Grup'
+    classGroupOverrides: {
+        'Muhammad Zhafir Setiaji': '2CDGH',
+        // Tambahkan mapping lain di sini jika diperlukan nanti
+        // Contoh: 'Abdullah': 'Kelas Khusus'
+    },
     
     // Urutan Musyrif di Dropdown
     musyrifSortOrder: ['Andi Aqillah Fadia Haswat', 'Abdullah', 'Muhammad Zhafir Setiaji'], 
