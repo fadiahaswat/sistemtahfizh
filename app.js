@@ -63,6 +63,135 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const UI = {
+        // ... di dalam const UI = { ... }
+
+// Fungsi Membuka Modal Detail
+openDetailModal: (santriId) => {
+    const santri = State.santriData.find(s => s.id === santriId);
+    if (!santri) return;
+
+    // 1. Isi Info Dasar
+    DOM.detailNama.textContent = santri.nama;
+    DOM.detailInfo.textContent = `${santri.kelas} - ${santri.program} | Musyrif: ${santri.musyrif}`;
+
+    // 2. Render Grafik
+    UI.renderChart(santri);
+
+    // 3. Render Balok Juz
+    UI.renderJuzBlocks(santri);
+
+    // Tampilkan Modal
+    DOM.studentDetailModal.classList.remove('hidden');
+},
+
+// Fungsi Render Grafik Chart.js
+renderChart: (santri) => {
+    const ctx = DOM.progressChart.getContext('2d');
+
+    // Hapus chart lama jika ada
+    if (window.mySantriChart) window.mySantriChart.destroy();
+
+    // Olah Data: Group by Bulan
+    const monthlyData = {};
+    santri.setoran.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    santri.setoran.forEach(s => {
+        const date = new Date(s.createdAt);
+        const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
+
+        // Hitung nilai halaman (convert surat ke estimasi halaman jika perlu)
+        let pages = parseFloat(s.halaman) || 0;
+        if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) {
+            pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0;
+        }
+
+        // Kita hitung Kumulatif (Akumulasi)
+        if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
+        monthlyData[monthKey] += pages;
+    });
+
+    const labels = Object.keys(monthlyData);
+    // Buat data kumulatif (semakin naik)
+    let accumulator = 0;
+    const dataPoints = Object.values(monthlyData).map(val => {
+        accumulator += val;
+        return accumulator.toFixed(1);
+    });
+
+    // Buat Chart Baru
+    window.mySantriChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Halaman Hafalan',
+                data: dataPoints,
+                borderColor: '#f59e0b', // Amber-500
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#d97706'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+},
+
+// Fungsi Render Visual Balok
+renderJuzBlocks: (santri) => {
+    const container = DOM.juzVisualContainer;
+    container.innerHTML = '';
+
+    // Tentukan Juz mana yang mau ditampilkan (Prioritas: 30, 29, 28...)
+    // Atau tampilkan Juz yang sudah ada setorannya
+    const targetJuzs = [30, 29, 28, 1]; // Sesuaikan dengan kebutuhan
+
+    targetJuzs.forEach(juzNum => {
+        // Hitung total halaman yang sudah disetor di Juz ini
+        const setoranJuz = santri.setoran.filter(s => s.juz == juzNum);
+        let totalPagesDone = 0;
+
+        setoranJuz.forEach(s => {
+            if (s.jenis === 'Mutqin') {
+                totalPagesDone = 20; // Langsung penuh
+            } else {
+                let pages = parseFloat(s.halaman) || 0;
+                if (!pages && s.surat) {
+                    pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0;
+                }
+                totalPagesDone += pages;
+            }
+        });
+
+        // Cap maksimal 20 halaman
+        const maxPages = 20;
+        const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
+        const percentage = Math.round((totalPagesDone / maxPages) * 100);
+
+        // Buat HTML Wrapper Juz
+        const juzWrapper = document.createElement('div');
+        juzWrapper.className = 'mb-4';
+        juzWrapper.innerHTML = `
+            <div class="flex justify-between text-sm mb-1">
+                <span class="font-bold text-gray-700">Juz ${juzNum}</span>
+                <span class="text-xs text-gray-500">${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)</span>
+            </div>
+            <div class="grid grid-cols-10 gap-1">
+                ${Array(20).fill(0).map((_, i) => {
+                    // Jika index < filledBlocks, warnai hijau
+                    const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-gray-200';
+                    return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
+                }).join('')}
+            </div>
+        `;
+        container.appendChild(juzWrapper);
+    });
+}
         showToast: (message, type = 'success') => {
             DOM.toastMessage.textContent = message;
             const isSuccess = type === 'success';
