@@ -7,10 +7,12 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3063/3063212.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063212.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
@@ -23,11 +25,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Smooth Scroll & Hide Scrollbar */
-        html { scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-
-        /* Background Mesh Gradient yang Halus */
+        /* Latar Belakang Mesh Gradient Halus */
         .bg-mesh {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -38,7 +36,7 @@
             z-index: -1;
         }
 
-        /* Glassmorphism Classes */
+        /* Glassmorphism Styles */
         .glass-panel {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -47,14 +45,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         }
 
-        .glass-nav-mobile {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
-        }
-
-        /* Form Inputs Focus Ring */
+        /* Input Styles */
         .input-ring {
             transition: all 0.2s ease;
             border: 1px solid #e2e8f0;
@@ -65,12 +56,24 @@
             outline: none;
         }
 
-        /* Animations */
+        /* Nav Link Active State (Dikelola oleh app.js) */
+        .nav-link.active {
+            color: #d97706; /* amber-700 */
+        }
+        .nav-link.active div { /* Icon container */
+            background-color: #fef3c7; /* amber-100 */
+            color: #d97706;
+        }
+
+        /* Animasi */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .fade-up { animation: fadeUp 0.4s ease-out forwards; }
+        
+        /* Hide Scrollbar */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -79,41 +82,57 @@
 
     <div class="flex min-h-screen">
         
-        <aside class="hidden sm:flex w-64 flex-col fixed h-full glass-panel border-r border-slate-200 z-30">
-            <div class="p-8 pb-4">
-                <div class="flex items-center gap-3 text-amber-600">
-                    <div class="p-2 bg-amber-100 rounded-xl">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" /></svg>
-                    </div>
-                    <span class="font-bold text-xl tracking-tight text-slate-800">Setor.in</span>
+        <nav id="main-nav" class="fixed bottom-0 left-0 w-full z-40 bg-white/90 backdrop-blur-xl border-t border-slate-200 sm:static sm:w-72 sm:h-screen sm:flex-col sm:border-t-0 sm:border-r sm:bg-white/60 sm:p-6 transition-all">
+            
+            <div class="hidden sm:flex items-center gap-3 mb-8 px-2 text-amber-600">
+                <div class="p-2.5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl text-white shadow-lg shadow-orange-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" /></svg>
                 </div>
+                <span class="font-bold text-xl tracking-tight text-slate-800">Setor.in</span>
             </div>
 
-            <nav id="desktop-nav" class="flex-1 px-4 space-y-1 mt-4">
-                <a href="#" data-page="page-beranda" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-50 hover:text-amber-600 transition-all group">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    Beranda
+            <div class="flex justify-around items-center h-16 sm:h-full sm:flex-col sm:justify-start sm:items-stretch sm:space-y-2">
+                
+                <a href="#" data-page="page-beranda" class="nav-link active group flex flex-col sm:flex-row items-center sm:gap-4 p-1 sm:px-4 sm:py-3 rounded-xl transition-all hover:bg-slate-50">
+                    <div class="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    </div>
+                    <span class="text-[10px] sm:text-sm font-bold sm:font-medium text-slate-500 group-hover:text-amber-700">Beranda</span>
                 </a>
-                <a href="#" data-page="page-form" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-50 hover:text-amber-600 transition-all group">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Input Setoran
-                </a>
-                <a href="#" data-page="page-analisis" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-50 hover:text-amber-600 transition-all group">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    Analisis
-                </a>
-                <a href="#" data-page="page-riwayat" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-50 hover:text-amber-600 transition-all group">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Riwayat
-                </a>
-                <a href="#" data-page="page-rekap" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-50 hover:text-amber-600 transition-all group">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Rekapitulasi
-                </a>
-            </nav>
 
-            <div class="p-4 border-t border-slate-200">
-                <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                <a href="#" data-page="page-form" class="nav-link group flex flex-col sm:flex-row items-center sm:gap-4 p-1 sm:px-4 sm:py-3 rounded-xl transition-all hover:bg-slate-50">
+                    <div class="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <span class="text-[10px] sm:text-sm font-bold sm:font-medium text-slate-500 group-hover:text-amber-700">Input</span>
+                </a>
+
+                <div class="relative -top-6 sm:static sm:top-0">
+                    <a href="#" data-page="page-analisis" class="nav-link group flex sm:flex-row items-center justify-center sm:justify-start sm:gap-4 w-14 h-14 sm:w-auto sm:h-auto bg-slate-800 sm:bg-transparent rounded-2xl sm:rounded-xl shadow-lg sm:shadow-none shadow-slate-800/30 sm:hover:bg-slate-50 transition-all border-4 border-slate-50 sm:border-0 sm:p-1 sm:px-4 sm:py-3">
+                         <div class="p-0 sm:p-1.5 rounded-lg text-white sm:text-slate-400 sm:group-hover:text-amber-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <span class="hidden sm:inline text-sm font-medium text-slate-500 sm:group-hover:text-amber-700">Analisis</span>
+                    </a>
+                </div>
+
+                <a href="#" data-page="page-riwayat" class="nav-link group flex flex-col sm:flex-row items-center sm:gap-4 p-1 sm:px-4 sm:py-3 rounded-xl transition-all hover:bg-slate-50">
+                    <div class="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="text-[10px] sm:text-sm font-bold sm:font-medium text-slate-500 group-hover:text-amber-700">Riwayat</span>
+                </a>
+
+                <a href="#" data-page="page-rekap" class="nav-link group flex flex-col sm:flex-row items-center sm:gap-4 p-1 sm:px-4 sm:py-3 rounded-xl transition-all hover:bg-slate-50">
+                    <div class="p-1.5 rounded-lg text-slate-400 group-hover:text-amber-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <span class="text-[10px] sm:text-sm font-bold sm:font-medium text-slate-500 group-hover:text-amber-700">Rekap</span>
+                </a>
+            </div>
+
+            <div class="hidden sm:block mt-auto pt-6 border-t border-slate-100">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50/50">
                     <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-xl">👳‍♂️</div>
                     <div>
                         <p class="text-sm font-bold text-slate-700">Ustadz Pengampu</p>
@@ -121,18 +140,19 @@
                     </div>
                 </div>
             </div>
-        </aside>
+        </nav>
 
-        <main id="main-content" class="flex-1 sm:ml-64 pb-24 sm:pb-0 overflow-y-auto h-screen">
+
+        <main id="main-content" class="flex-1 pb-24 sm:pb-0 overflow-y-auto h-screen">
             
-            <div class="sm:hidden sticky top-0 z-20 glass-panel border-b border-slate-100 px-4 py-3 flex justify-between items-center">
+            <div class="sm:hidden sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <div class="p-1.5 bg-amber-100 rounded-lg text-amber-600">
+                    <div class="p-1.5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg text-white">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
                     <span class="font-bold text-lg text-slate-800">Setor.in</span>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-sm border border-slate-200">🔔</div>
+                <button class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-sm border border-slate-200 text-slate-500">🔔</button>
             </div>
 
             <div class="p-4 sm:p-8 max-w-7xl mx-auto min-h-full relative">
@@ -159,7 +179,7 @@
                                 <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-tight leading-tight">Assalamu 'alaikum,<br>Ustadz.</h1>
                                 <p class="mt-2 text-slate-500 max-w-md">Pantau perkembangan hafalan santri hari ini. Jangan lupa catat setoran terbaru.</p>
                                 <div class="mt-6 flex gap-3">
-                                    <button data-target-page="page-form" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-amber-500/30 transition-all hover:-translate-y-0.5 active:scale-95 text-sm">Input Baru</button>
+                                    <button data-target-page="page-form" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-slate-900/30 transition-all hover:-translate-y-0.5 active:scale-95 text-sm">Input Baru</button>
                                 </div>
                             </div>
                         </div>
@@ -306,7 +326,7 @@
                                 <input type="hidden" id="kualitas" name="kualitas" value="Lancar">
                             </div>
 
-                            <button type="submit" id="submit-button" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-slate-800 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
+                            <button type="submit" id="submit-button" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-orange-500/20 hover:shadow-orange-500/30 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
                                 <span id="submit-spinner" class="hidden animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full"></span>
                                 <span id="submit-button-text">Simpan Data</span>
                                 <svg id="submit-button-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -385,41 +405,6 @@
 
             </div>
         </main>
-
-        <nav id="mobile-nav" class="sm:hidden fixed bottom-0 w-full glass-nav-mobile z-50 pb-safe">
-            <div class="flex justify-around items-center h-16 px-2">
-                <a href="#" data-page="page-beranda" class="nav-link flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 active:scale-95 transition-transform group">
-                    <div class="p-1 rounded-full group-[.active]:bg-amber-100 group-[.active]:text-amber-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    </div>
-                    <span class="text-[10px] font-bold group-[.active]:text-amber-700">Home</span>
-                </a>
-                <a href="#" data-page="page-form" class="nav-link flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 active:scale-95 transition-transform group">
-                    <div class="p-1 rounded-full group-[.active]:bg-amber-100 group-[.active]:text-amber-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    </div>
-                    <span class="text-[10px] font-bold group-[.active]:text-amber-700">Input</span>
-                </a>
-                <div class="relative -top-5">
-                    <a href="#" data-page="page-analisis" class="nav-link flex items-center justify-center w-14 h-14 bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-900/40 transform transition-transform active:scale-90 border-4 border-[#f8fafc]">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                    </a>
-                </div>
-                <a href="#" data-page="page-riwayat" class="nav-link flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 active:scale-95 transition-transform group">
-                    <div class="p-1 rounded-full group-[.active]:bg-amber-100 group-[.active]:text-amber-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <span class="text-[10px] font-bold group-[.active]:text-amber-700">Riwayat</span>
-                </a>
-                <a href="#" data-page="page-rekap" class="nav-link flex-1 flex flex-col items-center justify-center gap-1 text-slate-400 active:scale-95 transition-transform group">
-                    <div class="p-1 rounded-full group-[.active]:bg-amber-100 group-[.active]:text-amber-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </div>
-                    <span class="text-[10px] font-bold group-[.active]:text-amber-700">Rekap</span>
-                </a>
-            </div>
-        </nav>
-
     </div>
 
     <template id="analisis-dashboard-template">
