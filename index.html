@@ -277,10 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const State = {
         allSetoran: [],
-        santriData: [],
+        rawSantriList: [], // <--- Tambahkan ini untuk menyimpan data dari Sheet
+        santriData: [],    // Ini untuk data yang sudah diolah (dengan nilai, dll)
         classGroups: {},
         setoranIdToDelete: null,
-        searchDebounceTimer: null
+        searchDebounceTimer: null,
+        santriNameMap: new Map() // Pindahkan inisialisasi Map ke sini biar aman
     };
 
     const DOM = {};
@@ -1180,6 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
