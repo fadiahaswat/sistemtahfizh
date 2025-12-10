@@ -19,72 +19,66 @@
     <div class="sm:flex min-h-screen">
         <nav class="fixed bottom-0 left-0 w-full border-t sm:relative sm:w-64 sm:flex-shrink-0 sm:border-r sm:border-t-0 z-30 glass-nav">
             <div class="flex sm:flex-col sm:py-4 sm:px-3 h-full">
-                <div class="hidden sm:flex items-center justify-between p-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-amber-500 p-2 rounded-lg text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-                        </div>
-                        <span class="font-bold text-lg">Setor.in</span>
-                    </div>
-                </div>
                 <div id="main-nav" class="flex sm:flex-col w-full">
                     <a href="#" data-page="page-beranda" title="Beranda" class="nav-link active flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                         <span class="text-xs sm:text-sm">Beranda</span>
                     </a>
+                    
                     <a href="#" data-page="page-form" title="Input Setoran" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         <span class="text-xs sm:text-sm">Input</span>
                     </a>
+
+                    <a href="#" data-page="page-analisis" title="Analisis Santri" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="text-xs sm:text-sm">Analisis</span>
+                    </a>
+
                     <a href="#" data-page="page-riwayat" title="Riwayat Setoran" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                         <span class="text-xs sm:text-sm">Riwayat</span>
                     </a>
+                    
                     <a href="#" data-page="page-rekap" title="Rekapitulasi" class="nav-link flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 p-2 sm:p-3 text-sm font-medium rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         <span class="text-xs sm:text-sm">Rekap</span>
                     </a>
                 </div>
-                <div class="hidden sm:flex items-center justify-center gap-2 mt-auto p-3 border-t border-[var(--nav-border)]">
-                    <button id="help-button" title="Bantuan" class="p-2 w-full flex items-center justify-center gap-2 rounded-lg hover:bg-[var(--hover-bg)] transition-colors text-[var(--subtle-text)] hover:text-[#d97706]">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.79 4 4 0 2.21-1.79 4-4 4-1.742 0-3.223-.835-3.772-2M12 18v.01" /></svg>
-                        <span class="text-sm font-medium">Bantuan</span>
-                    </button>
                 </div>
-            </div>
         </nav>
 
         <main id="main-content" class="flex-1 pb-20 sm:pb-0 overflow-y-auto">
             <div id="skeleton-page-beranda" class="skeleton-container p-8 space-y-8"><div class="h-40 skeleton rounded-2xl"></div><div class="h-40 skeleton rounded-2xl"></div><div class="h-48 skeleton rounded-2xl"></div><div class="h-32 skeleton rounded-2xl"></div></div>
-            <div id="skeleton-page-form" class="skeleton-container hidden p-8 space-y-6"><div class="h-12 w-3/4 skeleton rounded-lg"></div><div class="h-48 skeleton rounded-2xl"></div><div class="h-64 skeleton rounded-2xl"></div></div>
-            <div id="skeleton-page-riwayat" class="skeleton-container hidden p-8 space-y-6"><div class="h-12 w-3/4 skeleton rounded-lg"></div><div class="h-24 skeleton rounded-2xl"></div><div class="h-96 skeleton rounded-2xl"></div></div>
-            <div id="skeleton-page-rekap" class="skeleton-container hidden p-8 space-y-6"><div class="h-12 w-3/4 skeleton rounded-lg"></div><div class="h-12 skeleton rounded-2xl"></div><div class="h-96 skeleton rounded-2xl"></div></div>
-            
+            <div id="skeleton-page-analisis" class="skeleton-container hidden p-8 space-y-6"><div class="h-12 w-full skeleton rounded-lg"></div><div class="h-64 skeleton rounded-2xl"></div><div class="h-48 skeleton rounded-2xl"></div></div>
             <div id="page-beranda" class="page-content p-4 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto space-y-8">
                     <header class="fade-in">
                          <div class="flex flex-col lg:grid lg:grid-cols-4 lg:grid-rows-2 gap-4">
                              <div id="datetime-container" class="order-1 lg:col-span-2 glass-card p-6 rounded-2xl flex items-center justify-center transition-transform hover:scale-105 duration-300"></div>
+                             
                              <div class="order-2 lg:order-none md:col-span-2 lg:col-span-2 lg:row-span-2 bg-gradient-to-br from-amber-400 to-orange-500 text-white p-6 rounded-2xl flex flex-col justify-between transition-transform hover:scale-105 duration-300">
-                                 <div><h2 class="text-lg font-medium opacity-90 mb-2">Assalamu 'alaikum ustadz,</h2><h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Selamat Datang di Setor.in</h1><p class="mt-4 text-base opacity-90 max-w-md">Catat setiap setoran, rayakan setiap kemajuan.</p></div>
+                                 <div><h2 class="text-lg font-medium opacity-90 mb-2">Assalamu 'alaikum ustadz,</h2><h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Setor.in Dashboard</h1><p class="mt-4 text-base opacity-90 max-w-md">Input setoran & Pantau analisis santri.</p></div>
                                  <div class="flex items-center gap-3 mt-6"><div class="bg-white/20 p-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg></div><span class="font-bold text-lg">Setor.in</span></div>
                              </div>
-                             <button data-target-page="page-form" class="order-3 lg:order-none lg:col-span-2 bg-gray-800 hover:bg-gray-900 text-white p-6 rounded-2xl text-left flex flex-col justify-between group transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.03]">
+
+                             <button data-target-page="page-analisis" class="order-3 lg:order-none lg:col-span-2 bg-gray-800 hover:bg-gray-900 text-white p-6 rounded-2xl text-left flex flex-col justify-between group transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.03]">
                                  <div>
-                                     <h3 class="text-2xl font-bold">Input Setoran Baru</h3>
-                                     <p class="text-gray-300 mt-1">Catat kemajuan hafalan santri.</p>
+                                     <h3 class="text-2xl font-bold">Lihat Analisis Santri</h3>
+                                     <p class="text-gray-300 mt-1">Status perpulangan & progres individu.</p>
                                  </div>
                                  <div class="flex justify-end">
-                                     <div class="bg-amber-500 p-3 rounded-full group-hover:bg-amber-400 group-hover:rotate-12 transition-all duration-300">
-                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                                     <div class="bg-amber-500 p-3 rounded-full group-hover:bg-amber-400 group-hover:scale-110 transition-all duration-300">
+                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                                      </div>
                                  </div>
                              </button>
                           </div>
                     </header>
+                    
                     <section class="fade-in" style="animation-delay: 100ms;">
-                        <h3 class="section-header"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>Statistik Umum</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                         <h3 class="section-header"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>Statistik Umum</h3>
+                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="stat-card-blue text-white p-5 rounded-2xl shadow-lg flex items-center gap-4">
                                 <div class="bg-white/20 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
                                 <div><p class="text-sm font-semibold opacity-90">Santri Aktif</p><p id="stats-santri-aktif" class="text-2xl font-bold">0 / 0</p></div>
@@ -99,136 +93,127 @@
                             </div>
                         </div>
                     </section>
-                    <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 200ms;"><h3 class="section-header"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.25A4.5 4.5 0 017.5 6.5h9a4.5 4.5 0 014.5 4.5v8.25m-16.5 0h16.5m-16.5 0l1.65 1.65m13.2-1.65l-1.65 1.65" /></svg>Target Ketuntasan</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="p-5 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white shadow-lg flex flex-col justify-between"><div><div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg></div><h4 class="text-lg font-bold">A. Ketuntasan Wajib</h4></div><p class="text-sm opacity-90 mt-2">Mutqin Setengah Juz 30 (An-Naba' s.d. Ath-Thariq) untuk nilai 100.</p></div><div class="text-xs font-semibold mt-4 opacity-80">Berlaku untuk: Unggulan & Tahfizh</div></div><div class="p-5 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white shadow-lg flex flex-col justify-between"><div><div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg></div><h4 class="text-lg font-bold">B. Ketuntasan Program Tahfizh</h4></div><p class="text-sm opacity-90 mt-2">Wajib menyelesaikan Mutqin Juz 30 & Juz 29 secara penuh.</p></div><div class="text-xs font-semibold mt-4 opacity-80">Berlaku untuk: Program Tahfizh</div></div></div></section>
-                    <section class="fade-in" style="animation-delay: 500ms;"><h3 class="section-header"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>Progres Ketuntasan Juz Wajib</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div id="mutqin-unggulan-progress-container" class="hidden p-5 rounded-xl glass-card flex flex-col items-center justify-center text-center"><div id="mutqin-unggulan-circle" class="relative w-28 h-28"></div><h3 class="text-lg font-bold text-sky-800 mt-3 mb-1">Santri Unggulan (1/2 Juz 30)</h3><p id="mutqin-unggulan-details" class="text-xs text-sky-700"></p></div><div id="mutqin-juz30-progress-container" class="hidden p-5 rounded-xl glass-card flex flex-col items-center justify-center text-center"><div id="mutqin-juz30-circle" class="relative w-28 h-28"></div><h3 class="text-lg font-bold text-green-800 mt-3 mb-1">Tahfizh (Mutqin Juz 30)</h3><p id="mutqin-juz30-details" class="text-xs text-green-700"></p></div><div id="mutqin-juz29-progress-container" class="hidden p-5 rounded-xl glass-card flex flex-col items-center justify-center text-center"><div id="mutqin-juz29-circle" class="relative w-28 h-28"></div><h3 class="text-lg font-bold text-amber-800 mt-3 mb-1">Tahfizh (Mutqin Juz 29)</h3><p id="mutqin-juz29-details" class="text-xs text-amber-700"></p></div></div></section>
+                    
+                    <section id="jadwal-perpulangan-section" class="fade-in" style="animation-delay: 200ms;"></section>
+
+                    <section id="target-ketuntasan-section" class="fade-in" style="animation-delay: 200ms;"></section>
+                    <section class="fade-in" style="animation-delay: 500ms;"></section>
                     <section id="peringkat-section" class="fade-in" style="animation-delay: 600ms;"></section>
-                    <section id="tuntas-tracking-section" class="fade-in" style="animation-delay: 700ms;"><h3 class="section-header"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Lacak Ketuntasan per Kelas</h3><div id="tuntas-tracking-accordion" class="space-y-2"></div></section>
+                    <section id="tuntas-tracking-section" class="fade-in" style="animation-delay: 700ms;"></section>
                     <section id="tahfizh-tuntas-tracking-section" class="fade-in" style="animation-delay: 800ms;"></section>
-                    <footer class="text-center py-8 mt-8 text-sm text-[var(--subtle-text)]">
-                        <p>&copy; 2025 - Dibuat untuk Asrama 1 Abu Bakar Ash-Shiddiq.</p>
-                        <a href="mailto:dukungan@contoh.com?subject=Masukan%20Aplikasi%20Setor.in" class="text-amber-600 hover:underline">Beri Masukan</a>
-                    </footer>
                 </div>
             </div>
 
-            <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8">
-                 <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8 fade-in"><h2 class="text-2xl sm:text-3xl font-bold flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Formulir Setoran Baru</h2><p class="text-[var(--subtle-text)] mt-2 sm:pl-11">Catat kemajuan hafalan santri dengan mudah.</p></div>
-                 <form id="setoranForm" class="max-w-2xl mx-auto flex flex-col gap-6" novalidate>
-                    <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 50ms;"><fieldset><legend class="flex items-center gap-3 text-lg font-semibold text-blue-800 mb-4 border-b border-[var(--card-border)] pb-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Informasi Dasar</legend><div><label for="tanggal" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg><span>Tanggal & Waktu</span></label><input type="datetime-local" id="tanggal" name="tanggal" class="w-full mt-1 p-3 rounded-lg transition-all glass-input"><span class="form-error">Tanggal tidak boleh kosong.</span><div class="text-right mt-2"><button type="button" id="nowBtn" class="text-xs text-amber-700 hover:underline">Gunakan waktu sekarang</button></div></div></fieldset></div>
-                    <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 150ms;"><fieldset><legend class="flex items-center gap-3 text-lg font-semibold text-green-800 mb-4 border-b border-[var(--card-border)] pb-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>Detail Santri</legend><div class="flex flex-col gap-5"><div><label for="musyrif" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg><span>Musyrif</span></label><select id="musyrif" name="musyrif" class="w-full mt-1 p-3 rounded-lg transition-all glass-input"><option value="">Pilih Musyrif</option></select><span class="form-error">Musyrif harus dipilih.</span></div><div><label for="namaSantri" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg><span>Nama Santri</span></label><select id="namaSantri" name="namaSantri" class="w-full mt-1 p-3 rounded-lg transition-all disabled:bg-gray-200/50 disabled:cursor-not-allowed disabled:opacity-70 glass-input" disabled><option value="">Pilih Musyrif dahulu</option></select><span class="form-error">Nama santri harus dipilih.</span><input type="hidden" id="santriId" name="santriId"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label for="kelas" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg><span>Kelas</span></label><input type="text" id="kelas" name="kelas" class="w-full mt-1 p-3 rounded-lg disabled:bg-gray-200/50 glass-input" readonly disabled></div><div><label for="program" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 1v2h6V5H7zm0 4v2h6V9H7zm0 4v2h6v-2H7z" /></svg><span>Program</span></label><input type="text" id="program" name="program" class="w-full mt-1 p-3 rounded-lg disabled:bg-gray-200/50 glass-input" readonly disabled></div></div></div></fieldset></div>
-                    <div class="p-6 sm:p-8 fade-in glass-card rounded-2xl" style="animation-delay: 250ms;"><fieldset><legend class="flex items-center gap-3 text-lg font-semibold text-amber-800 mb-4 border-b border-[var(--card-border)] pb-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>Detail Setoran</legend><div class="flex flex-col gap-5"><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label for="jenis" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span>Jenis</span></label><select id="jenis" name="jenis" class="w-full mt-1 p-3 rounded-lg transition-all disabled:bg-gray-200/50 glass-input" disabled><option value="">Pilih Santri</option></select><span class="form-error">Jenis setoran harus dipilih.</span></div><div><label for="juz" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10zm-3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10z" clip-rule="evenodd" /></svg><span>Juz</span></label><select id="juz" name="juz" class="w-full mt-1 p-3 rounded-lg transition-all disabled:bg-gray-200/50 glass-input" disabled><option value="">Pilih Jenis</option></select><span class="form-error">Juz harus dipilih.</span></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div id="halaman-container" class="hidden"><label for="halaman" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg><span>Halaman</span></label><input type="number" id="halaman" name="halaman" min="1" class="w-full mt-1 p-3 rounded-lg transition-all disabled:bg-gray-200/50 glass-input" disabled><span class="form-error">Halaman harus diisi.</span></div><div id="surat-container" class="hidden"><label for="surat" class="flex items-center gap-2 text-sm font-medium mb-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804V4.804A7.968 7.968 0 0014.5 4z" /></svg><span>Surat</span></label><select id="surat" name="surat" class="w-full mt-1 p-3 rounded-lg transition-all glass-input"></select><span class="form-error">Surat harus dipilih.</span></div></div></div><input type="hidden" id="kualitas" name="kualitas" value="Mumtaz"></fieldset></div>
-                    <div class="mt-2"><button type="submit" id="submit-button" class="group w-full inline-flex items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed"><span id="submit-button-text">Simpan Setoran</span><svg id="submit-button-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg><svg id="submit-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></button></div>
-                 </form>
-            </div>
-
-            <div id="page-riwayat" class="page-content hidden p-4 sm:p-6 lg:p-8">
-                <div class="max-w-6xl mx-auto">
-                    <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8"><h2 class="text-2xl sm:text-3xl font-bold flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg> Riwayat Setoran</h2><p class="text-[var(--subtle-text)] mt-2 sm:pl-11">Cari dan filter 50 riwayat setoran terakhir.</p></div>
-                    <div class="p-4 rounded-xl mb-6 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 items-end glass-card"><div class="lg:col-span-1"><label for="search-riwayat" class="text-sm font-medium">Cari Santri</label><div class="relative"><input type="search" id="search-riwayat" placeholder="Ketik nama..." class="w-full mt-1 p-2 rounded-lg glass-input" autocomplete="off"><div id="suggestions-container" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden"></div></div></div><div><label for="filter-program" class="text-sm font-medium">Program</label><select id="filter-program" class="w-full mt-1 p-2 rounded-lg glass-input"><option value="Semua">Semua Program</option><option value="Tahfizh">Tahfizh</option><option value="Unggulan">Unggulan</option></select></div><div><label for="filter-kelas" class="text-sm font-medium">Kelas</label><select id="filter-kelas" class="w-full mt-1 p-2 rounded-lg glass-input"><option value="Semua">Semua Kelas</option><option value="2A">2A</option><option value="2B">2B</option><option value="2C">2C</option><option value="2D">2D</option><option value="2G">2G</option><option value="2H">2H</option><option value="2CDGH">2CDGH</option></select></div><div><label for="filter-tanggal-mulai" class="text-sm font-medium">Dari</label><input type="date" id="filter-tanggal-mulai" class="w-full mt-1 p-2 rounded-lg glass-input"></div><div><label for="filter-tanggal-akhir" class="text-sm font-medium">Sampai</label><input type="date" id="filter-tanggal-akhir" class="w-full mt-1 p-2 rounded-lg glass-input"></div></div>
-                    <div id="icon-legend-riwayat" class="mb-6"></div>
-                    <div id="content-riwayat" class="rounded-2xl overflow-hidden glass-card overflow-x-auto"><table class="min-w-full"><thead class="glass-nav border-b border-[var(--nav-border)] sticky top-0 z-10"><tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Santri</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Detail</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider hidden sm:table-cell">Tanggal</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Aksi</th></tr></thead><tbody id="setoranTableBody" class="divide-y divide-[var(--card-border)]"></tbody></table></div>
-                </div>
-            </div>
-            
-            <div id="page-rekap" class="page-content hidden p-4 sm:p-6 lg:p-8">
-                <div class="max-w-6xl mx-auto">
-                    <div class="text-center sm:text-left pt-12 sm:pt-0 mb-8"><h2 class="text-2xl sm:text-3xl font-bold flex items-center gap-3 justify-center sm:justify-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Rekapitulasi Setoran</h2><p class="text-[var(--subtle-text)] mt-2 sm:pl-11">Pantau perkembangan dan ekspor laporan per kelas.</p></div>
-                    <div id="icon-legend-rekap" class="mb-6"></div>
-                    <div id="content-rekap" class="rounded-2xl p-5 glass-card">
-                        <div class="mb-6">
-                            <label for="rekap-select" class="block text-sm font-medium mb-1">Pilih Tampilan Rekap</label>
-                            <select id="rekap-select" class="w-full p-3 rounded-lg glass-input transition-all"></select>
-                        </div>
-                        <div id="rekap-content-container"></div>
+            <div id="page-analisis" class="page-content hidden p-4 sm:p-6 lg:p-8">
+                <div class="max-w-4xl mx-auto">
+                    <div class="pt-12 sm:pt-0 mb-8 fade-in">
+                        <h2 class="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Analisis Progres Santri
+                        </h2>
+                        <p class="text-[var(--subtle-text)] mt-2 sm:pl-11">Pilih santri untuk melihat detail progres hafalan, nilai, dan status perpulangan.</p>
                     </div>
+                    <div class="mb-6 fade-in" style="animation-delay: 100ms;">
+                        <label for="santri-select-analisis" class="block text-sm font-medium mb-1">Pilih Nama Santri</label>
+                        <select id="santri-select-analisis" class="w-full p-3 rounded-lg glass-input transition-all"></select>
+                    </div>
+                    <div id="analisis-content-container"></div>
                 </div>
             </div>
+
+            <div id="page-form" class="page-content hidden p-4 sm:p-6 lg:p-8"> </div>
+             <div id="page-riwayat" class="page-content hidden p-4 sm:p-6 lg:p-8"> </div>
+             <div id="page-rekap" class="page-content hidden p-4 sm:p-6 lg:p-8"> </div>
+
         </main>
     </div>
 
-    <div id="passwordConfirmModal" class="modal fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden"><div class="modal-backdrop fixed inset-0" aria-hidden="true"></div><div class="modal-content w-full max-w-sm relative z-50 p-6 rounded-2xl glass-modal-content"><h3 class="text-lg font-bold">Masukkan Kata Sandi</h3><p class="text-sm text-[var(--subtle-text)] my-4">Untuk menghapus data, masukkan kata sandi.</p><input type="password" id="passwordInput" class="w-full mt-1 p-2 rounded-lg glass-input" placeholder="Kata Sandi"><div id="passwordError" class="text-red-500 text-xs mt-2 hidden">Kata sandi salah.</div><div class="flex justify-center gap-4 mt-6"><button id="cancelPasswordBtn" class="px-6 py-2 rounded-lg bg-gray-200/80 text-gray-800 font-semibold hover:bg-gray-300/90 transition-colors">Batal</button><button id="confirmPasswordBtn" class="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">Konfirmasi</button></div></div></div>
-    
-    <div id="helpModal" class="modal fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-        <div class="modal-backdrop fixed inset-0" aria-hidden="true"></div>
-        <div class="modal-content w-full max-w-lg relative z-50 p-6 rounded-2xl glass-modal-content max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold flex items-center gap-2"><svg class="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.79 4 4 0 2.21-1.79 4-4 4-1.742 0-3.223-.835-3.772-2M12 18v.01" /></svg>Bantuan & FAQ</h3>
-                <button id="closeHelpModal" class="p-1 rounded-full hover:bg-[var(--hover-bg)]">&times;</button>
-            </div>
-            <div class="text-sm space-y-4 text-[var(--subtle-text)]">
-                <div>
-                    <h4 class="font-semibold text-[var(--text-color)] mb-1">Penjelasan Istilah</h4>
-                    <ul class="list-disc list-inside space-y-1">
-                        <li><strong>Mutqin:</strong> Setoran untuk menguji kelancaran hafalan satu juz penuh (atau setengah juz 30) yang sudah selesai dimuraja'ah.</li>
-                        <li><strong>Muraja'ah:</strong> Setoran untuk mengulang hafalan yang sudah pernah disetor sebelumnya untuk menjaga kelancaran.</li>
-                        <li><strong>Ziyadah:</strong> Setoran hafalan baru (tambahan hafalan). Hanya tersedia untuk santri Tahfizh yang sudah Tuntas.</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-[var(--text-color)] mb-1">Bagaimana Penilaian Bekerja?</h4>
-                    <p>Nilai 100 diberikan jika santri (Unggulan & Tahfizh) berhasil menyelesaikan setoran <strong>Mutqin Setengah Juz 30</strong> sebelum tanggal deadline yang ditentukan.</p>
-                </div>
-                 <div>
-                    <h4 class="font-semibold text-[var(--text-color)] mb-1">Apa Syarat Tuntas?</h4>
-                    <ul class="list-disc list-inside space-y-1">
-                        <li><strong>Program Unggulan:</strong> Mencapai nilai 100.</li>
-                        <li><strong>Program Tahfizh:</strong> Mencapai nilai 100 DAN menyelesaikan Mutqin Juz 30 & Juz 29 sebelum deadline.</li>
-                    </ul>
-                </div>
-                <p class="mt-6 text-xs text-center">Jika ada pertanyaan lebih lanjut, silakan hubungi pengurus.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="studentDetailModal" class="modal fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
-        <div class="modal-backdrop fixed inset-0" aria-hidden="true"></div>
-        <div class="modal-content w-full max-w-4xl relative z-50 bg-white/90 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h3 id="detail-nama" class="text-2xl font-bold text-gray-800">Nama Santri</h3>
-                    <p id="detail-info" class="text-sm text-gray-600">Kelas - Program</p>
-                </div>
-                <button id="closeDetailModal" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white/50 p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                        Grafik Hafalan (Kumulatif)
-                    </h4>
-                    <div class="relative h-64 w-full">
-                        <canvas id="progressChart"></canvas>
+    <template id="analisis-dashboard-template">
+        <div class="space-y-8">
+            <div class="glass-card rounded-2xl flex flex-col fade-in shadow-lg overflow-hidden">
+                <div class="p-6 bg-gradient-to-br from-amber-400 to-orange-500 text-white relative">
+                    <div class="flex items-center gap-4">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center border-4 border-white/50 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-xl sm:text-2xl" data-name>Nama Santri</h3>
+                            <div class="flex items-center gap-4 text-sm opacity-90 mt-1">
+                                <span class="flex items-center gap-1.5" data-kelas-text></span>
+                                <span class="flex items-center gap-1.5" data-program-text></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="p-6 bg-white/50 grid grid-cols-3 gap-4 text-center">
+                    <div class="font-semibold">
+                        <p class="text-sm text-[var(--subtle-text)]">Status Tuntas</p>
+                        <div data-status-badge class="mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block"></div>
+                    </div>
+                    <div class="font-semibold">
+                        <p class="text-sm text-[var(--subtle-text)]">Nilai Akhir</p>
+                        <p class="text-2xl mt-1" data-nilai></p>
+                    </div>
+                    <div class="font-semibold">
+                        <p class="text-sm text-[var(--subtle-text)]">Perpulangan</p>
+                        <div data-perpulangan-badge class="mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fade-in" style="animation-delay: 100ms;">
+                <div class="flex border-b border-[var(--card-border)]" id="analisis-tabs">
+                    <button class="analisis-tab flex-1 p-3 text-sm font-semibold border-b-2 border-transparent active text-amber-600 border-amber-500" data-target="analisis-ringkasan">Ringkasan</button>
+                    <button class="analisis-tab flex-1 p-3 text-sm font-semibold border-b-2 border-transparent hover:text-amber-600" data-target="analisis-aktivitas">Aktivitas</button>
+                </div>
+            </div>
 
-                <div class="bg-white/50 p-4 rounded-xl border border-gray-200">
-                    <h4 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"></path></svg>
-                        Peta Hafalan Juz
-                    </h4>
-                    <div id="juz-visual-container" class="space-y-4"></div>
+            <div>
+                <div id="analisis-ringkasan" class="analisis-tab-content fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="stat-card glass-card p-4 rounded-xl text-center">
+                                    <p class="text-sm font-medium text-[var(--subtle-text)]">Total Setoran</p>
+                                    <p class="text-3xl font-bold mt-1" data-total-setoran></p>
+                                </div>
+                                <div class="stat-card glass-card p-4 rounded-xl text-center">
+                                    <p class="text-sm font-medium text-[var(--subtle-text)]">Total Ziyadah</p>
+                                    <p class="text-3xl font-bold mt-1" data-ziyadah></p>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="section-header text-base">Progres Target Wajib</h4>
+                                <div class="space-y-2" data-progres-juz></div>
+                            </div>
+                        </div>
+                        <div data-ziyadah-section class="hidden">
+                            <h4 class="section-header text-base">Progres Ziyadah (Tambahan)</h4>
+                            <div class="space-y-2" data-progres-ziyadah></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="analisis-aktivitas" class="analisis-tab-content hidden fade-in">
+                     <div class="glass-card rounded-xl overflow-hidden max-h-[28rem] overflow-y-auto">
+                        <table class="min-w-full">
+                            <tbody class="divide-y divide-[var(--card-border)]" data-aktivitas-terkini></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </template>
 
-    <div id="toast" class="fixed bottom-20 sm:bottom-8 left-1/2 z-50 flex items-center gap-3 bg-gray-900/80 text-white text-sm font-semibold py-3 px-5 rounded-lg border border-gray-700/50 backdrop-blur-sm"><svg id="toast-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"></svg><span id="toast-message"></span></div>
-
-    <template id="history-row-template"><tr class="hover:bg-[var(--hover-bg)] transition-colors"><td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center"><div class="font-medium data-nama"></div><span class="data-program-icon"></span><span class="data-kelas-icon"></span></div></td><td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--subtle-text)]"><div><span class="data-jenis font-semibold text-[var(--text-color)]"></span> <span class="data-juz-text"></span></div><div class="text-xs data-unit"></div></td><td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--subtle-text)] hidden sm:table-cell data-tanggal"></td><td class="px-6 py-4 whitespace-nowrap text-center"><button class="delete-btn text-gray-500 hover:text-red-500 p-1 rounded-full transition-colors" aria-label="Hapus setoran"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></td></tr></template>
-    <template id="rekap-content-template"><div class="rekap-tab-content"><div class="bg-white/20 p-4 rounded-t-xl border-b border-[var(--card-border)] flex flex-col sm:flex-row justify-between items-start sm:items-center"><div><h3 class="font-bold text-amber-700 text-lg data-title"></h3><p class="text-sm text-[var(--subtle-text)] data-musyrif"></p><p class="text-xs text-gray-500 data-timestamp"></p></div><button class="export-pdf-btn bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors mt-3 sm:mt-0">Ekspor PDF</button></div><div class="overflow-x-auto bg-white/10 p-2 rounded-b-xl"><table class="min-w-full divide-y divide-[var(--card-border)]"><thead class="bg-gray-100/80"><tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th><th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="nama">Nama <span class="sort-icon"></span></th><th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="nilai">Nilai <span class="sort-icon"></span></th><th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="ziyadah">Ziyadah <span class="sort-icon"></span></th><th class="sortable px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200/50" data-sort="keterangan">Keterangan <span class="sort-icon"></span></th></tr></thead><tbody class="divide-y divide-[var(--card-border)] data-table-body"></tbody></table></div></div></template>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(() => console.log('PWA Service Worker Registered'))
-                .catch(err => console.error('PWA Error:', err));
-        }
-    </script>
-    <script src="data-hafalan.js"></script>
-    <script src="config.js"></script>
-    <script src="app.js"></script>
-</body>
+    <template id="analisis-prompt-template">
+        <div class="text-center py-16 px-6 glass-card rounded-2xl fade-in">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <h3 class="mt-2 text-lg font-medium">Pilih Santri</h3>
+            <p class="mt-1 text-sm text-[var(--subtle-text)]">Silakan pilih nama santri di atas untuk melihat laporan progres hafalannya.</p>
+        </div>
+    </template>
+    
+    </body>
 </html>
+
