@@ -6,9 +6,10 @@ const ASSETS_TO_CACHE = [
   './app.js',
   './config.js',
   './data-hafalan.js',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
-  'https://cdn.jsdelivr.net/npm/chart.js'
+  // HAPUS ATAU COMMENT BARIS DI BAWAH INI:
+  // 'https://cdn.tailwindcss.com',
+  // 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
+  // 'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 // 1. Install Service Worker & Cache File
