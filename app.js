@@ -1145,27 +1145,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (button && button.matches('[data-target-page]')) { UI.switchPage(button.dataset.targetPage); return; }
 
-            // -----------------------------------------------------
-            // PERBAIKAN 2: TAB ANALISIS (AKTIF/TIDAK AKTIF)
-            // -----------------------------------------------------
+            // === PERBAIKAN 2: TAB ANALISIS ===
             if (tabBtn) {
                 const targetId = tabBtn.dataset.target;
-                // Pastikan selector parent mengambil container yang benar (biasanya div flex)
-                const parent = tabBtn.parentElement; 
+                const parent = tabBtn.parentElement;
                 
-                // Reset SEMUA tab di container ini
+                // 1. Reset SEMUA tab di container ini menjadi style 'Tidak Aktif'
                 parent.querySelectorAll('.analisis-tab').forEach(t => {
                     // Hapus style aktif
-                    t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm');
-                    // Tambahkan style inaktif (supaya terlihat abu-abu/redup)
-                    t.classList.add('text-slate-500', 'hover:bg-slate-50'); 
+                    t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm', 'ring-1', 'ring-black/5');
+                    // Tambahkan style inaktif (abu-abu)
+                    t.classList.add('text-slate-500', 'hover:text-slate-700'); 
                 });
 
-                // Set tab yang diklik jadi AKTIF
-                tabBtn.classList.remove('text-slate-500', 'hover:bg-slate-50'); // Hapus style inaktif
-                tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm'); // Tambah style aktif
+                // 2. Set tab yang diklik menjadi style 'Aktif'
+                // Hapus style inaktif
+                tabBtn.classList.remove('text-slate-500', 'hover:text-slate-700'); 
+                // Tambah style aktif (putih, teks oranye, shadow)
+                tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm', 'ring-1', 'ring-black/5');
 
-                // Switch Content
+                // 3. Ganti Konten
                 DOM.analisisContentContainer.querySelectorAll('.analisis-tab-content').forEach(c => c.classList.add('hidden'));
                 const targetPanel = DOM.analisisContentContainer.querySelector(`#${targetId}`);
                 if(targetPanel) targetPanel.classList.remove('hidden');
@@ -1181,24 +1180,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 State.setoranIdToDelete = button.dataset.id; 
                 DOM.passwordConfirmModal.classList.remove('hidden'); 
             } 
-            // -----------------------------------------------------
-            // PERBAIKAN 1: AKORDEON (LOGIKA BUKA/TUTUP)
-            // -----------------------------------------------------
+            // === PERBAIKAN 1: AKORDEON ===
             else if (button.matches('.accordion-button')) { 
-                // Menggunakan parentElement untuk fallback jika tidak dibungkus <h2>
+                // Mengambil container h2 atau parent langsung
                 const headerContainer = button.closest('h2') || button.parentElement;
                 const panel = headerContainer.nextElementSibling; 
                 
                 if (panel) {
                     const chevron = button.querySelector('.accordion-chevron');
                     
-                    // Cek apakah sedang terbuka (maxHeight ada nilainya)
-                    if (panel.style.maxHeight) {
-                        // Jika terbuka -> TUTUP
-                        panel.style.maxHeight = null;
+                    // Cek apakah sedang terbuka. 
+                    // Kita anggap terbuka jika maxHeight ada nilainya DAN TIDAK '0' atau '0px'
+                    const isOpen = panel.style.maxHeight && panel.style.maxHeight !== '0px' && panel.style.maxHeight !== '0';
+
+                    if (isOpen) {
+                        // Jika terbuka -> TUTUP (kembali ke 0)
+                        panel.style.maxHeight = '0px'; 
+                        // Opsional: set null agar kembali ke CSS default jika CSS defaultnya 0
+                        // panel.style.maxHeight = null; 
                         if(chevron) chevron.classList.remove('rotate-180');
                     } else {
-                        // Jika tertutup -> BUKA
+                        // Jika tertutup -> BUKA (set ke tinggi konten)
                         panel.style.maxHeight = `${panel.scrollHeight}px`;
                         if(chevron) chevron.classList.add('rotate-180');
                     }
