@@ -1,28 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 0. DEPENDENCIES & CONFIGURATION
-    // ==========================================
-    // Pastikan AppConfig sudah didefinisikan di file lain atau di window object
-    // sebelum script ini berjalan.
-
-    // ==========================================
     // 1. STATE MANAGEMENT
     // ==========================================
-    /**
-     * Menyimpan seluruh data aplikasi yang dinamis.
-     * State ini menjadi "Single Source of Truth" setelah data ditarik dari API.
-     */
     const State = {
-        allSetoran: [],         // Data mentah setoran dari spreadsheet
-        rawSantriList: [],      // Data mentah daftar santri
-        santriData: [],         // Data santri yang sudah diolah dengan statistik (Processed Data)
-        classGroups: {},        // Pengelompokan santri berdasarkan musyrif/kelas untuk fitur Rekap
-        setoranIdToDelete: null,// ID sementara untuk proses penghapusan
-        searchDebounceTimer: null, // Timer untuk fitur pencarian (menghindari lag)
-        santriNameMap: new Map(),  // Map untuk pencarian cepat ID berdasarkan nama
-        chartInstance: null,       // Instance Chart.js (untuk dimusnahkan saat update)
-        countdownInterval: null    // Interval timer mundur perpulangan
+        // Data Utama
+        allSetoran: [],         // Semua data mentah (Verified + Pending)
+        verifiedSetoran: [],    // Hanya yang Verified (untuk Statistik & Laporan)
+        pendingSetoran: [],     // Hanya yang Pending (untuk Inbox Validasi Musyrif)
+        
+        // Data Santri
+        rawSantriList: [],      
+        santriData: [],         // Data santri terproses
+        classGroups: {},        // Grouping kelas untuk rekap
+        
+        // Session / Role
+        currentRole: null,      // 'musyrif', 'santri', 'wali'
+        userPassword: null,     // Menyimpan password musyrif sementara (di memori)
+        
+        // Utils
+        setoranIdToDelete: null,
+        searchDebounceTimer: null,
+        santriNameMap: new Map(),
+        chartInstance: null,
+        countdownInterval: null
     };
 
     // ==========================================
@@ -30,18 +31,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const DOM = {};
 
-    /**
-     * Menyimpan referensi elemen HTML ke dalam object DOM.
-     * Tujuannya agar tidak melakukan document.getElementById berulang-ulang (Performance Optimization).
-     */
     function cacheDOMElements() {
         const elementMapping = {
-            // -- Navigasi & Layout Utama --
+            // -- Layout & Navigasi --
+            mainLayout: 'main-layout',
             mainNav: 'main-nav',
             mainContent: 'main-content',
             datetimeContainer: 'datetime-container',
+            navItemInput: 'nav-item-input', 
+            navItemAnalisis: 'nav-item-analisis',
+            headerRoleText: 'header-role-text',
+            appRoleLabel: 'app-role-label',
+
+            // -- Role Selection Modal --
+            roleSelectionModal: 'roleSelectionModal',
+            roleButtonsContainer: 'role-buttons',
+            musyrifLoginForm: 'musyrif-login-form',
+            rolePasswordInput: 'role-password-input',
+            roleErrorMsg: 'role-error-msg',
+            submitRoleBtn: 'submit-role-btn',
+            backRoleBtn: 'back-role-btn',
+            btnLogout: 'btn-logout',
             
-            // -- Form Input Setoran --
+            // -- Validation Section --
+            validationSection: 'validation-section',
+            validationContainer: 'validation-container',
+            validationCount: 'validation-count',
+            
+            // -- Form Input --
             setoranForm: 'setoranForm',
             tanggal: 'tanggal',
             nowBtn: 'nowBtn',
@@ -60,8 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButtonText: 'submit-button-text',
             submitButtonIcon: 'submit-button-icon',
             submitSpinner: 'submit-spinner',
+            formSubtitle: 'form-subtitle',
 
-            // -- Tabel Riwayat --
+            // -- Riwayat & Tabel --
             setoranTableBody: 'setoranTableBody',
             historyRowTemplate: 'history-row-template',
             searchRiwayat: 'search-riwayat',
@@ -71,12 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
             filterProgram: 'filter-program',
             filterKelas: 'filter-kelas',
 
-            // -- Dashboard: Statistik Atas --
+            // -- Statistik Beranda --
             statsSantriAktif: 'stats-santri-aktif',
             statsSantriTuntas: 'stats-santri-tuntas',
             statsSantriBelumTuntas: 'stats-santri-belum-tuntas',
 
-            // -- Dashboard: Visual Progress Mutqin --
+            // -- Visual Progress --
             mutqinJuz29ProgressContainer: 'mutqin-juz29-progress-container',
             mutqinJuz30ProgressContainer: 'mutqin-juz30-progress-container',
             mutqinUnggulanProgressContainer: 'mutqin-unggulan-progress-container',
@@ -87,24 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
             mutqinJuz30Details: 'mutqin-juz30-details',
             mutqinJuz29Details: 'mutqin-juz29-details',
 
-            // -- Dashboard: Section Lainnya --
+            // -- Sections Lain --
             peringkatSection: 'peringkat-section',
             tuntasTrackingAccordion: 'tuntas-tracking-accordion',
             tahfizhTuntasTrackingSection: 'tahfizh-tuntas-tracking-section',
             jadwalPerpulanganSection: 'jadwal-perpulangan-section',
 
-            // -- Halaman Rekap --
+            // -- Rekap & Analisis --
             rekapSelect: 'rekap-select',
             rekapContentContainer: 'rekap-content-container',
             rekapContentTemplate: 'rekap-content-template',
-
-            // -- Halaman Analisis --
             santriSelectAnalisis: 'santri-select-analisis',
             analisisContentContainer: 'analisis-content-container',
             analisisDashboardTemplate: 'analisis-dashboard-template',
             analisisPromptTemplate: 'analisis-prompt-template',
 
-            // -- Komponen: Toast & Modal --
+            // -- Modal & Templates --
             toast: 'toast',
             toastMessage: 'toast-message',
             toastIcon: 'toast-icon',
@@ -123,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             progressChart: 'progressChart',
             juzVisualContainer: 'juz-visual-container',
 
-            // -- Templates (HTML Template Tags) --
+            // -- HTML Templates --
             tplJadwalPerpulangan: 'tpl-jadwal-perpulangan',
             tplAccordionItem: 'tpl-accordion-item',
             tplPeringkatSection: 'tpl-peringkat-section',
@@ -131,17 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
             tplTahfizhSection: 'tpl-tahfizh-section',
             tplTahfizhContent: 'tpl-tahfizh-content',
             tplJuzBlock: 'tpl-juz-block',
-            tplRekapRow: 'tpl-rekap-row'
+            tplRekapRow: 'tpl-rekap-row',
+            tplValidationItem: 'tpl-validation-item'
         };
 
         for (const [propName, id] of Object.entries(elementMapping)) {
             const element = document.getElementById(id);
-            if (element) {
-                DOM[propName] = element;
-            } else {
-                // Log warning agar developer tahu jika ada ID yang hilang di HTML
-                console.warn(`[DOM Cache] Elemen dengan ID '${id}' tidak ditemukan.`);
-            }
+            if (element) DOM[propName] = element;
         }
         
         DOM.pages = document.querySelectorAll('.page-content');
@@ -152,10 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. UTILITIES & API
     // ==========================================
     const Utils = {
-        /**
-         * Mengambil data dari Google Sheet (via App Script).
-         * Menggunakan LocalStorage sebagai cache fallback jika offline.
-         */
         fetchSetoranData: async () => {
             try {
                 const response = await fetch(AppConfig.scriptURL);
@@ -167,15 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Network error, attempting to load offline cache...');
                 const cached = localStorage.getItem('cachedData');
                 if (cached) return JSON.parse(cached);
-                
                 UI.showToast('Gagal memuat data (Offline & Cache kosong).', 'error');
                 return [];
             }
         },
 
-        /**
-         * Mengirim data form ke Google Sheet.
-         */
         postData: async (formData) => {
             try {
                 const response = await fetch(AppConfig.scriptURL, { method: 'POST', body: formData });
@@ -183,19 +187,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return await response.json();
             } catch (error) {
                 console.error('Gagal mengirim data:', error);
-                UI.showToast(`Gagal: ${error.message}`, 'error');
                 return { result: 'error', error: error.message };
             }
         },
 
-        /**
-         * Helper untuk mengisi elemen <select> dengan opsi.
-         */
         populateSelect: (selectElement, options, placeholder) => {
             selectElement.innerHTML = '';
-            if (placeholder) {
-                selectElement.add(new Option(placeholder, ''));
-            }
+            if (placeholder) selectElement.add(new Option(placeholder, ''));
             options.forEach(opt => {
                 const option = (typeof opt === 'string')
                     ? new Option(opt, opt)
@@ -204,24 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        /**
-         * Normalisasi string nama untuk keperluan mapping ID (lowercase, hapus simbol).
-         */
         normalizeName: (name) => {
             return typeof name !== 'string' ? '' : name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
         },
 
-        /**
-         * Helper aman untuk mengisi textContent.
-         */
         setText: (element, selector, text) => {
             const el = element.querySelector(selector);
             if (el) el.textContent = text;
         },
 
-        /**
-         * Helper aman untuk mengisi innerHTML.
-         */
         setHTML: (element, selector, html) => {
             const el = element.querySelector(selector);
             if (el) el.innerHTML = html;
@@ -232,8 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. UI MANAGERS
     // ==========================================
     const UI = {
-        // --- General UI Helpers ---
-
         showToast: (message, type = 'success') => {
             DOM.toastMessage.textContent = message;
             const isSuccess = type === 'success';
@@ -251,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!pageId) return;
             DOM.pages.forEach(page => page.classList.add('hidden'));
             
-            // Efek Loading Skeleton
             if (showSkeleton) {
                 const skeleton = document.getElementById(`skeleton-${pageId}`);
                 if (skeleton) skeleton.classList.remove('hidden');
@@ -262,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) targetPage.classList.remove('hidden');
                 
-                // Update state Navigasi
                 DOM.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
                 DOM.mainNav.querySelectorAll('.nav-link div').forEach(div => div.classList.remove('bg-amber-100', 'text-amber-600'));
                 DOM.mainNav.querySelectorAll('.nav-link span').forEach(span => span.classList.remove('text-amber-700'));
@@ -292,21 +277,100 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
         },
 
-        /**
-         * Render ulang semua komponen UI utama.
-         * Dipanggil setelah data baru diambil.
-         */
+        // --- ROLE UI LOGIC ---
+        applyRoleUI: () => {
+            // 1. Reset
+            DOM.roleSelectionModal.classList.add('hidden');
+            DOM.mainLayout.classList.remove('hidden');
+            DOM.navItemInput.classList.remove('hidden');
+            DOM.navItemAnalisis.classList.remove('hidden'); 
+            DOM.validationSection.classList.add('hidden');
+            
+            // Sembunyikan tombol hapus secara default
+            document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
+
+            // 2. Adjust Tampilan
+            if (State.currentRole === 'musyrif') {
+                DOM.headerRoleText.textContent = 'Dashboard Musyrif';
+                DOM.appRoleLabel.textContent = 'Mode Admin';
+                DOM.submitButtonText.textContent = 'Simpan Setoran';
+                DOM.formSubtitle.textContent = 'Masukkan data setoran hafalan terbaru (Langsung Terverifikasi).';
+                
+                if (State.pendingSetoran.length > 0) {
+                    DOM.validationSection.classList.remove('hidden');
+                    UI.renderValidationInbox();
+                }
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.remove('hidden'));
+
+            } else if (State.currentRole === 'santri') {
+                DOM.headerRoleText.textContent = 'Dashboard Santri';
+                DOM.appRoleLabel.textContent = 'Mode Santri';
+                DOM.formSubtitle.textContent = 'Data akan dikirim ke Musyrif untuk diverifikasi.';
+                DOM.submitButtonText.textContent = 'Kirim untuk Validasi';
+
+            } else if (State.currentRole === 'wali') {
+                DOM.headerRoleText.textContent = 'Dashboard Wali';
+                DOM.appRoleLabel.textContent = 'Mode Pemantau';
+                DOM.navItemInput.classList.add('hidden');
+                
+                if (document.querySelector('.page-content:not(.hidden)')?.id === 'page-form') {
+                    UI.switchPage('page-beranda', false); 
+                }
+            }
+        },
+        
+        renderValidationInbox: () => {
+            const container = DOM.validationContainer;
+            container.innerHTML = '';
+            DOM.validationCount.textContent = State.pendingSetoran.length;
+
+            if (State.pendingSetoran.length === 0) {
+                DOM.validationSection.classList.add('hidden');
+                return;
+            }
+            
+            if (State.currentRole === 'musyrif') {
+                 DOM.validationSection.classList.remove('hidden');
+            }
+
+            State.pendingSetoran.forEach(s => {
+                const clone = DOM.tplValidationItem.content.cloneNode(true);
+                Utils.setText(clone, '.val-nama', s.namaSantri);
+                Utils.setText(clone, '.val-info', `${s.program} - ${s.kelas}`);
+                
+                const detail = `${s.jenis} • ${s.juz === 'juz30_setengah' ? '1/2 Juz 30' : 'Juz '+s.juz} • ${s.halaman ? s.halaman+' hlm' : s.surat}`;
+                Utils.setText(clone, '.val-detail', detail);
+                Utils.setText(clone, '.val-date', new Date(s.createdAt).toLocaleString('id-ID'));
+
+                const btnApprove = clone.querySelector('.btn-approve');
+                const btnReject = clone.querySelector('.btn-reject');
+                
+                btnApprove.dataset.id = s.rowNumber;
+                btnReject.dataset.id = s.rowNumber;
+
+                btnApprove.addEventListener('click', () => Core.handleValidation(s.rowNumber, 'Verified'));
+                btnReject.addEventListener('click', () => Core.handleValidation(s.rowNumber, 'Rejected'));
+
+                container.appendChild(clone);
+            });
+        },
+
         renderAll: () => {
             UI.renderBeranda();
+            UI.renderValidationInbox(); 
             UI.renderHistoryTable();
             UI.renderRekap();
             UI.renderAnalisisPage();
+            
+            if (State.currentRole !== 'musyrif') {
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
+            }
         },
 
-        // --- DASHBOARD (BERANDA) RENDERERS ---
-
+        // --- DASHBOARD RENDERERS ---
         renderBeranda: () => {
-            const santriAktifIds = new Set(State.allSetoran.map(s => s.santriId));
+            // Gunakan Verified Data untuk Statistik
+            const santriAktifIds = new Set(State.verifiedSetoran.map(s => s.santriId));
             const totalSantri = State.rawSantriList.length;
             const tuntasCount = State.santriData.filter(s => s.isTuntas).length;
 
@@ -325,19 +389,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (State.countdownInterval) clearInterval(State.countdownInterval);
             const now = new Date();
             const nextPeriod = AppConfig.perpulanganPeriods.find(p => now < p.deadline);
-            
             DOM.jadwalPerpulanganSection.innerHTML = '';
             
-            // Menggunakan Template
             const template = DOM.tplJadwalPerpulangan.content.cloneNode(true);
             DOM.jadwalPerpulanganSection.appendChild(template);
-
             const cont = DOM.jadwalPerpulanganSection.querySelector('#jadwal-content-container');
             
             if (nextPeriod) {
                 const monthName = nextPeriod.deadline.toLocaleString('id-ID', { month: 'long' });
                 const deadlineStr = nextPeriod.deadline.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                
                 const targetsHtml = nextPeriod.required.map(t => `<div class="flex items-center gap-2 bg-white/80 py-1.5 px-3 rounded-full text-xs font-bold shadow-sm border border-slate-200/80 text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>${t.replace(/_/g, ' ')}</span></div>`).join('');
                 
                 cont.innerHTML = `
@@ -371,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
                     const d = Math.floor(dist / 864e5), h = Math.floor(dist % 864e5 / 36e5), m = Math.floor(dist % 36e5 / 6e4), s = Math.floor(dist % 6e4 / 1e3);
-                    
                     timerEl.innerHTML = [d, h, m, s].map((val, i) => `
                         <div class="bg-white border border-slate-200 p-2 rounded-xl w-16 shadow-sm">
                             <div class="text-2xl font-black text-slate-800">${String(val).padStart(2, '0')}</div>
@@ -401,21 +460,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <circle class="progress-ring-circle ${color} transition-all duration-1000 ease-out" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50" style="stroke-dasharray:${circumference};stroke-dashoffset:${circumference};" />
                         </svg>
                         <span class="absolute inset-0 flex items-center justify-center text-3xl font-black ${color}">${pct}%</span>`;
-                    
-                    setTimeout(() => { 
-                        const circle = circleEl.querySelector('.progress-ring-circle');
-                        if(circle) circle.style.strokeDashoffset = offset;
-                    }, 100);
-                    
+                    setTimeout(() => { const circle = circleEl.querySelector('.progress-ring-circle'); if(circle) circle.style.strokeDashoffset = offset; }, 100);
                     detailsEl.textContent = `${tuntasCount} dari ${santriList.length} santri tuntas.`;
                 } else {
                     container.classList.add('hidden');
                 }
             };
-            
             const unggulan = State.santriData.filter(s => s.program === 'Unggulan');
             const tahfizh = State.santriData.filter(s => s.program === 'Tahfizh');
-            
             createProgress(DOM.mutqinUnggulanProgressContainer, DOM.mutqinUnggulanCircle, DOM.mutqinUnggulanDetails, unggulan, 'text-sky-500', s => s.nilai >= 100);
             createProgress(DOM.mutqinJuz30ProgressContainer, DOM.mutqinJuz30Circle, DOM.mutqinJuz30Details, tahfizh, 'text-green-500', s => s.mutqinJuz.has(30));
             createProgress(DOM.mutqinJuz29ProgressContainer, DOM.mutqinJuz29Circle, DOM.mutqinJuz29Details, tahfizh, 'text-amber-500', s => s.mutqinJuz.has(29));
@@ -432,24 +484,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const percentage = totalCount > 0 ? ((tuntasCount / totalCount) * 100).toFixed(0) : 0;
                 
                 const clone = DOM.tplAccordionItem.content.cloneNode(true);
-                
                 Utils.setText(clone, '.data-group-name', groupName);
                 Utils.setText(clone, '.data-percentage-text', `${percentage}%`);
                 Utils.setText(clone, '.data-tuntas-badge', `Tuntas: ${tuntasCount}`);
                 Utils.setText(clone, '.data-belum-badge', `Belum: ${totalCount - tuntasCount}`);
-                
                 const bar = clone.querySelector('.data-progress-bar');
                 if(bar) bar.style.width = `${percentage}%`;
-
                 const tuntasList = group.santri.filter(s => s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Belum ada</li>';
                 const belumList = group.santri.filter(s => !s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Semua tuntas</li>';
-                
                 Utils.setText(clone, '.label-tuntas', `Sudah Tuntas (${tuntasCount})`);
                 Utils.setHTML(clone, '.list-tuntas', tuntasList);
-                
                 Utils.setText(clone, '.label-belum', `Belum Tuntas (${totalCount - tuntasCount})`);
                 Utils.setHTML(clone, '.list-belum', belumList);
-
                 container.appendChild(clone);
             }
         },
@@ -459,42 +505,32 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '';
             const clone = DOM.tplPeringkatSection.content.cloneNode(true);
             container.appendChild(clone);
-            
             UI.renderPeringkatContent('Tahfizh');
             const tab = container.querySelector(`[data-program="Tahfizh"]`);
-            if(tab) {
-                tab.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
-                tab.classList.remove('text-slate-500');
-            }
+            if(tab) { tab.classList.add('bg-white', 'text-amber-600', 'shadow-sm'); tab.classList.remove('text-slate-500'); }
         },
 
         renderPeringkatContent: (program) => {
             const contentContainer = document.getElementById('peringkat-content');
             if(!contentContainer) return;
             const santriList = State.santriData.filter(s => s.program === program);
-
             const getPeringkat = (list, key) => list.sort((a, b) => b[key] - a[key]).slice(0, 5);
-
             const criteria = program === 'Tahfizh'
                 ? [{ key: 'setoranCount', title: 'Paling Rajin (Total Setoran)', unit: 'setoran' }, { key: 'ziyadahPages', title: 'Hafalan Terbanyak (Ziyadah)', unit: 'hlm' }]
                 : [{ key: 'setoranCount', title: 'Paling Rajin (Total Setoran)', unit: 'setoran' }, { key: 'unggulanPages', title: 'Hafalan Terbanyak (Halaman)', unit: 'hlm' }];
-
             const medalColors = ['bg-yellow-400', 'bg-slate-300', 'bg-amber-700'];
             
             contentContainer.innerHTML = '';
             const grid = document.createElement('div');
             grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
-
             criteria.forEach(c => {
                 const col = document.createElement('div');
                 const title = document.createElement('h4');
                 title.className = 'font-bold text-center mb-3 text-slate-700 text-sm uppercase tracking-wide';
                 title.textContent = c.title;
                 col.appendChild(title);
-
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-3';
-
                 const topList = getPeringkat(santriList, c.key);
                 if (topList.length > 0) {
                     topList.forEach((s, i) => {
@@ -502,19 +538,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         const badge = itemClone.querySelector('.medal-bg');
                         badge.textContent = i + 1;
                         badge.classList.add(medalColors[i] || 'bg-slate-200');
-                        
                         Utils.setText(itemClone, '.item-nama', s.nama);
                         Utils.setText(itemClone, '.item-kelas', `Kelas ${s.kelas}`);
-                        
                         const scoreVal = (s[c.key] || 0).toFixed(['ziyadahPages', 'unggulanPages'].includes(c.key) ? 1 : 0);
                         Utils.setText(itemClone, '.item-score', scoreVal);
                         Utils.setText(itemClone, '.item-unit', c.unit);
-                        
                         ul.appendChild(itemClone);
                     });
-                } else {
-                    ul.innerHTML = '<li class="text-center text-sm text-slate-400 py-4 italic">Belum ada data.</li>';
-                }
+                } else { ul.innerHTML = '<li class="text-center text-sm text-slate-400 py-4 italic">Belum ada data.</li>'; }
                 col.appendChild(ul);
                 grid.appendChild(col);
             });
@@ -526,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '';
             const clone = DOM.tplTahfizhSection.content.cloneNode(true);
             container.appendChild(clone);
-
             UI.renderTahfizhContent(30);
             const tab = container.querySelector(`[data-juz="30"]`);
             if(tab) tab.classList.add('text-amber-600', 'border-amber-500');
@@ -535,151 +565,32 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTahfizhContent: (juz, searchTerm = '') => {
             const contentContainer = document.getElementById('tahfizh-content');
             const tahfizhSantri = State.santriData.filter(s => s.program === 'Tahfizh');
-            if (tahfizhSantri.length === 0) {
-                contentContainer.innerHTML = '<p class="text-center text-slate-500 py-4 italic">Tidak ada santri program Tahfizh.</p>';
-                return;
-            }
-
+            if (tahfizhSantri.length === 0) { contentContainer.innerHTML = '<p class="text-center text-slate-500 py-4 italic">Tidak ada santri program Tahfizh.</p>'; return; }
+            
             const tuntasCount = tahfizhSantri.filter(s => s.mutqinJuz.has(juz)).length;
             const totalCount = tahfizhSantri.length;
             const percentage = totalCount > 0 ? Math.round((tuntasCount / totalCount) * 100) : 0;
-            
             const lowerSearchTerm = searchTerm.toLowerCase();
             const tuntasList = tahfizhSantri.filter(s => s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
             const belumTuntasList = tahfizhSantri.filter(s => !s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
 
             contentContainer.innerHTML = '';
             const clone = DOM.tplTahfizhContent.content.cloneNode(true);
-            
             Utils.setText(clone, '.text-progress-label', `Progres: ${tuntasCount} / ${totalCount} Santri`);
             Utils.setText(clone, '.text-percentage', `${percentage}%`);
             const bar = clone.querySelector('.progress-bar');
             if(bar) bar.style.width = `${percentage}%`;
             
             const searchInput = clone.querySelector('.tahfizh-search');
-            if(searchInput) {
-                searchInput.setAttribute('data-juz-filter', juz);
-                searchInput.value = searchTerm;
-            }
-
+            if(searchInput) { searchInput.setAttribute('data-juz-filter', juz); searchInput.value = searchTerm; }
             Utils.setText(clone, '.count-tuntas', tuntasList.length);
             Utils.setText(clone, '.count-belum', belumTuntasList.length);
-            
             const listTuntasEl = clone.querySelector('.list-tuntas');
             listTuntasEl.innerHTML = tuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-slate-400 italic">Tidak ada</li>';
-            
             const listBelumEl = clone.querySelector('.list-belum');
             listBelumEl.innerHTML = belumTuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-slate-400 italic">Semua tuntas</li>';
-            
             contentContainer.appendChild(clone);
         },
-
-        // --- ANALISIS PAGE RENDERER ---
-
-        renderAnalisisPage: () => {
-            if (!DOM.santriSelectAnalisis) return;
-            const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
-            Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
-            DOM.analisisContentContainer.innerHTML = '';
-            DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
-        },
-
-        renderSantriDashboard: (sId) => {
-            const s = State.santriData.find(s => s.id === sId);
-            if (!s) return;
-            
-            DOM.analisisContentContainer.innerHTML = '';
-            const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
-            
-            // Isi Data Profil
-            Utils.setText(dash, '[data-name]', s.nama);
-            Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
-            Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
-            
-            // Badge Status
-            const statusBadge = dash.querySelector('[data-status-badge]');
-            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
-            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
-            
-            const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
-            if (s.statusPerpulangan === 'Boleh Pulang') {
-                perpulanganBadge.textContent = 'Boleh Pulang';
-                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700';
-            } else {
-                perpulanganBadge.textContent = 'Belum';
-                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700';
-            }
-            
-            // Nilai & Statistik
-            Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
-            Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
-            Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
-            
-            // Progres Juz Wajib
-            const progItems = [
-                { juz: 'Setengah Juz 30', done: s.nilai >= 100 },
-                { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true },
-                { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }
-            ];
-            
-            const progresHtml = progItems
-                .filter(item => !item.tahfizhOnly || s.program === 'Tahfizh')
-                .map(item => `
-                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="font-bold text-sm text-slate-700">${item.juz}</span>
-                        ${item.done 
-                            ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' 
-                            : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
-                    </div>`)
-                .join('');
-            
-            Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
-            
-            // Progres Ziyadah
-            const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
-            if (s.program === 'Tahfizh' && s.isTuntas) {
-                ziyadahSect.classList.remove('hidden');
-                const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
-                const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
-                
-                ziyadahCont.innerHTML = allJuz.map(j => {
-                    const compPages = s.ziyadahProgress[j] || 0;
-                    if (compPages <= 0) return '';
-                    const totalPages = AppConfig.hafalanData.juzPageCounts[j];
-                    const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0;
-                    return `
-                    <div class="mb-3">
-                        <div class="flex justify-between mb-1 text-xs font-bold text-slate-600">
-                            <span>Juz ${j}</span>
-                            <span>${compPages.toFixed(1)} / ${totalPages}</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
-            
-            // Tabel Aktivitas
-            const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
-            const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            aktivitasCont.innerHTML = allActivities.length > 0 
-                ? allActivities.map(s => `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4">
-                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
-                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
-                        </td>
-                        <td class="p-4 text-right text-xs font-bold text-slate-400">
-                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                        </td>
-                    </tr>`).join('') 
-                : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
-            
-            DOM.analisisContentContainer.appendChild(dash);
-        },
-
-        // --- RIWAYAT TABLE RENDERER ---
 
         renderHistoryTable: () => {
             const searchTerm = DOM.searchRiwayat.value.toLowerCase();
@@ -697,6 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dateMatch = (!startDate || new Date(setoran.createdAt) >= startDate) && (!endDate || new Date(setoran.createdAt) <= endDate);
                     const programMatch = (programFilter === 'Semua' || (santri && santri.program === programFilter));
                     const searchMatch = setoran.namaSantri.toLowerCase().includes(searchTerm);
+                    
                     return searchMatch && programMatch && classMatch && dateMatch;
                 })
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -704,10 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const tableBody = DOM.setoranTableBody;
             tableBody.innerHTML = '';
-            if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-slate-500 italic">Tidak ada data yang cocok dengan filter.</td></tr>`;
-                return;
-            }
+            if (filtered.length === 0) { tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-slate-500 italic">Tidak ada data yang cocok dengan filter.</td></tr>`; return; }
 
             const fragment = document.createDocumentFragment();
             filtered.forEach(setoran => {
@@ -718,25 +627,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 Utils.setText(clone, '.data-jenis', setoran.jenis);
                 Utils.setText(clone, '.data-juz-text', String(setoran.juz) === "juz30_setengah" ? "Setengah Juz 30" : `Juz ${setoran.juz}`);
                 Utils.setText(clone, '.data-unit', setoran.halaman ? `${setoran.halaman} hlm` : setoran.surat);
-                Utils.setText(clone, '.data-tanggal', new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }));
                 
+                const dateContainer = clone.querySelector('.data-tanggal');
+                if (dateContainer) {
+                    dateContainer.innerHTML = new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                }
+
+                // Status Badge Logic
+                const statusEl = clone.querySelector('.data-status');
+                if (setoran.status === 'Pending') {
+                    statusEl.innerHTML = `<span class="badge-pending text-[10px] px-2 py-0.5 rounded-full font-bold">Menunggu Validasi</span>`;
+                }
+
                 const deleteBtn = clone.querySelector('.delete-btn');
-                if(deleteBtn) deleteBtn.dataset.id = setoran.id;
+                const actionCell = clone.querySelector('.action-cell');
+                if(deleteBtn) {
+                    deleteBtn.dataset.id = setoran.id;
+                    if (State.currentRole !== 'musyrif') {
+                        deleteBtn.classList.add('hidden');
+                        if (actionCell) actionCell.classList.add('hidden');
+                    } else {
+                        deleteBtn.classList.remove('hidden');
+                        if (actionCell) actionCell.classList.remove('hidden');
+                    }
+                }
                 
                 if (santri) {
                     const pIcon = clone.querySelector('.data-program-icon');
-                    if(pIcon) pIcon.innerHTML = santri.program === 'Unggulan' 
-                        ? `<span title="Unggulan" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">U</span>` 
-                        : `<span title="Tahfizh" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">T</span>`;
-                    
+                    if(pIcon) pIcon.innerHTML = santri.program === 'Unggulan' ? `<span title="Unggulan" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">U</span>` : `<span title="Tahfizh" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">T</span>`;
                     const cIcon = clone.querySelector('.data-kelas-icon');
                     if(cIcon) {
-                        let cl = 'bg-slate-200 text-slate-700'; 
-                        const i = santri.kelas.charAt(1); 
-                        if (['A'].includes(i)) cl = 'bg-red-100 text-red-700'; 
-                        if (['B'].includes(i)) cl = 'bg-amber-100 text-amber-700'; 
-                        if (['C', 'D'].includes(i)) cl = 'bg-emerald-100 text-emerald-700'; 
-                        if (['G', 'H'].includes(i)) cl = 'bg-blue-100 text-blue-700'; 
+                        let cl = 'bg-slate-200 text-slate-700'; const i = santri.kelas.charAt(1); 
+                        if (['A'].includes(i)) cl = 'bg-red-100 text-red-700'; if (['B'].includes(i)) cl = 'bg-amber-100 text-amber-700'; if (['C', 'D'].includes(i)) cl = 'bg-emerald-100 text-emerald-700'; if (['G', 'H'].includes(i)) cl = 'bg-blue-100 text-blue-700'; 
                         cIcon.innerHTML = `<span title="Kelas ${santri.kelas}" class="inline-flex items-center justify-center h-5 w-5 rounded-full ${cl} text-[10px] font-bold">${santri.kelas}</span>`;
                     }
                 }
@@ -744,8 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             tableBody.appendChild(fragment);
         },
-
-        // --- REKAP & REPORT RENDERER ---
 
         renderRekap: () => {
             const groupOrder = ['Seluruh Santri', 'Khusus Tahfizh', ...Object.keys(State.classGroups).filter(g => g !== 'Seluruh Santri' && g !== 'Khusus Tahfizh').sort()];
@@ -762,15 +682,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const clone = DOM.rekapContentTemplate.content.cloneNode(true);
                 const content = clone.querySelector('.rekap-tab-content');
                 content.id = `rekap-tab-${tabId}`;
-                
                 const group = State.classGroups[groupName];
                 Utils.setText(clone, '.data-title', `Rekap Capaian - ${groupName}`);
                 Utils.setText(clone, '.data-musyrif', `Musyrif: ${group.musyrif}`);
                 Utils.setText(clone, '.data-timestamp', new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }));
-                
                 const btn = clone.querySelector('.export-pdf-btn');
                 if(btn) btn.dataset.classGroup = groupName;
-                
                 if (index !== 0) { content.classList.add('hidden'); }
                 contentContainer.appendChild(content); 
                 UI.renderSingleRekapTable(groupName, { isInitial: true });
@@ -780,61 +697,31 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSingleRekapTable: (groupName, options = {}) => {
             const group = State.classGroups[groupName]; if (!group) return;
             const contentDiv = document.getElementById(`rekap-tab-${groupName.replace(/, /g, '').replace(/ /g, '-')}`); if (!contentDiv) return;
-            
-            if (options.isInitial && !group.sortState) {
-                group.sortState = { column: 'nama', dir: 'asc' };
-            }
+            if (options.isInitial && !group.sortState) { group.sortState = { column: 'nama', dir: 'asc' }; }
             const { column, dir } = group.sortState;
-            
             group.santri.sort((a, b) => { 
                 let valA, valB;
-                switch (column) {
-                    case 'nama': valA = a.nama; valB = b.nama; break;
-                    case 'nilai': valA = a.nilaiTampil; valB = b.nilaiTampil; break;
-                    case 'ziyadah': valA = a.program === 'Tahfizh' ? a.ziyadahPages : -1; valB = b.program === 'Tahfizh' ? b.ziyadahPages : -1; break;
-                    case 'keterangan': valA = a.isTuntas; valB = b.isTuntas; break;
-                    default: return 0;
-                }
-                if (valA < valB) return dir === 'asc' ? -1 : 1;
-                if (valA > valB) return dir === 'asc' ? 1 : -1;
-                return 0;
+                switch (column) { case 'nama': valA = a.nama; valB = b.nama; break; case 'nilai': valA = a.nilaiTampil; valB = b.nilaiTampil; break; case 'ziyadah': valA = a.program === 'Tahfizh' ? a.ziyadahPages : -1; valB = b.program === 'Tahfizh' ? b.ziyadahPages : -1; break; case 'keterangan': valA = a.isTuntas; valB = b.isTuntas; break; default: return 0; }
+                if (valA < valB) return dir === 'asc' ? -1 : 1; if (valA > valB) return dir === 'asc' ? 1 : -1; return 0;
             });
-
             contentDiv.querySelectorAll('th.sortable').forEach(th => {
                 th.removeAttribute('data-sort-dir');
                 const iconSpan = th.querySelector('.sort-icon');
                 if(iconSpan) iconSpan.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 12L3 8m4 8l4-8" /></svg>`;
-                
-                if (th.dataset.sort === column) {
-                    th.setAttribute('data-sort-dir', dir);
-                    if(iconSpan) {
-                        iconSpan.innerHTML = dir === 'asc' 
-                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>` 
-                            : `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>`;
-                    }
-                }
+                if (th.dataset.sort === column) { th.setAttribute('data-sort-dir', dir); if(iconSpan) { iconSpan.innerHTML = dir === 'asc' ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>`; } }
             });
-
             const tableBody = contentDiv.querySelector('.data-table-body');
             tableBody.innerHTML = '';
             const fragment = document.createDocumentFragment();
-
             group.santri.forEach((santri, idx) => {
                 const row = DOM.tplRekapRow.content.cloneNode(true);
                 Utils.setText(row, '.col-no', idx + 1);
-                
                 const btnDetail = row.querySelector('.detail-santri-btn');
-                if(btnDetail) {
-                    btnDetail.textContent = santri.nama;
-                    btnDetail.dataset.id = santri.id;
-                }
-                
+                if(btnDetail) { btnDetail.textContent = santri.nama; btnDetail.dataset.id = santri.id; }
                 Utils.setText(row, '.col-nilai', santri.nilaiTampil);
                 Utils.setText(row, '.col-ziyadah', santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-');
-                
                 const statusCell = row.querySelector('.col-status');
                 statusCell.innerHTML = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${santri.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${santri.isTuntas ? 'Tuntas' : 'Belum'}</span>`;
-                
                 fragment.appendChild(row);
             });
             tableBody.appendChild(fragment);
@@ -849,46 +736,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const head = [['No.', 'Nama Santri', 'Nilai', 'Ziyadah (hlm)', 'Keterangan']];
                 const body = group.santri.sort((a, b) => a.nama.localeCompare(b.nama)).map((santri, index) => [
-                    index + 1,
-                    santri.nama,
-                    santri.nilaiTampil,
-                    santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-',
-                    santri.isTuntas ? 'Tuntas' : 'Belum Tuntas'
+                    index + 1, santri.nama, santri.nilaiTampil, santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-', santri.isTuntas ? 'Tuntas' : 'Belum Tuntas'
                 ]);
-
-                doc.autoTable({
-                    head: head,
-                    body: body,
-                    theme: 'grid',
-                    headStyles: { fillColor: [245, 158, 11] }, // Amber-500
-                    styles: { font: 'helvetica', cellPadding: 6, valign: 'middle' },
-                    columnStyles: { 
-                        0: { cellWidth: 30 }, 
-                        1: { cellWidth: 'auto' }, 
-                        2: { cellWidth: 40, halign: 'center' }, 
-                        3: { cellWidth: 70, halign: 'center' }, 
-                        4: { cellWidth: 80, halign: 'center' } 
-                    },
-                    didParseCell: (data) => { if (data.column.index === 1) data.cell.styles.fontSize = 9; },
-                    didDrawPage: (data) => {
-                        doc.setFontSize(18); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold');
-                        doc.text('Laporan Capaian Tahfizh', data.settings.margin.left, 40);
-                        doc.setFontSize(11); doc.setTextColor(60); doc.setFont('helvetica', 'normal');
-                        doc.text(`Kelompok: ${classGroup} | Musyrif: ${group.musyrif}`, data.settings.margin.left, 58);
-                        doc.setFontSize(8); doc.setTextColor(150);
-                        doc.text(`Halaman ${data.pageNumber} dari ${doc.internal.getNumberOfPages()}`, data.settings.margin.left, doc.internal.pageSize.height - 20);
-                        doc.text(`Dibuat pada: ${new Date().toLocaleString('id-ID')}`, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 20, { align: 'right' });
-                    },
-                    margin: { top: 70, bottom: 40 }
-                });
+                doc.autoTable({ head, body, theme: 'grid', headStyles: { fillColor: [245, 158, 11] }, styles: { font: 'helvetica', cellPadding: 6, valign: 'middle' }, columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 40, halign: 'center' }, 3: { cellWidth: 70, halign: 'center' }, 4: { cellWidth: 80, halign: 'center' } }, didDrawPage: (data) => { doc.setFontSize(18); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold'); doc.text('Laporan Capaian Tahfizh', data.settings.margin.left, 40); doc.setFontSize(11); doc.setTextColor(60); doc.setFont('helvetica', 'normal'); doc.text(`Kelompok: ${classGroup} | Musyrif: ${group.musyrif}`, data.settings.margin.left, 58); } });
                 doc.save(`rekap_${classGroup.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`);
-            } catch (error) {
-                console.error("PDF Export Error:", error);
-                UI.showToast('Gagal mengekspor PDF.', 'error');
-            }
+            } catch (error) { UI.showToast('Gagal mengekspor PDF.', 'error'); }
         },
-
-        // --- DETAIL MODAL & CHARTS ---
 
         openDetailModal: (santriId) => {
             const santri = State.santriData.find(s => s.id === santriId);
@@ -904,46 +757,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const ctx = DOM.progressChart.getContext('2d');
             if (State.chartInstance) State.chartInstance.destroy();
             const monthlyData = {};
-            const sortedSetoran = [...santri.setoran].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            // Gunakan hanya data Verified untuk chart
+            const validSetoran = santri.setoran.filter(s => s.status !== 'Pending'); 
+            const sortedSetoran = [...validSetoran].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             sortedSetoran.forEach(s => {
                 const date = new Date(s.createdAt);
                 const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
                 let pages = parseFloat(s.halaman) || 0;
-                if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) {
-                    pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0;
-                }
+                if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) { pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0; }
                 if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
                 monthlyData[monthKey] += pages;
             });
             const labels = Object.keys(monthlyData);
             let accumulator = 0;
-            const dataPoints = Object.values(monthlyData).map(val => {
-                accumulator += val;
-                return accumulator.toFixed(1);
-            });
-            State.chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Total Halaman',
-                        data: dataPoints,
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#d97706',
-                        pointBorderColor: '#fff',
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
-                }
-            });
+            const dataPoints = Object.values(monthlyData).map(val => { accumulator += val; return accumulator.toFixed(1); });
+            State.chartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Total Halaman', data: dataPoints, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         },
     
         renderJuzBlocks: (santri) => {
@@ -951,35 +779,67 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '';
             const targetJuzs = [30, 29, 28, 1]; 
             targetJuzs.forEach(juzNum => {
-                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum);
+                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum && s.status !== 'Pending'); 
                 let totalPagesDone = 0;
                 setoranJuz.forEach(s => {
-                    if (s.jenis === 'Mutqin') {
-                        totalPagesDone = 20; 
-                    } else {
-                        let pages = parseFloat(s.halaman) || 0;
-                        if (!pages && s.surat) {
-                            pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0;
-                        }
-                        totalPagesDone += pages;
-                    }
+                    if (s.jenis === 'Mutqin') { totalPagesDone = 20; } else { let pages = parseFloat(s.halaman) || 0; if (!pages && s.surat) { pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0; } totalPagesDone += pages; }
                 });
                 const maxPages = 20;
                 const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
                 const percentage = Math.min(Math.round((totalPagesDone / maxPages) * 100), 100);
-                
                 const clone = DOM.tplJuzBlock.content.cloneNode(true);
                 Utils.setText(clone, '.block-title', `Juz ${juzNum}`);
                 Utils.setText(clone, '.block-stats', `${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)`);
-                
                 const grid = clone.querySelector('.block-grid');
-                grid.innerHTML = Array(20).fill(0).map((_, i) => {
-                    const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-slate-200';
-                    return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
-                }).join('');
-                
+                grid.innerHTML = Array(20).fill(0).map((_, i) => { const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-slate-200'; return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`; }).join('');
                 container.appendChild(clone);
             });
+        },
+
+        renderSantriDashboard: (sId) => {
+            const s = State.santriData.find(s => s.id === sId);
+            if (!s) return;
+            DOM.analisisContentContainer.innerHTML = '';
+            const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
+            Utils.setText(dash, '[data-name]', s.nama);
+            Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
+            Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
+            const statusBadge = dash.querySelector('[data-status-badge]');
+            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
+            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
+            const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
+            if (s.statusPerpulangan === 'Boleh Pulang') { perpulanganBadge.textContent = 'Boleh Pulang'; perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700'; } else { perpulanganBadge.textContent = 'Belum'; perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700'; }
+            Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
+            Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
+            Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
+            const progItems = [{ juz: 'Setengah Juz 30', done: s.nilai >= 100 }, { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true }, { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }];
+            const progresHtml = progItems.filter(item => !item.tahfizhOnly || s.program === 'Tahfizh').map(item => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="font-bold text-sm text-slate-700">${item.juz}</span>
+                        ${item.done ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
+                    </div>`).join('');
+            Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
+            const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
+            if (s.program === 'Tahfizh' && s.isTuntas) {
+                ziyadahSect.classList.remove('hidden');
+                const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
+                const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
+                ziyadahCont.innerHTML = allJuz.map(j => { const compPages = s.ziyadahProgress[j] || 0; if (compPages <= 0) return ''; const totalPages = AppConfig.hafalanData.juzPageCounts[j]; const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0; return `<div class="mb-3"><div class="flex justify-between mb-1 text-xs font-bold text-slate-600"><span>Juz ${j}</span><span>${compPages.toFixed(1)} / ${totalPages}</span></div><div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div></div></div>`; }).join('');
+            }
+            const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
+            const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            aktivitasCont.innerHTML = allActivities.length > 0 ? allActivities.map(s => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4">
+                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
+                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
+                        </td>
+                        <td class="p-4 text-right text-xs font-bold text-slate-400">
+                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                            ${s.status === 'Pending' ? '<span class="block text-amber-500 mt-1">Pending</span>' : ''}
+                        </td>
+                    </tr>`).join('') : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
+            DOM.analisisContentContainer.appendChild(dash);
         }
     };
 
@@ -988,105 +848,115 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const Core = {
         /**
-         * Mengambil data baru, memproses statistik, dan memicu render UI.
+         * Mengambil data baru, memproses statistik (hanya data Verified), dan memicu render UI.
          */
         reloadData: async () => {
             const response = await Utils.fetchSetoranData(); 
-            if (!response || !response.setoran) {
-                console.error("Format data server tidak valid.");
-                return;
-            }
+            if (!response || !response.setoran) { console.error("Format data server tidak valid."); return; }
+            
+            // Raw Processing
             State.rawSantriList = (response.santri || []).map(s => ({
-                id: s.ID || s.id, 
-                nama: s.Nama || s.NamaSantri || s.nama, 
-                kelas: s.Kelas || s.kelas,
-                program: s.Program || s.program,
-                musyrif: s.Musyrif || s.musyrif
+                id: s.ID || s.id, nama: s.Nama || s.NamaSantri || s.nama, kelas: s.Kelas || s.kelas, program: s.Program || s.program, musyrif: s.Musyrif || s.musyrif
             }));
             State.santriNameMap = new Map(State.rawSantriList.map(s => [Utils.normalizeName(s.nama), s.id]));
+            
+            // Split Data: All, Verified, Pending
             State.allSetoran = response.setoran.map(item => ({
                 id: `row-${item.rowNumber}`,
                 santriId: State.santriNameMap.get(Utils.normalizeName(item.namaSantri || '')) || null,
                 createdAt: item.tanggal, 
+                rowNumber: item.rowNumber, // Penting untuk validasi/delete
+                status: item.Status || 'Verified', // Ambil dari kolom Status
                 ...item
             }));
+            
+            State.verifiedSetoran = State.allSetoran.filter(s => s.status === 'Verified');
+            State.pendingSetoran = State.allSetoran.filter(s => s.status === 'Pending');
+
             Core.calculateSantriStats();
             Core.buildClassGroups();
-            UI.renderAll();
             Core.updateMusyrifList(); 
+            // UI Render dipanggil di Init
+        },
+
+        /**
+         * Mengirim perintah validasi (Approve/Reject) setoran Santri.
+         */
+        handleValidation: async (rowNumber, status) => {
+            if (State.currentRole !== 'musyrif' || !State.userPassword) {
+                UI.showToast("Akses ditolak. Silakan login sebagai Musyrif.", 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'validate');
+            formData.append('password', State.userPassword);
+            formData.append('rowNumber', rowNumber);
+            formData.append('status', status);
+
+            // Optimistic Update UI (Hapus dari list segera)
+            const btn = DOM.validationContainer.querySelector(`button[data-id="${rowNumber}"]`);
+            if (btn) btn.closest('div').remove(); 
+            
+            State.pendingSetoran = State.pendingSetoran.filter(s => s.rowNumber != rowNumber);
+            DOM.validationCount.textContent = State.pendingSetoran.length;
+            if (State.pendingSetoran.length === 0) DOM.validationSection.classList.add('hidden');
+            
+            const res = await Utils.postData(formData);
+            
+            if (res.result !== 'success') {
+                UI.showToast(`Gagal memvalidasi: ${res.error}. Mohon coba lagi.`, 'error');
+                await Core.reloadData(); // Rollback jika gagal
+            } else {
+                UI.showToast(status === 'Verified' ? 'Data diterima & terverifikasi.' : 'Data ditolak & dihapus.');
+                await Core.reloadData(); // Refresh data penuh
+            }
         },
 
         checkPerpulanganStatus: (s) => {
-            const hasMutqinSetengahJuz = s.setoran.some(set => set.jenis === 'Mutqin' && String(set.juz) === "juz30_setengah");
+            const validSetoran = s.setoran.filter(st => st.status === 'Verified');
+            const hasMutqinSetengahJuz = validSetoran.some(set => set.jenis === 'Mutqin' && String(set.juz) === "juz30_setengah");
             if (hasMutqinSetengahJuz) return 'Boleh Pulang';
-            
-            const hasMutqinJuz30 = s.setoran.some(set => set.jenis === 'Mutqin' && set.juz == 30);
+            const hasMutqinJuz30 = validSetoran.some(set => set.jenis === 'Mutqin' && set.juz == 30);
             if (hasMutqinJuz30) return 'Boleh Pulang';
-            
             const now = new Date();
             let latestAchievedPeriod = null;
-            
             if (AppConfig.perpulanganPeriods) {
                 for (const period of AppConfig.perpulanganPeriods) {
                     let conditionMet = false;
-                    if (period.type === 'surat') {
-                        conditionMet = period.required.every(requiredSurah => 
-                            s.setoran.some(set => set.surat === requiredSurah && new Date(set.createdAt) <= period.deadline)
-                        );
-                    } else if (period.type === 'mutqin') {
-                        conditionMet = s.setoran.some(set => set.jenis === 'Mutqin' && period.required.includes(String(set.juz)) && new Date(set.createdAt) <= period.deadline);
-                    }
-                    
-                    if (conditionMet) {
-                        latestAchievedPeriod = period;
-                    }
+                    if (period.type === 'surat') { conditionMet = period.required.every(requiredSurah => validSetoran.some(set => set.surat === requiredSurah && new Date(set.createdAt) <= period.deadline)); } 
+                    else if (period.type === 'mutqin') { conditionMet = validSetoran.some(set => set.jenis === 'Mutqin' && period.required.includes(String(set.juz)) && new Date(set.createdAt) <= period.deadline); }
+                    if (conditionMet) { latestAchievedPeriod = period; }
                 }
             }
-            
-            if (latestAchievedPeriod) {
-                const resetDate = new Date(latestAchievedPeriod.deadline);
-                resetDate.setDate(resetDate.getDate() + 1);
-                if (now < resetDate) {
-                    return 'Boleh Pulang';
-                }
-            }
+            if (latestAchievedPeriod) { const resetDate = new Date(latestAchievedPeriod.deadline); resetDate.setDate(resetDate.getDate() + 1); if (now < resetDate) { return 'Boleh Pulang'; } }
             return 'Belum Boleh Pulang';
         },
 
         /**
-         * Menghitung statistik hafalan setiap santri (Nilai, Ziyadah, Status Tuntas).
-         * Ini adalah fungsi logika terberat.
+         * Menghitung statistik hafalan setiap santri (HANYA MENGGUNAKAN DATA VERIFIED).
          */
         calculateSantriStats: () => {
             const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { 
-                ...s, 
-                mutqinJuz: new Set(), 
-                nilai: 0, 
-                nilaiTampil: 0, 
-                isTuntas: false, 
-                tuntasDate: null, 
-                ziyadahPages: 0, 
-                unggulanPages: 0, 
-                setoran: [], 
-                setoranCount: 0,
-                ziyadahProgress: {}, 
-                statusPerpulangan: 'Belum Boleh Pulang'
+                ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0, ziyadahProgress: {}, statusPerpulangan: 'Belum Boleh Pulang'
             }]));
             
             for (const setoran of State.allSetoran) {
                 if (santriStatsMap.has(setoran.santriId)) {
                     const santri = santriStatsMap.get(setoran.santriId);
                     santri.setoran.push(setoran);
-                    santri.setoranCount++;
                 }
             }
             
             santriStatsMap.forEach(santri => {
-                if (santri.setoran.length === 0) return;
+                const validSetoran = santri.setoran.filter(s => s.status === 'Verified');
+                santri.setoranCount = validSetoran.length;
 
-                const mutqinSetengahJuz = santri.setoran.find(s => s.jenis === 'Mutqin' && String(s.juz) === "juz30_setengah" && new Date(s.createdAt) <= AppConfig.deadlineJuz30Score);
-                const mutqinJuz30 = santri.setoran.find(s => s.jenis === 'Mutqin' && s.juz == 30 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['30']));
-                const mutqinJuz29 = santri.setoran.find(s => s.jenis === 'Mutqin' && s.juz == 29 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['29']));
+                if (validSetoran.length === 0) return;
+
+                const mutqinSetengahJuz = validSetoran.find(s => s.jenis === 'Mutqin' && String(s.juz) === "juz30_setengah" && new Date(s.createdAt) <= AppConfig.deadlineJuz30Score);
+                const mutqinJuz30 = validSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 30 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['30']));
+                const mutqinJuz29 = validSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 29 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['29']));
 
                 if (mutqinJuz29) santri.mutqinJuz.add(29);
                 if (mutqinJuz30) santri.mutqinJuz.add(30);
@@ -1094,36 +964,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mutqinSetengahJuz || (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineJuz30Score)) {
                     santri.nilai = 100;
                 } else {
-                    const setoranSurahs = new Set(santri.setoran.filter(set => set.juz == 30 && set.surat).map(set => set.surat));
+                    const setoranSurahs = new Set(validSetoran.filter(set => set.juz == 30 && set.surat).map(set => set.surat));
                     let score = 0;
-                    if (AppConfig.scoringTiers) {
-                        for (const tier of AppConfig.scoringTiers) {
-                            if (tier.required.every(surah => setoranSurahs.has(surah))) {
-                                score = tier.score;
-                                break;
-                            }
-                        }
-                    }
-                    if (score === 0) {
-                        score = santri.setoran
-                            .filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score)
-                            .reduce((sum, s) => {
-                                const pageCount = parseFloat(s.halaman) || AppConfig.hafalanData.juzPageCounts[s.juz] || 0;
-                                return sum + pageCount;
-                            }, 0);
-                    }
+                    if (AppConfig.scoringTiers) { for (const tier of AppConfig.scoringTiers) { if (tier.required.every(surah => setoranSurahs.has(surah))) { score = tier.score; break; } } }
+                    if (score === 0) { score = validSetoran.filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score).reduce((sum, s) => { const pageCount = parseFloat(s.halaman) || AppConfig.hafalanData.juzPageCounts[s.juz] || 0; return sum + pageCount; }, 0); }
                     santri.nilai = score;
                 }
 
                 let tuntas = false;
-                if (santri.program === 'Unggulan' && santri.nilai >= 100) {
-                    tuntas = true;
-                } else if (santri.program === 'Tahfizh') {
-                    const deadlineMet = (mutqinJuz29 && new Date(mutqinJuz29.createdAt) <= AppConfig.deadlineTahfizhTuntas) && (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineTahfizhTuntas);
-                    if (santri.nilai >= 100 && santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30) && deadlineMet) {
-                        tuntas = true;
-                    }
-                }
+                if (santri.program === 'Unggulan' && santri.nilai >= 100) { tuntas = true; } 
+                else if (santri.program === 'Tahfizh') { const deadlineMet = (mutqinJuz29 && new Date(mutqinJuz29.createdAt) <= AppConfig.deadlineTahfizhTuntas) && (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineTahfizhTuntas); if (santri.nilai >= 100 && santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30) && deadlineMet) { tuntas = true; } }
                 
                 if (tuntas) {
                     santri.isTuntas = true;
@@ -1131,31 +981,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (mutqinSetengahJuz) completionDates.push(new Date(mutqinSetengahJuz.createdAt));
                     if (mutqinJuz30) completionDates.push(new Date(mutqinJuz30.createdAt));
                     if (mutqinJuz29) completionDates.push(new Date(mutqinJuz29.createdAt));
-                    
                     if (completionDates.length > 0) {
                         santri.tuntasDate = new Date(Math.max(...completionDates));
-                        santri.setoran.forEach(setoran => {
+                        validSetoran.forEach(setoran => {
                             if (new Date(setoran.createdAt) > santri.tuntasDate) {
                                 const pageValue = (setoran.halaman ? parseFloat(setoran.halaman) : AppConfig.hafalanData.surahData[setoran.juz]?.pages[setoran.surat]) || 0;
-                                if (setoran.jenis === 'Ziyadah') {
-                                    santri.ziyadahPages += pageValue;
-                                    santri.ziyadahProgress[setoran.juz] = (santri.ziyadahProgress[setoran.juz] || 0) + pageValue;
-                                }
+                                if (setoran.jenis === 'Ziyadah') { santri.ziyadahPages += pageValue; santri.ziyadahProgress[setoran.juz] = (santri.ziyadahProgress[setoran.juz] || 0) + pageValue; }
                             }
                         });
                     }
                 }
                 santri.nilaiTampil = Math.min(100, santri.nilai);
-                
-                santri.unggulanPages = santri.setoran.reduce((sum, s) => {
-                    let pageCount = 0;
-                    if (s.halaman) pageCount = parseFloat(s.halaman);
-                    else if (s.juz === 'juz30_setengah') pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah'];
-                    else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat];
-                    else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz];
-                    return sum + pageCount;
-                }, 0);
-
+                santri.unggulanPages = validSetoran.reduce((sum, s) => { let pageCount = 0; if (s.halaman) pageCount = parseFloat(s.halaman); else if (s.juz === 'juz30_setengah') pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah']; else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat]; else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz]; return sum + pageCount; }, 0);
                 santri.statusPerpulangan = Core.checkPerpulanganStatus(santri);
             });
             State.santriData = Array.from(santriStatsMap.values());
@@ -1164,25 +1001,17 @@ document.addEventListener('DOMContentLoaded', () => {
         buildClassGroups: () => {
             const tempGroups = {};
             State.santriData.forEach(s => {
-                if (!tempGroups[s.musyrif]) {
-                    tempGroups[s.musyrif] = { santri: [], musyrif: s.musyrif, classes: new Set() };
-                }
+                if (!tempGroups[s.musyrif]) { tempGroups[s.musyrif] = { santri: [], musyrif: s.musyrif, classes: new Set() }; }
                 tempGroups[s.musyrif].santri.push(s);
                 tempGroups[s.musyrif].classes.add(s.kelas);
             });
-
             State.classGroups = {};
             for (const musyrif in tempGroups) {
                 const group = tempGroups[musyrif];
                 let groupName;
-                if (AppConfig.classGroupOverrides && AppConfig.classGroupOverrides[musyrif]) {
-                    groupName = AppConfig.classGroupOverrides[musyrif];
-                } else {
-                    groupName = [...group.classes].sort().join(', ');
-                }
+                if (AppConfig.classGroupOverrides && AppConfig.classGroupOverrides[musyrif]) { groupName = AppConfig.classGroupOverrides[musyrif]; } else { groupName = [...group.classes].sort().join(', '); }
                 State.classGroups[groupName] = { santri: group.santri, musyrif: group.musyrif };
             }
-
             State.classGroups['Khusus Tahfizh'] = { santri: State.santriData.filter(s => s.program === 'Tahfizh'), musyrif: 'Semua Musyrif' };
             State.classGroups['Seluruh Santri'] = { santri: State.santriData, musyrif: 'Semua Musyrif' };
         },
@@ -1198,34 +1027,97 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. EVENT LISTENERS
     // ==========================================
     function setupEventListeners() {
-        // -- Form Handling --
+        // --- ROLE SELECTION (NEW) ---
+        DOM.roleButtonsContainer.addEventListener('click', e => {
+            const btn = e.target.closest('.role-btn');
+            if (!btn) return;
+            const role = btn.dataset.role;
+            
+            DOM.roleButtonsContainer.classList.remove('hidden');
+            DOM.musyrifLoginForm.classList.add('hidden');
+
+            if (role === 'musyrif') {
+                DOM.roleButtonsContainer.classList.add('hidden');
+                DOM.musyrifLoginForm.classList.remove('hidden');
+                DOM.rolePasswordInput.focus();
+            } else {
+                State.currentRole = role;
+                UI.applyRoleUI();
+                UI.renderAll();
+            }
+        });
+
+        DOM.backRoleBtn.addEventListener('click', () => {
+            DOM.musyrifLoginForm.classList.add('hidden');
+            DOM.roleButtonsContainer.classList.remove('hidden');
+            DOM.roleErrorMsg.classList.add('hidden');
+            DOM.rolePasswordInput.value = '';
+        });
+
+        DOM.submitRoleBtn.addEventListener('click', async () => {
+            const pass = DOM.rolePasswordInput.value;
+            if (!pass) {
+                DOM.roleErrorMsg.textContent = 'Password harus diisi.';
+                DOM.roleErrorMsg.classList.remove('hidden');
+                return;
+            }
+            // Simpan password di state
+            State.userPassword = pass;
+            State.currentRole = 'musyrif';
+            UI.applyRoleUI();
+            UI.renderAll();
+        });
+
+        DOM.btnLogout.addEventListener('click', () => {
+            State.currentRole = null;
+            State.userPassword = null;
+            DOM.mainLayout.classList.add('hidden');
+            DOM.roleSelectionModal.classList.remove('hidden');
+            DOM.rolePasswordInput.value = '';
+            DOM.musyrifLoginForm.classList.add('hidden');
+            DOM.roleButtonsContainer.classList.remove('hidden');
+        });
+
+        // --- FORM HANDLING (MODIFIED) ---
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!validateForm()) return;
 
             const btn = DOM.submitButton;
             btn.disabled = true;
-            DOM.submitButtonText.textContent = 'Menyimpan...';
+            DOM.submitButtonText.textContent = 'Mengirim...';
             DOM.submitButtonIcon.classList.add('hidden');
             DOM.submitSpinner.classList.remove('hidden');
             
             const formData = new FormData(e.target);
             formData.set('namaSantri', DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text);
             
+            // PENTING: Kirim password jika role musyrif (untuk langsung Verified)
+            if (State.currentRole === 'musyrif' && State.userPassword) {
+                formData.append('password', State.userPassword);
+            }
+
             const data = await Utils.postData(formData);
             if (data.result === 'success') {
-                UI.showToast('Setoran berhasil disimpan!');
+                if (data.status === 'Verified') {
+                    UI.showToast('Setoran berhasil disimpan & terverifikasi!');
+                } else {
+                    UI.showToast('Setoran dikirim. Menunggu validasi Musyrif.', 'success');
+                }
                 e.target.reset();
                 DOM.namaSantri.dispatchEvent(new Event('change'));
                 await Core.reloadData();
+            } else {
+                UI.showToast(`Gagal: ${data.error}`, 'error');
             }
+            
             btn.disabled = false;
-            DOM.submitButtonText.textContent = 'Simpan Setoran';
+            DOM.submitButtonText.textContent = State.currentRole === 'musyrif' ? 'Simpan Setoran' : 'Kirim untuk Validasi';
             DOM.submitButtonIcon.classList.remove('hidden');
             DOM.submitSpinner.classList.add('hidden');
         });
 
-        // -- Navigation & Interaksi Umum --
+        // --- Navigation & Interaksi Umum ---
         DOM.nowBtn.addEventListener('click', () => {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -1234,28 +1126,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOM.mainNav.addEventListener('click', e => {
             const link = e.target.closest('.nav-link');
-            if (link) {
-                e.preventDefault();
-                UI.switchPage(link.dataset.page);
-            }
+            if (link) { e.preventDefault(); UI.switchPage(link.dataset.page); }
         });
 
-        // -- Event Delegation untuk Elemen Dinamis --
+        // --- Event Delegation ---
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
             const tabBtn = e.target.closest('.analisis-tab');
 
-            if (button && button.matches('[data-target-page]')) {
-                UI.switchPage(button.dataset.targetPage);
-                return;
-            }
+            if (button && button.matches('[data-target-page]')) { UI.switchPage(button.dataset.targetPage); return; }
 
             if (tabBtn) {
                 const targetId = tabBtn.dataset.target;
                 const parent = tabBtn.parentElement;
                 parent.querySelectorAll('.analisis-tab').forEach(t => t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm'));
                 tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm');
-                
                 DOM.analisisContentContainer.querySelectorAll('.analisis-tab-content').forEach(c => c.classList.add('hidden'));
                 const targetPanel = DOM.analisisContentContainer.querySelector(`#${targetId}`);
                 if(targetPanel) targetPanel.classList.remove('hidden');
@@ -1264,278 +1149,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!button) return;
 
-            if (button.matches('.export-pdf-btn')) {
-                UI.exportRecapToPDF(button.dataset.classGroup);
-            } else if (button.matches('.delete-btn')) {
-                State.setoranIdToDelete = button.dataset.id;
-                DOM.passwordConfirmModal.classList.remove('hidden');
-            } else if (button.matches('.accordion-button')) {
-                const panel = button.closest('h2').nextElementSibling;
-                panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`;
-                button.querySelector('.accordion-chevron').classList.toggle('rotate-180');
-            } else if (button.matches('.sortable')) {
+            if (button.matches('.export-pdf-btn')) { UI.exportRecapToPDF(button.dataset.classGroup); } 
+            else if (button.matches('.delete-btn')) { 
+                if (State.currentRole === 'musyrif') {
+                    State.setoranIdToDelete = button.dataset.id; 
+                    DOM.passwordConfirmModal.classList.remove('hidden');
+                } else {
+                    UI.showToast('Akses ditolak. Hanya Musyrif yang dapat menghapus.', 'error');
+                }
+            } 
+            else if (button.matches('.accordion-button')) { const panel = button.closest('h2').nextElementSibling; panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`; button.querySelector('.accordion-chevron').classList.toggle('rotate-180'); } 
+            else if (button.matches('.sortable')) {
                 const column = button.dataset.sort;
                 const tabContent = button.closest('.rekap-tab-content');
                 const groupName = Object.keys(State.classGroups).find(n => n.replace(/, /g, '').replace(/ /g, '-') === tabContent.id.replace('rekap-tab-', ''));
-                if (groupName) {
-                    const group = State.classGroups[groupName];
-                    const isSameColumn = group.sortState?.column === column;
-                    group.sortState = {
-                        column: column,
-                        dir: isSameColumn && group.sortState?.dir === 'asc' ? 'desc' : 'asc'
-                    };
-                    UI.renderSingleRekapTable(groupName);
-                }
+                if (groupName) { const group = State.classGroups[groupName]; const isSameColumn = group.sortState?.column === column; group.sortState = { column: column, dir: isSameColumn && group.sortState?.dir === 'asc' ? 'desc' : 'asc' }; UI.renderSingleRekapTable(groupName); }
             } else if (button.matches('.tab-peringkat')) {
                 const container = DOM.peringkatSection;
-                container.querySelectorAll('.tab-peringkat').forEach(b => {
-                    b.classList.remove('bg-white', 'text-amber-600', 'shadow-sm');
-                    b.classList.add('text-slate-500'); 
-                });
-                button.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
-                button.classList.remove('text-slate-500');
-                UI.renderPeringkatContent(button.dataset.program);
+                container.querySelectorAll('.tab-peringkat').forEach(b => { b.classList.remove('bg-white', 'text-amber-600', 'shadow-sm'); b.classList.add('text-slate-500'); });
+                button.classList.add('bg-white', 'text-amber-600', 'shadow-sm'); button.classList.remove('text-slate-500'); UI.renderPeringkatContent(button.dataset.program);
             } else if (button.matches('.tahfizh-tab')) {
                 const container = DOM.tahfizhTuntasTrackingSection;
                 container.querySelectorAll('.tahfizh-tab').forEach(b => b.classList.remove('text-amber-600', 'border-amber-500'));
-                button.classList.add('text-amber-600', 'border-amber-500');
-                UI.renderTahfizhContent(parseInt(button.dataset.juz, 10));
+                button.classList.add('text-amber-600', 'border-amber-500'); UI.renderTahfizhContent(parseInt(button.dataset.juz, 10));
             }
         });
         
-        // -- Search Input Handling (Debounce) --
-        DOM.mainContent.addEventListener('input', e => {
-            if (e.target.matches('.tahfizh-search')) {
-                clearTimeout(State.searchDebounceTimer);
-                State.searchDebounceTimer = setTimeout(() => {
-                    const juz = parseInt(e.target.dataset.juzFilter, 10);
-                    UI.renderTahfizhContent(juz, e.target.value);
-                }, 300);
-            }
-        });
-
-        // -- Halaman Analisis --
-        if (DOM.santriSelectAnalisis) {
-            DOM.santriSelectAnalisis.addEventListener('change', (e) => {
-                if (e.target.value) {
-                    UI.renderSantriDashboard(e.target.value);
-                } else {
-                    DOM.analisisContentContainer.innerHTML = '';
-                    DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
-                }
-            });
-        }
-
-        // -- Halaman Rekap --
-        DOM.rekapSelect.addEventListener('change', (e) => {
-            const selectedId = e.target.value;
-            DOM.rekapContentContainer.querySelectorAll('.rekap-tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(`rekap-tab-${selectedId}`).classList.remove('hidden');
-        });
-
-        DOM.rekapContentContainer.addEventListener('click', e => {
-            if (e.target.matches('.detail-santri-btn')) {
-                UI.openDetailModal(e.target.dataset.id);
-            }
-        });
-
-        // -- Modals --
-        DOM.closeDetailModal.addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
-        DOM.studentDetailModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
-
-        // -- Logika Dependensi Form (Musyrif -> Santri -> Detail) --
-        DOM.musyrif.addEventListener('change', () => {
-            const musyrifValue = DOM.musyrif.value;
-            const santriOptions = musyrifValue
-                ? State.rawSantriList.filter(s => s.musyrif === musyrifValue).sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }))
-                : [];
-            Utils.populateSelect(DOM.namaSantri, santriOptions, 'Pilih Santri');
-            DOM.namaSantri.disabled = !musyrifValue;
-            DOM.namaSantri.dispatchEvent(new Event('change'));
-        });
-
-        DOM.namaSantri.addEventListener('change', () => {
-            const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value);
-            const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value);
-            
-            DOM.kelas.value = santri?.kelas || '';
-            DOM.program.value = santri?.program || '';
-            DOM.santriId.value = santri?.id || '';
-            
-            const isTuntas = santriProcessed ? santriProcessed.isTuntas : false;
-            
-            const jenisOptions = santri ? (santri.program === "Unggulan" || (santri.program === "Tahfizh" && isTuntas) ? ["Ziyadah", "Murajaah", "Mutqin"] : ["Murajaah", "Mutqin"]) : [];
-            Utils.populateSelect(DOM.jenis, jenisOptions, 'Pilih Jenis');
-            DOM.jenis.disabled = !santri;
-            DOM.jenis.dispatchEvent(new Event('change'));
-        });
-
-        DOM.jenis.addEventListener('change', () => {
-            const jenisValue = DOM.jenis.value;
-            const santri = State.santriData.find(s => s.id === DOM.namaSantri.value);
-            let juzOptions = [];
-            if (jenisValue && santri) {
-                if (jenisValue === 'Mutqin') {
-                    if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" });
-                    const availableJuz = Object.keys(AppConfig.hafalanData.surahData);
-                    availableJuz.forEach(juzNum => {
-                        if (!santri.mutqinJuz.has(parseInt(juzNum))) {
-                            juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum });
-                        }
-                    });
-                } else {
-                    Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => {
-                        juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum });
-                    });
-                }
-            }
-            Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz');
-            DOM.juz.disabled = !jenisValue;
-            DOM.juz.dispatchEvent(new Event('change'));
-        });
-
-        DOM.juz.addEventListener('change', () => {
-            const jenisValue = DOM.jenis.value;
-            const juzValue = DOM.juz.value;
-            ['halaman', 'surat'].forEach(key => {
-                DOM[`${key}Container`].classList.add('hidden');
-                DOM[key].disabled = true;
-                DOM[key].required = false;
-            });
-            if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return;
-            const juzNum = parseInt(juzValue, 10);
-            if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) {
-                DOM.suratContainer.classList.remove('hidden');
-                DOM.surat.disabled = false;
-                DOM.surat.required = true;
-                Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat');
-            } else {
-                DOM.halamanContainer.classList.remove('hidden');
-                DOM.halaman.disabled = false;
-                DOM.halaman.required = jenisValue !== 'Mutqin';
-                if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz';
-            }
-        });
-
-        // -- Filter & Pencarian Riwayat --
-        [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
-        DOM.searchRiwayat.addEventListener('input', e => {
-            clearTimeout(State.searchDebounceTimer);
-            State.searchDebounceTimer = setTimeout(() => {
-                UI.renderHistoryTable();
-                const query = e.target.value;
-                if (query.length < 2) {
-                    DOM.suggestionsContainer.classList.add('hidden');
-                    return;
-                }
-                const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
-                if (suggestions.length > 0) {
-                    DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join('');
-                    DOM.suggestionsContainer.classList.remove('hidden');
-                } else {
-                    DOM.suggestionsContainer.classList.add('hidden');
-                }
-            }, 300);
-        });
-        DOM.suggestionsContainer.addEventListener('click', e => {
-            if (e.target.matches('.suggestion-item')) {
-                DOM.searchRiwayat.value = e.target.textContent;
-                DOM.suggestionsContainer.classList.add('hidden');
-                UI.renderHistoryTable();
-            }
-        });
-
-        // -- Konfirmasi Hapus Data (Password) --
+        // --- Modal & Form Helpers ---
         DOM.cancelPasswordBtn.addEventListener('click', () => DOM.passwordConfirmModal.classList.add('hidden'));
         DOM.confirmPasswordBtn.addEventListener('click', async () => {
             const inputPass = DOM.passwordInput.value;
-            if (!inputPass) {
-                 DOM.passwordError.textContent = "Masukkan kata sandi.";
-                 DOM.passwordError.classList.remove('hidden');
-                 return;
-            }
+            if (!inputPass) { DOM.passwordError.textContent = "Masukkan kata sandi."; DOM.passwordError.classList.remove('hidden'); return; }
             DOM.passwordError.classList.add('hidden');
             const setoran = State.allSetoran.find(s => s.id === State.setoranIdToDelete);
             if (!setoran) return;
-
-            const originalText = DOM.confirmPasswordBtn.textContent;
-            DOM.confirmPasswordBtn.textContent = "Memverifikasi...";
-            DOM.confirmPasswordBtn.disabled = true;
-            DOM.cancelPasswordBtn.disabled = true;
-
-            const formData = new FormData();
-            formData.append('action', 'delete');
-            formData.append('rowNumber', setoran.rowNumber);
-            formData.append('password', inputPass);
-
-            try {
-                const data = await Utils.postData(formData);
-                if (data.result === 'success') {
-                    UI.showToast('Data berhasil dihapus.');
-                    DOM.passwordConfirmModal.classList.add('hidden');
-                    DOM.passwordInput.value = '';
-                    await Core.reloadData();
-                } else {
-                    if (data.error === 'Kata sandi salah.') {
-                        DOM.passwordError.textContent = "Kata sandi salah.";
-                        DOM.passwordError.classList.remove('hidden');
-                    } else {
-                        DOM.passwordConfirmModal.classList.add('hidden');
-                        UI.showToast(`Gagal: ${data.error}`, 'error');
-                    }
-                }
-            } catch (error) {
-                console.error(error);
-                UI.showToast('Terjadi kesalahan koneksi.', 'error');
-            } finally {
-                DOM.confirmPasswordBtn.textContent = originalText;
-                DOM.confirmPasswordBtn.disabled = false;
-                DOM.cancelPasswordBtn.disabled = false;
-            }
+            const originalText = DOM.confirmPasswordBtn.textContent; DOM.confirmPasswordBtn.textContent = "Memverifikasi..."; DOM.confirmPasswordBtn.disabled = true; DOM.cancelPasswordBtn.disabled = true;
+            const formData = new FormData(); formData.append('action', 'delete'); formData.append('rowNumber', setoran.rowNumber); formData.append('password', inputPass);
+            try { const data = await Utils.postData(formData); if (data.result === 'success') { UI.showToast('Data berhasil dihapus.'); DOM.passwordConfirmModal.classList.add('hidden'); DOM.passwordInput.value = ''; await Core.reloadData(); } else { if (data.error === 'Kata sandi salah.') { DOM.passwordError.textContent = "Kata sandi salah."; DOM.passwordError.classList.remove('hidden'); } else { DOM.passwordConfirmModal.classList.add('hidden'); UI.showToast(`Gagal: ${data.error}`, 'error'); } } } catch (error) { UI.showToast('Terjadi kesalahan koneksi.', 'error'); } finally { DOM.confirmPasswordBtn.textContent = originalText; DOM.confirmPasswordBtn.disabled = false; DOM.cancelPasswordBtn.disabled = false; }
         });
         
-        // -- Help Modal --
         DOM.helpButton.addEventListener('click', () => DOM.helpModal.classList.remove('hidden'));
         DOM.closeHelpModal.addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
         DOM.helpModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
+        
+        // --- Form Dependency Logic ---
+        DOM.musyrif.addEventListener('change', () => { const musyrifValue = DOM.musyrif.value; const santriOptions = musyrifValue ? State.rawSantriList.filter(s => s.musyrif === musyrifValue).sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id })) : []; Utils.populateSelect(DOM.namaSantri, santriOptions, 'Pilih Santri'); DOM.namaSantri.disabled = !musyrifValue; DOM.namaSantri.dispatchEvent(new Event('change')); });
+        DOM.namaSantri.addEventListener('change', () => { const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value); const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value); DOM.kelas.value = santri?.kelas || ''; DOM.program.value = santri?.program || ''; DOM.santriId.value = santri?.id || ''; const isTuntas = santriProcessed ? santriProcessed.isTuntas : false; const jenisOptions = santri ? (santri.program === "Unggulan" || (santri.program === "Tahfizh" && isTuntas) ? ["Ziyadah", "Murajaah", "Mutqin"] : ["Murajaah", "Mutqin"]) : []; Utils.populateSelect(DOM.jenis, jenisOptions, 'Pilih Jenis'); DOM.jenis.disabled = !santri; DOM.jenis.dispatchEvent(new Event('change')); });
+        DOM.jenis.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const santri = State.santriData.find(s => s.id === DOM.namaSantri.value); let juzOptions = []; if (jenisValue && santri) { if (jenisValue === 'Mutqin') { if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" }); const availableJuz = Object.keys(AppConfig.hafalanData.surahData); availableJuz.forEach(juzNum => { if (!santri.mutqinJuz.has(parseInt(juzNum))) { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); } }); } else { Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); }); } } Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz'); DOM.juz.disabled = !jenisValue; DOM.juz.dispatchEvent(new Event('change')); });
+        DOM.juz.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const juzValue = DOM.juz.value; ['halaman', 'surat'].forEach(key => { DOM[`${key}Container`].classList.add('hidden'); DOM[key].disabled = true; DOM[key].required = false; }); if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; const juzNum = parseInt(juzValue, 10); if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { DOM.suratContainer.classList.remove('hidden'); DOM.surat.disabled = false; DOM.surat.required = true; Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); } else { DOM.halamanContainer.classList.remove('hidden'); DOM.halaman.disabled = false; DOM.halaman.required = jenisValue !== 'Mutqin'; if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz'; } });
+
+        // -- Filter & Search ---
+        [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
+        DOM.searchRiwayat.addEventListener('input', e => { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { UI.renderHistoryTable(); const query = e.target.value; if (query.length < 2) { DOM.suggestionsContainer.classList.add('hidden'); return; } const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5); if (suggestions.length > 0) { DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join(''); DOM.suggestionsContainer.classList.remove('hidden'); } else { DOM.suggestionsContainer.classList.add('hidden'); } }, 300); });
+        DOM.suggestionsContainer.addEventListener('click', e => { if (e.target.matches('.suggestion-item')) { DOM.searchRiwayat.value = e.target.textContent; DOM.suggestionsContainer.classList.add('hidden'); UI.renderHistoryTable(); } });
     }
 
-    /**
-     * Validasi sederhana form setoran sebelum dikirim.
-     */
     function validateForm() {
         let isValid = true;
         document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
-        
-        const requiredFields = [
-            { id: 'tanggal', message: 'Tanggal tidak boleh kosong.' },
-            { id: 'musyrif', message: 'Musyrif harus dipilih.' },
-            { id: 'namaSantri', message: 'Nama santri harus dipilih.' },
-            { id: 'jenis', message: 'Jenis setoran harus dipilih.' },
-            { id: 'juz', message: 'Juz harus dipilih.' }
-        ];
-
-        requiredFields.forEach(field => {
-            const input = DOM[field.id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase())];
-            if (!input.value) {
-                const errorEl = input.nextElementSibling;
-                if (errorEl && errorEl.classList.contains('form-error')) {
-                    errorEl.textContent = field.message;
-                    errorEl.style.display = 'block';
-                }
-                isValid = false;
-            }
-        });
-
-        if (DOM.halaman.required && !DOM.halaman.value) {
-            DOM.halaman.nextElementSibling.style.display = 'block';
-            isValid = false;
-        }
-        if (DOM.surat.required && !DOM.surat.value) {
-            DOM.surat.nextElementSibling.style.display = 'block';
-            isValid = false;
-        }
-
+        const requiredFields = [ { id: 'tanggal', message: 'Tanggal tidak boleh kosong.' }, { id: 'musyrif', message: 'Musyrif harus dipilih.' }, { id: 'namaSantri', message: 'Nama santri harus dipilih.' }, { id: 'jenis', message: 'Jenis setoran harus dipilih.' }, { id: 'juz', message: 'Juz harus dipilih.' } ];
+        requiredFields.forEach(field => { const input = DOM[field.id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase())]; if (!input.value) { const errorEl = input.nextElementSibling; if (errorEl && errorEl.classList.contains('form-error')) { errorEl.textContent = field.message; errorEl.style.display = 'block'; } isValid = false; } });
+        if (DOM.halaman.required && !DOM.halaman.value) { DOM.halaman.nextElementSibling.style.display = 'block'; isValid = false; }
+        if (DOM.surat.required && !DOM.surat.value) { DOM.surat.nextElementSibling.style.display = 'block'; isValid = false; }
         return isValid;
     }
 
@@ -1545,19 +1220,19 @@ document.addEventListener('DOMContentLoaded', () => {
     async function main() {
         cacheDOMElements();
         setupEventListeners();
-        
-        // Set halaman default
         UI.switchPage('page-beranda');
-
-        // Jalankan jam
         UI.updateDateTime();
         setInterval(UI.updateDateTime, 1000);
-
-        // Tarik data awal
+        
+        // 1. Coba ambil data (with loading screen)
         await Core.reloadData();
         
-        // Matikan loading skeleton
-        UI.switchPage('page-beranda', false);
+        // 2. Tampilkan Role Selection Modal (sebelum switch page)
+        DOM.roleSelectionModal.classList.remove('hidden');
+        DOM.mainLayout.classList.add('hidden');
+
+        // 3. Matikan loading skeleton setelah data dimuat
+        UI.switchPage('page-beranda', false); 
     }
 
     main();
