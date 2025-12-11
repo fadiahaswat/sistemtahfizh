@@ -1285,8 +1285,69 @@ document.addEventListener('DOMContentLoaded', () => {
         // -- Form Dependency & Filter/Search & Delete (Tidak Berubah) --
         DOM.musyrif.addEventListener('change', () => { const musyrifValue = DOM.musyrif.value; const santriOptions = musyrifValue ? State.rawSantriList.filter(s => s.musyrif === musyrifValue).sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id })) : []; Utils.populateSelect(DOM.namaSantri, santriOptions, 'Pilih Santri'); DOM.namaSantri.disabled = !musyrifValue; DOM.namaSantri.dispatchEvent(new Event('change')); });
         DOM.namaSantri.addEventListener('change', () => { const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value); const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value); DOM.kelas.value = santri?.kelas || ''; DOM.program.value = santri?.program || ''; DOM.santriId.value = santri?.id || ''; const isTuntas = santriProcessed ? santriProcessed.isTuntas : false; const jenisOptions = santri ? (santri.program === "Unggulan" || (santri.program === "Tahfizh" && isTuntas) ? ["Ziyadah", "Murajaah", "Mutqin"] : ["Murajaah", "Mutqin"]) : []; Utils.populateSelect(DOM.jenis, jenisOptions, 'Pilih Jenis'); DOM.jenis.disabled = !santri; DOM.jenis.dispatchEvent(new Event('change')); });
-        DOM.jenis.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const santri = State.santriData.find(s => s.id === DOM.namaSantri.value); let juzOptions = []; if (jenisValue && santri) { if (jenisValue === 'Mutqin') { if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" }); const availableJuz = Object.keys(AppConfig.hafalanData.surahData); availableJuz.forEach(juzNum => { if (!santri.mutqinJuz.has(parseInt(juzNum))) { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); } }); } else { Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); }); } } Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz'); DOM.juz.disabled = !jenisValue; DOM.juz.dispatchEvent(new Event('change')); });
-        DOM.juz.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const juzValue = DOM.juz.value; ['halaman', 'surat'].forEach(key => { DOM[`${key}Container`].classList.add('hidden'); DOM[key].disabled = true; DOM[key].required = false; }); if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; const juzNum = parseInt(juzValue, 10); if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { DOM.suratContainer.classList.remove('hidden'); DOM.surat.disabled = false; DOM.surat.required = true; Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); } else { DOM.halamanContainer.classList.remove('hidden'); DOM.halaman.disabled = false; DOM.halaman.required = jenisValue !== 'Mutqin'; if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz'; } });
+        // ... (Di dalam fungsi setupEventListeners di app.js)
+
+        DOM.jenis.addEventListener('change', () => { 
+            const jenisValue = DOM.jenis.value; 
+            const santri = State.santriData.find(s => s.id === DOM.namaSantri.value); 
+            let juzOptions = []; 
+            
+            // CEK KEAMANAN DATA: Pastikan data hafalan sudah dimuat
+            if (!AppConfig.hafalanData || !AppConfig.hafalanData.surahData) {
+                // Jika belum ada data, jangan error, tapi beri notif atau log
+                console.warn("Data hafalan belum siap.");
+                return;
+            }
+
+            if (jenisValue && santri) { 
+                if (jenisValue === 'Mutqin') { 
+                    if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" }); 
+                    const availableJuz = Object.keys(AppConfig.hafalanData.surahData); 
+                    availableJuz.forEach(juzNum => { 
+                        if (!santri.mutqinJuz.has(parseInt(juzNum))) { 
+                            juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); 
+                        } 
+                    }); 
+                } else { 
+                    Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => { 
+                        juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); 
+                    }); 
+                } 
+            } 
+            Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz'); 
+            DOM.juz.disabled = !jenisValue; 
+            DOM.juz.dispatchEvent(new Event('change')); 
+        });
+
+        DOM.juz.addEventListener('change', () => { 
+            const jenisValue = DOM.jenis.value; 
+            const juzValue = DOM.juz.value; 
+            
+            ['halaman', 'surat'].forEach(key => { 
+                DOM[`${key}Container`].classList.add('hidden'); 
+                DOM[key].disabled = true; 
+                DOM[key].required = false; 
+            }); 
+            
+            if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; 
+            
+            // CEK KEAMANAN DATA LAGI
+            if (!AppConfig.hafalanData || !AppConfig.hafalanData.surahData) return;
+
+            const juzNum = juzValue; 
+            
+            if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { 
+                DOM.suratContainer.classList.remove('hidden'); 
+                DOM.surat.disabled = false; 
+                DOM.surat.required = true; 
+                Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); 
+            } else { 
+                DOM.halamanContainer.classList.remove('hidden'); 
+                DOM.halaman.disabled = false; 
+                DOM.halaman.required = jenisValue !== 'Mutqin'; 
+                if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz'; 
+            } 
+        });
 
         [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
         DOM.searchRiwayat.addEventListener('input', e => { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { UI.renderHistoryTable(); const query = e.target.value; if (query.length < 2) { DOM.suggestionsContainer.classList.add('hidden'); return; } const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5); if (suggestions.length > 0) { DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join(''); DOM.suggestionsContainer.classList.remove('hidden'); } else { DOM.suggestionsContainer.classList.add('hidden'); } }, 300); });
