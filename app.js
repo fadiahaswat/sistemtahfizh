@@ -1116,55 +1116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-                // --- LOGIC MULTI-INPUT (QUEUE) ---
         
-        // 1. Handle Tombol Tambah
-        DOM.addToQueueBtn.addEventListener('click', () => {
-            // Validasi input saat ini dulu
-            if (!validateForm()) return;
-        
-            // Ambil data dari form saat ini
-            const formData = new FormData(DOM.setoranForm);
-            
-            // Buat object item untuk antrian
-            const item = {
-                id: Date.now(), // ID unik sementara
-                musyrif: DOM.musyrif.value,
-                namaSantri: DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text,
-                santriId: DOM.santriId.value,
-                kelas: DOM.kelas.value,
-                program: DOM.program.value,
-                jenis: DOM.jenis.value,
-                juz: DOM.juz.value,
-                // Logika ambil halaman atau surat
-                halaman: (!DOM.halaman.disabled && DOM.halaman.value) ? DOM.halaman.value : '',
-                surat: (!DOM.surat.disabled && DOM.surat.value) ? DOM.surat.value : '',
-                tanggal: DOM.tanggal.value,
-                kualitas: 'Lancar' // Default value dari hidden input
-            };
-        
-            // Tambahkan ke State
-            State.setoranQueue.push(item);
-        
-            // Render UI Antrian
-            renderQueueUI();
-        
-            // Reset Input Parsial (Hanya bagian hafalan, nama/musyrif jangan direset biar cepat)
-            resetHafalanInputs();
-            
-            UI.showToast('Ditambahkan ke daftar. Klik (+) lagi untuk tambah atau Simpan Setoran untuk kirim.', 'success');
-        });
-        
-        // 2. Handle Hapus Item dari Antrian (Event Delegation)
-        DOM.queueList.addEventListener('click', (e) => {
-            const removeBtn = e.target.closest('.remove-queue-item');
-            if (removeBtn) {
-                const id = Number(removeBtn.dataset.id);
-                State.setoranQueue = State.setoranQueue.filter(i => i.id !== id);
-                renderQueueUI();
-            }
-        });
-
         DOM.backRoleBtn.addEventListener('click', () => {
             DOM.musyrifLoginForm.classList.add('hidden');
             DOM.roleButtonsContainer.classList.remove('hidden');
@@ -1198,38 +1150,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- LOGIC BARU UNTUK SUBMIT FORM ---
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-        
-            // Skenario 1: Antrian Kosong (Perilaku Normal / Single Submit)
-            // Kode ini persis seperti kode lama Anda, hanya dibungkus if
-            if (State.setoranQueue.length === 0) {
-                if (!validateForm()) return;
-        
-                // UI Loading
-                uiToggleLoading(true);
-        
-                const formData = new FormData(e.target);
-                formData.set('namaSantri', DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text);
-        
-                if (State.currentRole === 'musyrif' && State.userPassword) {
-                    formData.append('password', State.userPassword);
-                }
-        
-                const data = await Utils.postData(formData);
-                handleSingleResult(data, e.target);
-            } 
-            // Skenario 2: Ada Antrian (Multi Submit / Batch)
-            else {
-                await processBatchSubmit();
-            }
-        });
-        
-        // --- LOGIC TOMBOL TAMBAH (+) ---
-        DOM.addToQueueBtn.addEventListener('click', () => {
-            if (!validateForm()) return; // Pastikan data saat ini valid dulu
-        
-            // Ambil nilai dari form saat ini
-            const item = {
-                id: Date.now(), // ID unik sementara
+            if (!validateForm()) return;
+
+            // UI Loading
+            const btn = DOM.submitButton;
+            btn.disabled = true;
+            DOM.submitButtonText.textContent = 'Memproses...';
+            DOM.submitButtonIcon.classList.add('hidden');
+            DOM.submitSpinner.classList.remove('hidden');
+            
+            // 1. Kumpulkan Data Dasar
+            const baseData = {
                 musyrif: DOM.musyrif.value,
                 namaSantri: DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text,
                 santriId: DOM.santriId.value,
@@ -1237,30 +1168,84 @@ document.addEventListener('DOMContentLoaded', () => {
                 program: DOM.program.value,
                 jenis: DOM.jenis.value,
                 juz: DOM.juz.value,
-                // Ambil halaman ATAU surat tergantung input yg aktif
-                halaman: (!DOM.halaman.disabled && DOM.halaman.value) ? DOM.halaman.value : '',
-                surat: (!DOM.surat.disabled && DOM.surat.value) ? DOM.surat.value : '',
                 tanggal: DOM.tanggal.value,
-                kualitas: 'Lancar' 
+                kualitas: 'Lancar'
             };
-        
-            // Masukkan ke State
-            State.setoranQueue.push(item);
-            
-            // Update Tampilan & Reset Form sebagian
-            renderQueueUI();
-            resetHafalanInputs(); 
-            UI.showToast('Ditambahkan ke daftar. Isi lagi atau klik Simpan.', 'success');
-        });
 
-        // Logic Hapus Item dari Antrian
-        DOM.queueList.addEventListener('click', (e) => {
-            const btn = e.target.closest('.remove-queue-item');
-            if (btn) {
-                State.setoranQueue = State.setoranQueue.filter(i => i.id != btn.dataset.id);
-                renderQueueUI();
+            // 2. Siapkan Antrian Pengiriman (Payload List)
+            let payloads = [];
+
+            // A. Jika Input Menggunakan LIST SURAT (Ziyadah/Murajaah per surat)
+            if (!DOM.suratContainer.classList.contains('hidden')) {
+                const checkedSurat = document.querySelectorAll('.surat-checkbox:checked');
+                
+                // Loop setiap surat yang dicentang
+                checkedSurat.forEach(checkbox => {
+                    payloads.push({
+                        ...baseData,
+                        surat: checkbox.value,  // Nama surat beda-beda tiap baris
+                        halaman: ''             // Halaman kosong
+                    });
+                });
+            } 
+            // B. Jika Input Menggunakan HALAMAN / MUTQIN 1 JUZ
+            else {
+                payloads.push({
+                    ...baseData,
+                    surat: '',
+                    halaman: DOM.halaman.value
+                });
             }
+
+            // 3. PROSES PENGIRIMAN (LOOPING)
+            let successCount = 0;
+            let failCount = 0;
+            
+            // Update teks tombol agar user tahu ada berapa data
+            DOM.submitButtonText.textContent = `Mengirim 0/${payloads.length}...`;
+
+            for (const [index, item] of payloads.entries()) {
+                const formData = new FormData();
+                for (const key in item) {
+                    formData.append(key, item[key]);
+                }
+                if (State.currentRole === 'musyrif' && State.userPassword) {
+                    formData.append('password', State.userPassword);
+                }
+
+                try {
+                    // Kirim Data
+                    DOM.submitButtonText.textContent = `Mengirim ${index + 1}/${payloads.length}...`;
+                    const res = await Utils.postData(formData);
+                    
+                    if (res.result === 'success') successCount++;
+                    else failCount++;
+                    
+                } catch (err) {
+                    console.error(err);
+                    failCount++;
+                }
+            }
+
+            // 4. HASIL AKHIR
+            if (failCount === 0) {
+                UI.showToast(`Sukses! ${successCount} hafalan tersimpan.`, 'success');
+                e.target.reset();
+                DOM.suratChecklistArea.innerHTML = ''; // Bersihkan checklist
+                DOM.namaSantri.dispatchEvent(new Event('change'));
+                await Core.reloadData();
+            } else {
+                UI.showToast(`${successCount} sukses, ${failCount} gagal. Cek koneksi.`, 'warning');
+                await Core.reloadData();
+            }
+            
+            // Reset Tombol
+            btn.disabled = false;
+            DOM.submitButtonText.textContent = State.currentRole === 'musyrif' ? 'Simpan Setoran' : 'Kirim untuk Validasi';
+            DOM.submitButtonIcon.classList.remove('hidden');
+            DOM.submitSpinner.classList.add('hidden');
         });
+        
         // --- Navigation (Tidak Berubah) ---
         DOM.nowBtn.addEventListener('click', () => {
             const now = new Date();
