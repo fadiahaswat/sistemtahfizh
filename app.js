@@ -1038,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. EVENT LISTENERS
     // ==========================================
     function setupEventListeners() {
-        // --- ROLE SELECTION ---
+        // --- ROLE SELECTION (Tidak Berubah) ---
         DOM.roleButtonsContainer.addEventListener('click', e => {
             const btn = e.target.closest('.role-btn');
             if (!btn) return;
@@ -1088,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.roleButtonsContainer.classList.remove('hidden');
         });
 
-        // --- FORM HANDLING ---
+        // --- FORM HANDLING (Tidak Berubah) ---
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!validateForm()) return;
@@ -1126,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.submitSpinner.classList.add('hidden');
         });
 
-        // --- Navigation ---
+        // --- Navigation (Tidak Berubah) ---
         DOM.nowBtn.addEventListener('click', () => {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -1138,18 +1138,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (link) { e.preventDefault(); UI.switchPage(link.dataset.page); }
         });
 
-        // --- Event Delegation ---
+        // --- Event Delegation (BAGIAN INI DIPERBAIKI) ---
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
             const tabBtn = e.target.closest('.analisis-tab');
 
             if (button && button.matches('[data-target-page]')) { UI.switchPage(button.dataset.targetPage); return; }
 
+            // -----------------------------------------------------
+            // PERBAIKAN 2: TAB ANALISIS (AKTIF/TIDAK AKTIF)
+            // -----------------------------------------------------
             if (tabBtn) {
                 const targetId = tabBtn.dataset.target;
-                const parent = tabBtn.parentElement;
-                parent.querySelectorAll('.analisis-tab').forEach(t => t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm'));
-                tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm');
+                // Pastikan selector parent mengambil container yang benar (biasanya div flex)
+                const parent = tabBtn.parentElement; 
+                
+                // Reset SEMUA tab di container ini
+                parent.querySelectorAll('.analisis-tab').forEach(t => {
+                    // Hapus style aktif
+                    t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm');
+                    // Tambahkan style inaktif (supaya terlihat abu-abu/redup)
+                    t.classList.add('text-slate-500', 'hover:bg-slate-50'); 
+                });
+
+                // Set tab yang diklik jadi AKTIF
+                tabBtn.classList.remove('text-slate-500', 'hover:bg-slate-50'); // Hapus style inaktif
+                tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm'); // Tambah style aktif
+
+                // Switch Content
                 DOM.analisisContentContainer.querySelectorAll('.analisis-tab-content').forEach(c => c.classList.add('hidden'));
                 const targetPanel = DOM.analisisContentContainer.querySelector(`#${targetId}`);
                 if(targetPanel) targetPanel.classList.remove('hidden');
@@ -1158,9 +1174,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!button) return;
 
-            if (button.matches('.export-pdf-btn')) { UI.exportRecapToPDF(button.dataset.classGroup); } 
-            else if (button.matches('.delete-btn')) { State.setoranIdToDelete = button.dataset.id; DOM.passwordConfirmModal.classList.remove('hidden'); } 
-            else if (button.matches('.accordion-button')) { const panel = button.closest('h2').nextElementSibling; panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`; button.querySelector('.accordion-chevron').classList.toggle('rotate-180'); } 
+            if (button.matches('.export-pdf-btn')) { 
+                UI.exportRecapToPDF(button.dataset.classGroup); 
+            } 
+            else if (button.matches('.delete-btn')) { 
+                State.setoranIdToDelete = button.dataset.id; 
+                DOM.passwordConfirmModal.classList.remove('hidden'); 
+            } 
+            // -----------------------------------------------------
+            // PERBAIKAN 1: AKORDEON (LOGIKA BUKA/TUTUP)
+            // -----------------------------------------------------
+            else if (button.matches('.accordion-button')) { 
+                // Menggunakan parentElement untuk fallback jika tidak dibungkus <h2>
+                const headerContainer = button.closest('h2') || button.parentElement;
+                const panel = headerContainer.nextElementSibling; 
+                
+                if (panel) {
+                    const chevron = button.querySelector('.accordion-chevron');
+                    
+                    // Cek apakah sedang terbuka (maxHeight ada nilainya)
+                    if (panel.style.maxHeight) {
+                        // Jika terbuka -> TUTUP
+                        panel.style.maxHeight = null;
+                        if(chevron) chevron.classList.remove('rotate-180');
+                    } else {
+                        // Jika tertutup -> BUKA
+                        panel.style.maxHeight = `${panel.scrollHeight}px`;
+                        if(chevron) chevron.classList.add('rotate-180');
+                    }
+                }
+            } 
             else if (button.matches('.sortable')) {
                 const column = button.dataset.sort;
                 const tabContent = button.closest('.rekap-tab-content');
@@ -1186,18 +1229,16 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.closeDetailModal.addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
         DOM.studentDetailModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
 
-        // -- Form Dependency --
+        // -- Form Dependency & Filter/Search & Delete (Tidak Berubah) --
         DOM.musyrif.addEventListener('change', () => { const musyrifValue = DOM.musyrif.value; const santriOptions = musyrifValue ? State.rawSantriList.filter(s => s.musyrif === musyrifValue).sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id })) : []; Utils.populateSelect(DOM.namaSantri, santriOptions, 'Pilih Santri'); DOM.namaSantri.disabled = !musyrifValue; DOM.namaSantri.dispatchEvent(new Event('change')); });
         DOM.namaSantri.addEventListener('change', () => { const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value); const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value); DOM.kelas.value = santri?.kelas || ''; DOM.program.value = santri?.program || ''; DOM.santriId.value = santri?.id || ''; const isTuntas = santriProcessed ? santriProcessed.isTuntas : false; const jenisOptions = santri ? (santri.program === "Unggulan" || (santri.program === "Tahfizh" && isTuntas) ? ["Ziyadah", "Murajaah", "Mutqin"] : ["Murajaah", "Mutqin"]) : []; Utils.populateSelect(DOM.jenis, jenisOptions, 'Pilih Jenis'); DOM.jenis.disabled = !santri; DOM.jenis.dispatchEvent(new Event('change')); });
         DOM.jenis.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const santri = State.santriData.find(s => s.id === DOM.namaSantri.value); let juzOptions = []; if (jenisValue && santri) { if (jenisValue === 'Mutqin') { if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" }); const availableJuz = Object.keys(AppConfig.hafalanData.surahData); availableJuz.forEach(juzNum => { if (!santri.mutqinJuz.has(parseInt(juzNum))) { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); } }); } else { Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); }); } } Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz'); DOM.juz.disabled = !jenisValue; DOM.juz.dispatchEvent(new Event('change')); });
         DOM.juz.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const juzValue = DOM.juz.value; ['halaman', 'surat'].forEach(key => { DOM[`${key}Container`].classList.add('hidden'); DOM[key].disabled = true; DOM[key].required = false; }); if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; const juzNum = parseInt(juzValue, 10); if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { DOM.suratContainer.classList.remove('hidden'); DOM.surat.disabled = false; DOM.surat.required = true; Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); } else { DOM.halamanContainer.classList.remove('hidden'); DOM.halaman.disabled = false; DOM.halaman.required = jenisValue !== 'Mutqin'; if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz'; } });
 
-        // -- Filter & Search --
         [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
         DOM.searchRiwayat.addEventListener('input', e => { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { UI.renderHistoryTable(); const query = e.target.value; if (query.length < 2) { DOM.suggestionsContainer.classList.add('hidden'); return; } const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5); if (suggestions.length > 0) { DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join(''); DOM.suggestionsContainer.classList.remove('hidden'); } else { DOM.suggestionsContainer.classList.add('hidden'); } }, 300); });
         DOM.suggestionsContainer.addEventListener('click', e => { if (e.target.matches('.suggestion-item')) { DOM.searchRiwayat.value = e.target.textContent; DOM.suggestionsContainer.classList.add('hidden'); UI.renderHistoryTable(); } });
 
-        // -- Delete Action --
         DOM.cancelPasswordBtn.addEventListener('click', () => DOM.passwordConfirmModal.classList.add('hidden'));
         DOM.confirmPasswordBtn.addEventListener('click', async () => {
             const inputPass = DOM.passwordInput.value;
@@ -1214,17 +1255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.closeHelpModal.addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
         DOM.helpModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
     }
-
-    function validateForm() {
-        let isValid = true;
-        document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
-        const requiredFields = [ { id: 'tanggal', message: 'Tanggal tidak boleh kosong.' }, { id: 'musyrif', message: 'Musyrif harus dipilih.' }, { id: 'namaSantri', message: 'Nama santri harus dipilih.' }, { id: 'jenis', message: 'Jenis setoran harus dipilih.' }, { id: 'juz', message: 'Juz harus dipilih.' } ];
-        requiredFields.forEach(field => { const input = DOM[field.id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase())]; if (!input.value) { const errorEl = input.nextElementSibling; if (errorEl && errorEl.classList.contains('form-error')) { errorEl.textContent = field.message; errorEl.style.display = 'block'; } isValid = false; } });
-        if (DOM.halaman.required && !DOM.halaman.value) { DOM.halaman.nextElementSibling.style.display = 'block'; isValid = false; }
-        if (DOM.surat.required && !DOM.surat.value) { DOM.surat.nextElementSibling.style.display = 'block'; isValid = false; }
-        return isValid;
-    }
-
+    
     // ==========================================
     // 7. INITIALIZATION
     // ==========================================
