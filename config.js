@@ -1,25 +1,20 @@
-// fadiahaswat/sistemtahfizh/sistemtahfizh-f3e71de63eb81c563f668c79024fb682052f4819/config.js
-
 const AppConfig = {
-    // URL Web App Google Apps Script Anda
+    // URL Web App Google Apps Script Anda (PASTIKAN INI URL TERBARU SETELAH DEPLOY)
     scriptURL: 'https://script.google.com/macros/s/AKfycbyl2FCcGUtolkJIDsoiTYFKeKp8IQwHT0V3z8n1pOHH9CLiyvYZTBaimrojILJM_A-HLg/exec',
 
-    // [BARU] Konfigurasi Nama Grup Kelas Khusus
-    // Format: 'Nama Musyrif': 'Nama Tampilan Grup'
+    // Konfigurasi Nama Grup Kelas Khusus
     classGroupOverrides: {
         'Muhammad Zhafir Setiaji': '2CDGH',
-        // Tambahkan mapping lain di sini jika diperlukan nanti
-        // Contoh: 'Abdullah': 'Kelas Khusus'
     },
     
     // Urutan Musyrif di Dropdown
     musyrifSortOrder: ['Andi Aqillah Fadia Haswat', 'Abdullah', 'Muhammad Zhafir Setiaji'], 
     
-    // Deadline Existing
+    // Deadline
     deadlineJuz30Score: new Date('2026-01-03T23:59:59'),
     deadlineTahfizhTuntas: new Date('2025-09-30T23:59:59'),
 
-    // --- FITUR BARU: Konfigurasi Perpulangan ---
+    // Perpulangan
     perpulanganPeriods: [
         { name: 'Periode 1', deadline: new Date('2025-08-16T13:00:00'), required: ["An-Naba", "An-Nazi'at"], type: 'surat' },
         { name: 'Periode 2', deadline: new Date('2025-09-06T13:00:00'), required: ["An-Naba", "An-Nazi'at", 'Abasa'], type: 'surat' },
@@ -29,7 +24,7 @@ const AppConfig = {
         { name: 'Periode 6', deadline: new Date('2026-01-03T13:00:00'), required: ['juz30_setengah'], type: 'mutqin' }
     ],
 
-    // --- FITUR BARU: Tier Penilaian Otomatis ---
+    // Scoring
     scoringTiers: [
         { score: 80, required: ["An-Naba", "An-Nazi'at", 'Abasa', 'At-Takwir', 'Al-Infithor', 'Al-Muthoffifin', 'Al-Insyiqaq', 'Al-Buruj', 'Ath-Thariq'] },
         { score: 76, required: ["An-Naba", "An-Nazi'at", 'Abasa', 'At-Takwir', 'Al-Infithor', 'Al-Muthoffifin', 'Al-Insyiqaq', 'Al-Buruj'] },
@@ -42,9 +37,8 @@ const AppConfig = {
         { score: 12, required: ['An-Naba'] }
     ],
     
-    // Mengambil data dari file data-hafalan.js
-    hafalanData: HAFALAN_DATA,
+    // [PENTING] Set null agar diisi oleh data dari Spreadsheet
+    hafalanData: null, 
     
-    // Santri List TETAP KOSONG agar dinamis dari Google Sheets
     santriList: []
 };
