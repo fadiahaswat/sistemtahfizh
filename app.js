@@ -1535,12 +1535,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 4. Validasi Surat (Khusus jika input surat aktif)
+        // 4. Validasi Surat (MODIFIKASI CHECKLIST)
         if (DOM.suratContainer && !DOM.suratContainer.classList.contains('hidden')) {
-             if (DOM.surat.required && !DOM.surat.value) { 
+             // Cari apakah ada minimal 1 checkbox yang dicentang
+             const checkedSurat = document.querySelectorAll('.surat-checkbox:checked');
+             
+             if (checkedSurat.length === 0) { 
                 const errorEl = DOM.suratContainer.querySelector('.form-error');
                 if(errorEl) {
-                    errorEl.textContent = 'Surat harus dipilih.';
+                    errorEl.textContent = 'Pilih minimal satu surat.';
                     errorEl.style.display = 'block';
                     errorEl.classList.remove('hidden');
                 }
