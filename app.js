@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             queueContainer: 'queue-container',
             queueList: 'queue-list',
             queueCount: 'queue-count',
+            suratChecklistArea: 'surat-checklist-area', // <--- TAMBAHKAN INI
 
             // -- Role Selection Modal --
             roleSelectionModal: 'roleSelectionModal',
