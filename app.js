@@ -1308,7 +1308,78 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.closeHelpModal.addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
         DOM.helpModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
     }
-    
+
+    // ==========================================
+    // FUNGSI VALIDASI FORM (TAMBAHKAN INI)
+    // ==========================================
+    function validateForm() {
+        let isValid = true;
+        
+        // 1. Reset (Sembunyikan) semua pesan error
+        document.querySelectorAll('.form-error').forEach(el => {
+            el.style.display = 'none';
+            el.classList.add('hidden'); 
+        });
+
+        // 2. Validasi Field Utama
+        const requiredFields = [ 
+            { id: 'tanggal', message: 'Tanggal tidak boleh kosong.' }, 
+            { id: 'musyrif', message: 'Musyrif harus dipilih.' }, 
+            { id: 'namaSantri', message: 'Nama santri harus dipilih.' }, 
+            { id: 'jenis', message: 'Jenis setoran harus dipilih.' }, 
+            { id: 'juz', message: 'Juz harus dipilih.' } 
+        ];
+
+        requiredFields.forEach(field => { 
+            const inputId = field.id.replace(/-(\w)/g, (_, p1) => p1.toUpperCase());
+            const input = DOM[inputId]; 
+            
+            if (!input.value) { 
+                // Cari container error terdekat
+                const container = input.closest('.space-y-2, .bg-slate-50'); 
+                const errorEl = container ? container.querySelector('.form-error') : null;
+
+                if (errorEl) { 
+                    errorEl.textContent = field.message; 
+                    errorEl.style.display = 'block'; 
+                    errorEl.classList.remove('hidden'); 
+                } 
+                isValid = false; 
+            } 
+        });
+
+        // 3. Validasi Halaman (Khusus jika input halaman aktif)
+        if (DOM.halamanContainer && !DOM.halamanContainer.classList.contains('hidden')) {
+            if ((DOM.halaman.required && !DOM.halaman.value) || (DOM.halaman.value === '')) {
+                 // Mutqin boleh kosong (default full), tapi Ziyadah wajib isi
+                 if (DOM.jenis.value !== 'Mutqin' && !DOM.halaman.value) {
+                    const errorEl = DOM.halamanContainer.querySelector('.form-error');
+                    if(errorEl) {
+                        errorEl.textContent = 'Jumlah halaman harus diisi.';
+                        errorEl.style.display = 'block';
+                        errorEl.classList.remove('hidden');
+                    }
+                    isValid = false; 
+                 }
+            }
+        }
+
+        // 4. Validasi Surat (Khusus jika input surat aktif)
+        if (DOM.suratContainer && !DOM.suratContainer.classList.contains('hidden')) {
+             if (DOM.surat.required && !DOM.surat.value) { 
+                const errorEl = DOM.suratContainer.querySelector('.form-error');
+                if(errorEl) {
+                    errorEl.textContent = 'Surat harus dipilih.';
+                    errorEl.style.display = 'block';
+                    errorEl.classList.remove('hidden');
+                }
+                isValid = false; 
+            }
+        }
+
+        return isValid;
+    }
+ 
     // ==========================================
     // 7. INITIALIZATION
     // ==========================================
