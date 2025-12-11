@@ -896,6 +896,23 @@ document.addEventListener('DOMContentLoaded', () => {
         reloadData: async () => {
             const response = await Utils.fetchSetoranData(); 
             if (!response || !response.setoran) { console.error("Format data server tidak valid."); return; }
+
+            // --- [BAGIAN INI YANG DIUBAH/DITAMBAHKAN] ---
+            // Proses Data Hafalan dari Spreadsheet (Ref_Juz & Ref_Surat)
+            if (response.refJuz && response.refSurat) {
+                AppConfig.hafalanData = Utils.processHafalanData(response.refJuz, response.refSurat);
+                
+                // Simpan ke cache khusus hafalan (opsional, agar offline tetap jalan lancar)
+                localStorage.setItem('cachedHafalan', JSON.stringify(AppConfig.hafalanData));
+            } else {
+                // Fallback: Ambil dari cache jika API gagal memuat referensi
+                const cachedHafalan = localStorage.getItem('cachedHafalan');
+                if (cachedHafalan) {
+                    AppConfig.hafalanData = JSON.parse(cachedHafalan);
+                } else {
+                    console.error("Data referensi hafalan tidak ditemukan di Server maupun Cache.");
+                }
+            }
             
             // Raw Processing
             State.rawSantriList = (response.santri || []).map(s => ({
