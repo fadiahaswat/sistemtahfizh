@@ -181,6 +181,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // --- [TAMBAHKAN FUNGSI INI DI SINI] ---
+        processHafalanData: (refJuz, refSurat) => {
+            const processed = {
+                juzPageCounts: {},
+                surahData: {}
+            };
+
+            // 1. Proses Juz Page Counts
+            if (refJuz) {
+                refJuz.forEach(item => {
+                    processed.juzPageCounts[item.key] = item.val;
+                });
+            }
+
+            // 2. Proses Surah Data
+            if (refSurat) {
+                refSurat.forEach(item => {
+                    const juzKey = item.juz;
+                    
+                    if (!processed.surahData[juzKey]) {
+                        processed.surahData[juzKey] = {
+                            list: [],
+                            pages: {}
+                        };
+                    }
+
+                    processed.surahData[juzKey].list.push(item.nama);
+                    processed.surahData[juzKey].pages[item.nama] = parseFloat(item.halaman);
+                });
+            }
+
+            return processed;
+        },
+
         postData: async (formData) => {
             try {
                 const response = await fetch(AppConfig.scriptURL, { method: 'POST', body: formData });
