@@ -1407,25 +1407,51 @@ document.addEventListener('DOMContentLoaded', () => {
             const jenisValue = DOM.jenis.value; 
             const juzValue = DOM.juz.value; 
             
-            ['halaman', 'surat'].forEach(key => { 
-                DOM[`${key}Container`].classList.add('hidden'); 
-                DOM[key].disabled = true; 
-                DOM[key].required = false; 
-            }); 
+            // Reset tampilan
+            DOM.halamanContainer.classList.add('hidden');
+            DOM.suratContainer.classList.add('hidden');
+            DOM.halaman.disabled = true;
+            
+            // Bersihkan checklist area
+            DOM.suratChecklistArea.innerHTML = '';
             
             if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; 
-            
-            // CEK KEAMANAN DATA LAGI
-            if (!AppConfig.hafalanData || !AppConfig.hafalanData.surahData) return;
 
+            // Cek Data Hafalan
+            if (!AppConfig.hafalanData || !AppConfig.hafalanData.surahData) return;
             const juzNum = juzValue; 
             
+            // LOGIKA TAMPILAN
             if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { 
+                // Tampilkan Container Surat Checklist
                 DOM.suratContainer.classList.remove('hidden'); 
-                DOM.surat.disabled = false; 
-                DOM.surat.required = true; 
-                Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); 
+                
+                // GENERATE CHECKBOX SURAT
+                const suratList = AppConfig.hafalanData.surahData[juzNum].list;
+                
+                if (suratList.length > 0) {
+                    suratList.forEach((namaSurat, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100 cursor-pointer';
+                        
+                        // Buat Checkbox
+                        // ID unik: surat-0, surat-1, dll
+                        const checkboxId = `chk-surat-${index}`;
+                        div.innerHTML = `
+                            <div class="relative flex items-center">
+                                <input type="checkbox" id="${checkboxId}" value="${namaSurat}" class="surat-checkbox peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-slate-300 transition-all checked:border-brand-500 checked:bg-brand-500 hover:shadow-sm">
+                                <svg class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <label for="${checkboxId}" class="w-full cursor-pointer text-sm font-bold text-slate-700 select-none">${namaSurat}</label>
+                        `;
+                        DOM.suratChecklistArea.appendChild(div);
+                    });
+                } else {
+                    DOM.suratChecklistArea.innerHTML = '<p class="text-xs text-red-400 text-center">Data surat tidak ditemukan.</p>';
+                }
+
             } else { 
+                // Tampilkan Input Halaman (Logic Lama)
                 DOM.halamanContainer.classList.remove('hidden'); 
                 DOM.halaman.disabled = false; 
                 DOM.halaman.required = jenisValue !== 'Mutqin'; 
