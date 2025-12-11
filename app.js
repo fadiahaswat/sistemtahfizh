@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Data Santri
         rawSantriList: [],      
-        santriData: [],         // Data santri terproses
+        santriData: [],         // Data santri terproses lengkap dengan statistik
         classGroups: {},        // Grouping kelas untuk rekap
         
         // Session / Role
@@ -98,9 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
             mutqinJuz29ProgressContainer: 'mutqin-juz29-progress-container',
             mutqinJuz30ProgressContainer: 'mutqin-juz30-progress-container',
             mutqinUnggulanProgressContainer: 'mutqin-unggulan-progress-container',
+            
             mutqinUnggulanCircle: 'mutqin-unggulan-circle',
             mutqinJuz30Circle: 'mutqin-juz30-circle',
             mutqinJuz29Circle: 'mutqin-juz29-circle',
+            
             mutqinUnggulanDetails: 'mutqin-unggulan-details',
             mutqinJuz30Details: 'mutqin-juz30-details',
             mutqinJuz29Details: 'mutqin-juz29-details',
@@ -153,7 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (const [propName, id] of Object.entries(elementMapping)) {
             const element = document.getElementById(id);
-            if (element) DOM[propName] = element;
+            if (element) {
+                DOM[propName] = element;
+            }
         }
         
         DOM.pages = document.querySelectorAll('.page-content');
@@ -175,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Mengambil data offline dari cache...');
                 const cached = localStorage.getItem('cachedData');
                 if (cached) return JSON.parse(cached);
+                
                 UI.showToast('Gagal memuat data (Offline & Cache kosong).', 'error');
                 return [];
             }
@@ -193,7 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         populateSelect: (selectElement, options, placeholder) => {
             selectElement.innerHTML = '';
-            if (placeholder) selectElement.add(new Option(placeholder, ''));
+            if (placeholder) {
+                selectElement.add(new Option(placeholder, ''));
+            }
             options.forEach(opt => {
                 const option = (typeof opt === 'string')
                     ? new Option(opt, opt)
@@ -207,11 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         setText: (element, selector, text) => {
+            if (!element) return;
             const el = element.querySelector(selector);
             if (el) el.textContent = text;
         },
 
         setHTML: (element, selector, html) => {
+            if (!element) return;
             const el = element.querySelector(selector);
             if (el) el.innerHTML = html;
         }
@@ -283,54 +292,44 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.roleSelectionModal.classList.add('hidden');
             DOM.mainLayout.classList.remove('hidden');
             DOM.navItemInput.classList.remove('hidden');
-            DOM.navItemAnalisis.classList.remove('hidden'); 
             DOM.validationSection.classList.add('hidden');
             
-            // Sembunyikan tombol hapus secara default
-            document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
-
-            // 2. Adjust Tampilan
+            // 2. Adjust based on Role
             if (State.currentRole === 'musyrif') {
                 DOM.headerRoleText.textContent = 'Dashboard Musyrif';
                 DOM.appRoleLabel.textContent = 'Mode Admin';
-                DOM.submitButtonText.textContent = 'Simpan Setoran';
-                DOM.formSubtitle.textContent = 'Masukkan data setoran hafalan terbaru (Langsung Terverifikasi).';
-                
+                // Tampilkan Inbox Validasi jika ada data pending
                 if (State.pendingSetoran.length > 0) {
                     DOM.validationSection.classList.remove('hidden');
                     UI.renderValidationInbox();
                 }
-                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.remove('hidden'));
-
             } else if (State.currentRole === 'santri') {
                 DOM.headerRoleText.textContent = 'Dashboard Santri';
                 DOM.appRoleLabel.textContent = 'Mode Santri';
-                DOM.formSubtitle.textContent = 'Data akan dikirim ke Musyrif untuk diverifikasi.';
+                DOM.formSubtitle.textContent = 'Data akan diverifikasi oleh Musyrif.';
                 DOM.submitButtonText.textContent = 'Kirim untuk Validasi';
-
+                // Sembunyikan elemen sensitif
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
             } else if (State.currentRole === 'wali') {
                 DOM.headerRoleText.textContent = 'Dashboard Wali';
                 DOM.appRoleLabel.textContent = 'Mode Pemantau';
+                // Sembunyikan menu input
                 DOM.navItemInput.classList.add('hidden');
-                
-                if (document.querySelector('.page-content:not(.hidden)')?.id === 'page-form') {
-                    UI.switchPage('page-beranda', false); 
-                }
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
+                // Redirect jika sedang di halaman form
+                UI.switchPage('page-beranda', false); 
             }
         },
-        
+
         renderValidationInbox: () => {
             const container = DOM.validationContainer;
+            if(!container) return;
             container.innerHTML = '';
             DOM.validationCount.textContent = State.pendingSetoran.length;
 
             if (State.pendingSetoran.length === 0) {
                 DOM.validationSection.classList.add('hidden');
                 return;
-            }
-            
-            if (State.currentRole === 'musyrif') {
-                 DOM.validationSection.classList.remove('hidden');
             }
 
             State.pendingSetoran.forEach(s => {
@@ -360,8 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.renderValidationInbox(); 
             UI.renderHistoryTable();
             UI.renderRekap();
-            UI.renderAnalisisPage();
+            // Analisis page dirender saat dibuka saja untuk performa
             
+            // Re-apply role restrictions
             if (State.currentRole !== 'musyrif') {
                 document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
             }
@@ -445,8 +445,15 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         renderMutqinProgress: () => {
-            const createProgress = (container, circleEl, detailsEl, santriList, color, checkFn) => {
+            const createProgress = (container, circleEl, detailsEl, santriList, color, checkFn, titleOverride) => {
                 if (!container) return;
+                
+                // [FIX] Update judul jika ada override (untuk Setengah Juz 30)
+                if (titleOverride) {
+                    const titleEl = container.querySelector('h4');
+                    if(titleEl) titleEl.textContent = titleOverride;
+                }
+
                 if (santriList.length > 0) {
                     container.classList.remove('hidden');
                     const tuntasCount = santriList.filter(checkFn).length;
@@ -466,9 +473,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     container.classList.add('hidden');
                 }
             };
+            
             const unggulan = State.santriData.filter(s => s.program === 'Unggulan');
             const tahfizh = State.santriData.filter(s => s.program === 'Tahfizh');
-            createProgress(DOM.mutqinUnggulanProgressContainer, DOM.mutqinUnggulanCircle, DOM.mutqinUnggulanDetails, unggulan, 'text-sky-500', s => s.isTuntas);
+            
+            // [FIX] Mengubah judul lingkaran pertama untuk Unggulan menjadi "Mutqin Setengah Juz 30"
+            // Syarat tuntas Setengah Juz 30 adalah nilai >= 100 (karena logic di calculateSantriStats setting nilai 100 jika mutqin setengah juz/juz 30)
+            createProgress(DOM.mutqinUnggulanProgressContainer, DOM.mutqinUnggulanCircle, DOM.mutqinUnggulanDetails, unggulan, 'text-sky-500', s => s.nilai >= 100, "Mutqin Setengah Juz 30 (Unggulan)");
+            
             createProgress(DOM.mutqinJuz30ProgressContainer, DOM.mutqinJuz30Circle, DOM.mutqinJuz30Details, tahfizh, 'text-green-500', s => s.mutqinJuz.has(30));
             createProgress(DOM.mutqinJuz29ProgressContainer, DOM.mutqinJuz29Circle, DOM.mutqinJuz29Details, tahfizh, 'text-amber-500', s => s.mutqinJuz.has(29));
         },
@@ -633,7 +645,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     dateContainer.innerHTML = new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
                 }
 
-                // Status Badge Logic
                 const statusEl = clone.querySelector('.data-status');
                 if (setoran.status === 'Pending') {
                     statusEl.innerHTML = `<span class="badge-pending text-[10px] px-2 py-0.5 rounded-full font-bold">Menunggu Validasi</span>`;
@@ -645,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     deleteBtn.dataset.id = setoran.id;
                     if (State.currentRole !== 'musyrif') {
                         deleteBtn.classList.add('hidden');
-                        if (actionCell) actionCell.classList.add('hidden');
+                        if (actionCell) actionCell.classList.add('hidden'); 
                     } else {
                         deleteBtn.classList.remove('hidden');
                         if (actionCell) actionCell.classList.remove('hidden');
@@ -764,41 +775,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const date = new Date(s.createdAt);
                 const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
                 let pages = parseFloat(s.halaman) || 0;
-                if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) {
-                    pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0;
-                }
+                if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) { pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0; }
                 if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
                 monthlyData[monthKey] += pages;
             });
             const labels = Object.keys(monthlyData);
             let accumulator = 0;
-            const dataPoints = Object.values(monthlyData).map(val => {
-                accumulator += val;
-                return accumulator.toFixed(1);
-            });
-            State.chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Total Halaman',
-                        data: dataPoints,
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#d97706',
-                        pointBorderColor: '#fff',
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
-                }
-            });
+            const dataPoints = Object.values(monthlyData).map(val => { accumulator += val; return accumulator.toFixed(1); });
+            State.chartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Total Halaman', data: dataPoints, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         },
     
         renderJuzBlocks: (santri) => {
@@ -809,32 +793,79 @@ document.addEventListener('DOMContentLoaded', () => {
                 const setoranJuz = santri.setoran.filter(s => s.juz == juzNum && s.status !== 'Pending'); 
                 let totalPagesDone = 0;
                 setoranJuz.forEach(s => {
-                    if (s.jenis === 'Mutqin') {
-                        totalPagesDone = 20; 
-                    } else {
-                        let pages = parseFloat(s.halaman) || 0;
-                        if (!pages && s.surat) {
-                            pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0;
-                        }
-                        totalPagesDone += pages;
-                    }
+                    if (s.jenis === 'Mutqin') { totalPagesDone = 20; } else { let pages = parseFloat(s.halaman) || 0; if (!pages && s.surat) { pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0; } totalPagesDone += pages; }
                 });
                 const maxPages = 20;
                 const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
                 const percentage = Math.min(Math.round((totalPagesDone / maxPages) * 100), 100);
-                
                 const clone = DOM.tplJuzBlock.content.cloneNode(true);
                 Utils.setText(clone, '.block-title', `Juz ${juzNum}`);
                 Utils.setText(clone, '.block-stats', `${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)`);
-                
                 const grid = clone.querySelector('.block-grid');
-                grid.innerHTML = Array(20).fill(0).map((_, i) => {
-                    const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-slate-200';
-                    return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
-                }).join('');
-                
+                grid.innerHTML = Array(20).fill(0).map((_, i) => { const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-slate-200'; return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`; }).join('');
                 container.appendChild(clone);
             });
+        },
+
+        renderAnalisisPage: () => {
+            // [FIX] Populate dropdown santri saat render
+            if (!DOM.santriSelectAnalisis) return;
+            
+            // Urutkan santri
+            const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
+            
+            // Populate
+            Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
+            
+            // Tampilkan prompt awal
+            DOM.analisisContentContainer.innerHTML = '';
+            DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
+        },
+
+        renderSantriDashboard: (sId) => {
+            const s = State.santriData.find(s => s.id === sId);
+            if (!s) return;
+            DOM.analisisContentContainer.innerHTML = '';
+            const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
+            Utils.setText(dash, '[data-name]', s.nama);
+            Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
+            Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
+            const statusBadge = dash.querySelector('[data-status-badge]');
+            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
+            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
+            const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
+            if (s.statusPerpulangan === 'Boleh Pulang') { perpulanganBadge.textContent = 'Boleh Pulang'; perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700'; } else { perpulanganBadge.textContent = 'Belum'; perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700'; }
+            Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
+            Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
+            Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
+            const progItems = [{ juz: 'Setengah Juz 30', done: s.nilai >= 100 }, { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true }, { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }];
+            const progresHtml = progItems.filter(item => !item.tahfizhOnly || s.program === 'Tahfizh').map(item => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="font-bold text-sm text-slate-700">${item.juz}</span>
+                        ${item.done ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
+                    </div>`).join('');
+            Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
+            const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
+            if (s.program === 'Tahfizh' && s.isTuntas) {
+                ziyadahSect.classList.remove('hidden');
+                const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
+                const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
+                ziyadahCont.innerHTML = allJuz.map(j => { const compPages = s.ziyadahProgress[j] || 0; if (compPages <= 0) return ''; const totalPages = AppConfig.hafalanData.juzPageCounts[j]; const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0; return `<div class="mb-3"><div class="flex justify-between mb-1 text-xs font-bold text-slate-600"><span>Juz ${j}</span><span>${compPages.toFixed(1)} / ${totalPages}</span></div><div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div></div></div>`; }).join('');
+            }
+            const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
+            const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            aktivitasCont.innerHTML = allActivities.length > 0 ? allActivities.map(s => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4">
+                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
+                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
+                        </td>
+                        <td class="p-4 text-right text-xs font-bold text-slate-400">
+                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                            ${s.status === 'Pending' ? '<span class="block text-amber-500 mt-1">Pending</span>' : ''}
+                        </td>
+                    </tr>`).join('') : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
+            DOM.analisisContentContainer.appendChild(dash);
         }
     };
 
@@ -842,9 +873,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. CORE LOGIC (BUSINESS LOGIC)
     // ==========================================
     const Core = {
-        /**
-         * Mengambil data baru, memproses statistik (hanya data Verified), dan memicu render UI.
-         */
         reloadData: async () => {
             const response = await Utils.fetchSetoranData(); 
             if (!response || !response.setoran) { console.error("Format data server tidak valid."); return; }
@@ -861,22 +889,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 santriId: State.santriNameMap.get(Utils.normalizeName(item.namaSantri || '')) || null,
                 createdAt: item.tanggal, 
                 rowNumber: item.rowNumber,
-                status: item.Status || 'Verified', // Default Verified jika kolom kosong
+                status: item.Status || 'Verified', 
                 ...item
             }));
             
             State.verifiedSetoran = State.allSetoran.filter(s => s.status === 'Verified');
             State.pendingSetoran = State.allSetoran.filter(s => s.status === 'Pending');
 
+            // [FIX] Urutan Penting: Hitung Stats dulu, baru Render
             Core.calculateSantriStats();
             Core.buildClassGroups();
-            Core.updateMusyrifList(); 
-            // Render dipanggil terpisah
+            Core.updateMusyrifList();
+            
+            // Render setelah semua data siap
+            UI.renderAll();
+            UI.applyRoleUI(); 
         },
 
-        /**
-         * Mengirim perintah validasi (Approve/Reject) setoran Santri.
-         */
         handleValidation: async (rowNumber, status) => {
             if (State.currentRole !== 'musyrif' || !State.userPassword) {
                 UI.showToast("Akses ditolak. Silakan login sebagai Musyrif.", 'error');
@@ -889,19 +918,14 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('rowNumber', rowNumber);
             formData.append('status', status);
 
-            // Optimistic Update UI
             const item = DOM.validationContainer.querySelector(`button[data-id="${rowNumber}"]`)?.closest('div');
             if (item) item.remove();
             
-            // Update State
-            State.pendingSetoran = State.pendingSetoran.filter(s => s.rowNumber != rowNumber);
-            DOM.validationCount.textContent = State.pendingSetoran.length;
-            if (State.pendingSetoran.length === 0) DOM.validationSection.classList.add('hidden');
-
             const res = await Utils.postData(formData);
+            
             if (res.result !== 'success') {
                 UI.showToast(`Gagal memvalidasi: ${res.error}`, 'error');
-                await Core.reloadData(); // Rollback
+                await Core.reloadData(); 
             } else {
                 UI.showToast(status === 'Verified' ? 'Data diterima.' : 'Data ditolak.');
                 await Core.reloadData(); 
@@ -909,55 +933,30 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         checkPerpulanganStatus: (s) => {
-            // Gunakan hanya data yang sudah terverifikasi
             const validSetoran = s.setoran.filter(st => st.status === 'Verified');
-            
-            // Cek Hafalan Langsung: Jika sudah punya Mutqin, langsung BOLEH PULANG
             const hasMutqinSetengahJuz = validSetoran.some(set => set.jenis === 'Mutqin' && String(set.juz) === "juz30_setengah");
             if (hasMutqinSetengahJuz) return 'Boleh Pulang';
-            
             const hasMutqinJuz30 = validSetoran.some(set => set.jenis === 'Mutqin' && set.juz == 30);
             if (hasMutqinJuz30) return 'Boleh Pulang';
-            
-            // Cek Berdasarkan Periode Waktu
             const now = new Date();
             let latestAchievedPeriod = null;
             if (AppConfig.perpulanganPeriods) {
                 for (const period of AppConfig.perpulanganPeriods) {
                     let conditionMet = false;
-                    if (period.type === 'surat') { 
-                        conditionMet = period.required.every(requiredSurah => 
-                            validSetoran.some(set => set.surat === requiredSurah && new Date(set.createdAt) <= period.deadline)
-                        ); 
-                    } 
-                    else if (period.type === 'mutqin') { 
-                        conditionMet = validSetoran.some(set => set.jenis === 'Mutqin' && period.required.includes(String(set.juz)) && new Date(set.createdAt) <= period.deadline); 
-                    }
-                    
-                    if (conditionMet) { 
-                        latestAchievedPeriod = period; 
-                    }
+                    if (period.type === 'surat') { conditionMet = period.required.every(requiredSurah => validSetoran.some(set => set.surat === requiredSurah && new Date(set.createdAt) <= period.deadline)); } 
+                    else if (period.type === 'mutqin') { conditionMet = validSetoran.some(set => set.jenis === 'Mutqin' && period.required.includes(String(set.juz)) && new Date(set.createdAt) <= period.deadline); }
+                    if (conditionMet) { latestAchievedPeriod = period; }
                 }
             }
-            
-            if (latestAchievedPeriod) { 
-                const resetDate = new Date(latestAchievedPeriod.deadline); 
-                resetDate.setDate(resetDate.getDate() + 1); 
-                if (now < resetDate) { return 'Boleh Pulang'; } 
-            }
+            if (latestAchievedPeriod) { const resetDate = new Date(latestAchievedPeriod.deadline); resetDate.setDate(resetDate.getDate() + 1); if (now < resetDate) { return 'Boleh Pulang'; } }
             return 'Belum Boleh Pulang';
         },
 
-        /**
-         * Menghitung statistik hafalan setiap santri (HANYA MENGGUNAKAN DATA VERIFIED).
-         * PERBAIKAN: Logika Tuntas tidak lagi bergantung ketat pada deadline untuk Tahfizh.
-         */
         calculateSantriStats: () => {
             const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { 
                 ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0, ziyadahProgress: {}, statusPerpulangan: 'Belum Boleh Pulang'
             }]));
             
-            // Masukkan data semua setoran untuk keperluan riwayat
             for (const setoran of State.allSetoran) {
                 if (santriStatsMap.has(setoran.santriId)) {
                     const santri = santriStatsMap.get(setoran.santriId);
@@ -966,96 +965,56 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             santriStatsMap.forEach(santri => {
-                // Filter hanya yang verified untuk perhitungan nilai & kelulusan
                 const validSetoran = santri.setoran.filter(s => s.status === 'Verified');
                 santri.setoranCount = validSetoran.length;
 
                 if (validSetoran.length === 0) return;
 
-                // --- 1. POPULATE MUTQIN SET (Tanpa Deadline Check) ---
-                // Agar status hafalan tercatat meski telat
                 const mutqinJuz30AnyTime = validSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 30 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['30']));
                 const mutqinJuz29AnyTime = validSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 29 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['29']));
 
                 if (mutqinJuz29AnyTime) santri.mutqinJuz.add(29);
                 if (mutqinJuz30AnyTime) santri.mutqinJuz.add(30);
 
-                // --- 2. HITUNG NILAI (Masih menggunakan Deadline) ---
-                // Nilai tetap berbasis ketepatan waktu untuk ranking
                 const mutqinSetengahJuz = validSetoran.find(s => s.jenis === 'Mutqin' && String(s.juz) === "juz30_setengah" && new Date(s.createdAt) <= AppConfig.deadlineJuz30Score);
                 const mutqinJuz30OnTime = validSetoran.find(s => s.jenis === 'Mutqin' && s.juz == 30 && (!s.halaman || parseInt(s.halaman) >= AppConfig.hafalanData.juzPageCounts['30']) && new Date(s.createdAt) <= AppConfig.deadlineJuz30Score);
 
                 if (mutqinSetengahJuz || mutqinJuz30OnTime) {
                     santri.nilai = 100;
                 } else {
-                    // Logic nilai parsial per surat
                     const setoranSurahs = new Set(validSetoran.filter(set => set.juz == 30 && set.surat).map(set => set.surat));
                     let score = 0;
-                    if (AppConfig.scoringTiers) { 
-                        for (const tier of AppConfig.scoringTiers) { 
-                            if (tier.required.every(surah => setoranSurahs.has(surah))) { score = tier.score; break; } 
-                        } 
-                    }
-                    // Fallback jika lewat deadline tapi mutqin: hitung halaman
-                    if (score === 0) { 
-                        score = validSetoran.filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score)
-                            .reduce((sum, s) => { 
-                                const pageCount = parseFloat(s.halaman) || AppConfig.hafalanData.juzPageCounts[s.juz] || 0; 
-                                return sum + pageCount; 
-                            }, 0); 
-                    }
+                    if (AppConfig.scoringTiers) { for (const tier of AppConfig.scoringTiers) { if (tier.required.every(surah => setoranSurahs.has(surah))) { score = tier.score; break; } } }
+                    if (score === 0) { score = validSetoran.filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score).reduce((sum, s) => { const pageCount = parseFloat(s.halaman) || AppConfig.hafalanData.juzPageCounts[s.juz] || 0; return sum + pageCount; }, 0); }
                     santri.nilai = score;
                 }
 
-                // --- 3. TENTUKAN STATUS TUNTAS (DIPERBAIKI) ---
-                // Logika Baru: Tuntas jika hafalan selesai, TIDAK PEDULI deadline.
                 let tuntas = false;
-                
                 if (santri.program === 'Unggulan') {
-                    // Unggulan Tuntas jika nilai >= 100 (Juz 30 Selesai)
-                    // Jika ingin melonggarkan juga: tuntas = santri.mutqinJuz.has(30);
-                    if (santri.nilai >= 100 || santri.mutqinJuz.has(30)) { 
-                        tuntas = true; 
-                    }
+                    if (santri.nilai >= 100 || santri.mutqinJuz.has(30)) { tuntas = true; }
                 } else if (santri.program === 'Tahfizh') {
-                    // Tahfizh Tuntas jika Juz 29 & 30 Selesai (Apapun tanggalnya)
-                    if (santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30)) {
-                        tuntas = true;
-                    }
+                    if (santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30)) { tuntas = true; }
                 }
                 
                 if (tuntas) {
                     santri.isTuntas = true;
-                    // Hitung Ziyadah jika sudah tuntas
                     let completionDates = [];
-                    // Ambil tanggal mutqin (kapanpun itu)
                     if (mutqinJuz30AnyTime) completionDates.push(new Date(mutqinJuz30AnyTime.createdAt));
                     if (mutqinJuz29AnyTime) completionDates.push(new Date(mutqinJuz29AnyTime.createdAt));
-                    if (mutqinSetengahJuz) completionDates.push(new Date(mutqinSetengahJuz.createdAt)); // Fallback
+                    if (mutqinSetengahJuz) completionDates.push(new Date(mutqinSetengahJuz.createdAt)); 
 
                     if (completionDates.length > 0) {
                         santri.tuntasDate = new Date(Math.max(...completionDates));
                         validSetoran.forEach(setoran => {
                             if (new Date(setoran.createdAt) > santri.tuntasDate) {
                                 const pageValue = (setoran.halaman ? parseFloat(setoran.halaman) : AppConfig.hafalanData.surahData[setoran.juz]?.pages[setoran.surat]) || 0;
-                                if (setoran.jenis === 'Ziyadah') { 
-                                    santri.ziyadahPages += pageValue; 
-                                    santri.ziyadahProgress[setoran.juz] = (santri.ziyadahProgress[setoran.juz] || 0) + pageValue; 
-                                }
+                                if (setoran.jenis === 'Ziyadah') { santri.ziyadahPages += pageValue; santri.ziyadahProgress[setoran.juz] = (santri.ziyadahProgress[setoran.juz] || 0) + pageValue; }
                             }
                         });
                     }
                 }
                 santri.nilaiTampil = Math.min(100, santri.nilai);
-                santri.unggulanPages = validSetoran.reduce((sum, s) => { 
-                    let pageCount = 0; 
-                    if (s.halaman) pageCount = parseFloat(s.halaman); 
-                    else if (s.juz === 'juz30_setengah') pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah']; 
-                    else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat]; 
-                    else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz]; 
-                    return sum + pageCount; 
-                }, 0);
-                
+                santri.unggulanPages = validSetoran.reduce((sum, s) => { let pageCount = 0; if (s.halaman) pageCount = parseFloat(s.halaman); else if (s.juz === 'juz30_setengah') pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah']; else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat]; else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz]; return sum + pageCount; }, 0);
                 santri.statusPerpulangan = Core.checkPerpulanganStatus(santri);
             });
             State.santriData = Array.from(santriStatsMap.values());
@@ -1190,18 +1149,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (link) { e.preventDefault(); UI.switchPage(link.dataset.page); }
         });
 
-        // --- Event Delegation ---
+        // --- [FIX] AKORDEON & TABS ---
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
             const tabBtn = e.target.closest('.analisis-tab');
 
             if (button && button.matches('[data-target-page]')) { UI.switchPage(button.dataset.targetPage); return; }
 
+            // [FIX] Logika Tab Analisis
             if (tabBtn) {
                 const targetId = tabBtn.dataset.target;
                 const parent = tabBtn.parentElement;
-                parent.querySelectorAll('.analisis-tab').forEach(t => t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm'));
-                tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm');
+                
+                // Reset semua tab
+                parent.querySelectorAll('.analisis-tab').forEach(t => {
+                    t.classList.remove('bg-white', 'text-brand-600', 'ring-1', 'ring-black/5', 'shadow-sm');
+                    t.classList.add('text-slate-500');
+                });
+                
+                // Set tab aktif
+                tabBtn.classList.add('bg-white', 'text-brand-600', 'ring-1', 'ring-black/5', 'shadow-sm');
+                tabBtn.classList.remove('text-slate-500');
+                
+                // Switch konten
                 DOM.analisisContentContainer.querySelectorAll('.analisis-tab-content').forEach(c => c.classList.add('hidden'));
                 const targetPanel = DOM.analisisContentContainer.querySelector(`#${targetId}`);
                 if(targetPanel) targetPanel.classList.remove('hidden');
@@ -1212,7 +1182,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (button.matches('.export-pdf-btn')) { UI.exportRecapToPDF(button.dataset.classGroup); } 
             else if (button.matches('.delete-btn')) { State.setoranIdToDelete = button.dataset.id; DOM.passwordConfirmModal.classList.remove('hidden'); } 
-            else if (button.matches('.accordion-button')) { const panel = button.closest('h2').nextElementSibling; panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`; button.querySelector('.accordion-chevron').classList.toggle('rotate-180'); } 
+            
+            // [FIX] Logika Akordeon
+            else if (button.matches('.accordion-button')) { 
+                const panel = button.closest('h2').nextElementSibling;
+                // Toggle logika: jika ada max-height, set null (tutup). Jika tidak, set height.
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                    button.querySelector('.accordion-chevron').classList.remove('rotate-180');
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                    button.querySelector('.accordion-chevron').classList.add('rotate-180');
+                }
+            } 
+            
             else if (button.matches('.sortable')) {
                 const column = button.dataset.sort;
                 const tabContent = button.closest('.rekap-tab-content');
@@ -1231,7 +1214,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         DOM.mainContent.addEventListener('input', e => { if (e.target.matches('.tahfizh-search')) { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { const juz = parseInt(e.target.dataset.juzFilter, 10); UI.renderTahfizhContent(juz, e.target.value); }, 300); } });
 
-        if (DOM.santriSelectAnalisis) { DOM.santriSelectAnalisis.addEventListener('change', (e) => { if (e.target.value) { UI.renderSantriDashboard(e.target.value); } else { DOM.analisisContentContainer.innerHTML = ''; DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true)); } }); }
+        // [FIX] Analisis Dropdown Change
+        if (DOM.santriSelectAnalisis) { 
+            DOM.santriSelectAnalisis.addEventListener('change', (e) => { 
+                if (e.target.value) { 
+                    UI.renderSantriDashboard(e.target.value); 
+                } else { 
+                    DOM.analisisContentContainer.innerHTML = ''; 
+                    DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true)); 
+                } 
+            }); 
+        }
 
         DOM.rekapSelect.addEventListener('change', (e) => { const selectedId = e.target.value; DOM.rekapContentContainer.querySelectorAll('.rekap-tab-content').forEach(c => c.classList.add('hidden')); document.getElementById(`rekap-tab-${selectedId}`).classList.remove('hidden'); });
         DOM.rekapContentContainer.addEventListener('click', e => { if (e.target.matches('.detail-santri-btn')) { UI.openDetailModal(e.target.dataset.id); } });
