@@ -275,6 +275,135 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => DOM.toast.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         },
 
+        // 1. Fungsi Mengirim Banyak Data (Looping)
+        async function processBatchSubmit() {
+            uiToggleLoading(true, `Mengirim ${State.setoranQueue.length} data...`);
+        
+            let successCount = 0;
+            let failCount = 0;
+        
+            // Loop antrian dan kirim satu per satu
+            // Kita gunakan loop "for...of" dengan await agar data masuk berurutan 
+            // (menghindari error 'LockService' di Google Apps Script)
+            for (const item of State.setoranQueue) {
+                const formData = new FormData();
+                
+                // Masukkan data item ke FormData
+                for (const key in item) {
+                    if (key !== 'id') formData.append(key, item[key]);
+                }
+                // Tambah password jika musyrif
+                if (State.currentRole === 'musyrif' && State.userPassword) {
+                    formData.append('password', State.userPassword);
+                }
+        
+                try {
+                    const res = await Utils.postData(formData);
+                    if (res.result === 'success') successCount++;
+                    else failCount++;
+                } catch (err) {
+                    console.error(err);
+                    failCount++;
+                }
+            }
+        
+            uiToggleLoading(false);
+        
+            if (failCount === 0) {
+                UI.showToast(`Alhamdulillah! ${successCount} setoran berhasil disimpan.`, 'success');
+                State.setoranQueue = []; // Kosongkan antrian
+                renderQueueUI();
+                DOM.setoranForm.reset();
+                DOM.namaSantri.dispatchEvent(new Event('change'));
+                await Core.reloadData();
+            } else {
+                UI.showToast(`${successCount} sukses, ${failCount} gagal. Periksa koneksi.`, 'warning');
+                State.setoranQueue = []; // Reset antrian (atau biarkan sisa yg gagal jika mau logic kompleks)
+                renderQueueUI();
+                await Core.reloadData();
+            }
+        }
+        
+        // 2. Render Tampilan Antrian
+        function renderQueueUI() {
+            const list = DOM.queueList;
+            list.innerHTML = '';
+            DOM.queueCount.textContent = State.setoranQueue.length;
+        
+            if (State.setoranQueue.length > 0) {
+                DOM.queueContainer.classList.remove('hidden');
+                DOM.submitButtonText.textContent = `Kirim ${State.setoranQueue.length} Setoran`;
+                
+                State.setoranQueue.forEach((item, index) => {
+                    const detailText = item.halaman ? `${item.halaman} Hlm` : item.surat;
+                    const juzText = item.juz === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${item.juz}`;
+                    
+                    const row = document.createElement('div');
+                    row.className = 'bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm text-sm';
+                    row.innerHTML = `
+                        <div>
+                            <span class="font-bold text-slate-700">${index + 1}. ${juzText}</span>
+                            <span class="mx-1 text-slate-300">|</span>
+                            <span class="text-slate-500">${item.jenis} - ${detailText}</span>
+                        </div>
+                        <button type="button" class="remove-queue-item text-red-500 hover:bg-red-50 p-1.5 rounded-lg" data-id="${item.id}">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    `;
+                    list.appendChild(row);
+                });
+            } else {
+                DOM.queueContainer.classList.add('hidden');
+                DOM.submitButtonText.textContent = State.currentRole === 'musyrif' ? 'Simpan Setoran' : 'Kirim untuk Validasi';
+            }
+        }
+        
+        // 3. Reset Input Parsial (Hanya hafalan, Nama Santri tetap)
+        function resetHafalanInputs() {
+            DOM.jenis.value = '';
+            DOM.juz.innerHTML = ''; 
+            DOM.juz.disabled = true;
+            DOM.halaman.value = '';
+            DOM.halamanContainer.classList.add('hidden');
+            DOM.surat.innerHTML = '';
+            DOM.suratContainer.classList.add('hidden');
+            
+            // Trigger event agar tampilan dropdown reset bersih
+            DOM.namaSantri.dispatchEvent(new Event('change')); 
+        }
+        
+        // 4. Helper Toggle Loading UI
+        function uiToggleLoading(isLoading, customText = 'Mengirim...') {
+            const btn = DOM.submitButton;
+            btn.disabled = isLoading;
+            if (isLoading) {
+                DOM.submitButtonText.textContent = customText;
+                DOM.submitButtonIcon.classList.add('hidden');
+                DOM.submitSpinner.classList.remove('hidden');
+            } else {
+                DOM.submitButtonText.textContent = State.currentRole === 'musyrif' ? 'Simpan Setoran' : 'Kirim untuk Validasi';
+                DOM.submitButtonIcon.classList.remove('hidden');
+                DOM.submitSpinner.classList.add('hidden');
+            }
+        }
+        
+        // 5. Helper Handle Single Result (Logic lama yg dipisah)
+        async function handleSingleResult(data, formElement) {
+            uiToggleLoading(false);
+            if (data.result === 'success') {
+                if (data.status === 'Verified') {
+                    UI.showToast('Setoran berhasil disimpan & terverifikasi!');
+                } else {
+                    UI.showToast('Setoran dikirim. Menunggu validasi Musyrif.', 'success');
+                }
+                formElement.reset();
+                DOM.namaSantri.dispatchEvent(new Event('change'));
+                await Core.reloadData();
+            } else {
+                UI.showToast(`Gagal: ${data.error}`, 'error');
+            }
+        }
+
         switchPage: (pageId, showSkeleton = true) => {
             if (!pageId) return;
             DOM.pages.forEach(page => page.classList.add('hidden'));
@@ -1194,44 +1323,72 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.roleButtonsContainer.classList.remove('hidden');
         });
 
-        // --- FORM HANDLING (Tidak Berubah) ---
+        // --- LOGIC BARU UNTUK SUBMIT FORM ---
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!validateForm()) return;
-
-            const btn = DOM.submitButton;
-            btn.disabled = true;
-            DOM.submitButtonText.textContent = 'Mengirim...';
-            DOM.submitButtonIcon.classList.add('hidden');
-            DOM.submitSpinner.classList.remove('hidden');
-            
-            const formData = new FormData(e.target);
-            formData.set('namaSantri', DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text);
-            
-            if (State.currentRole === 'musyrif' && State.userPassword) {
-                formData.append('password', State.userPassword);
-            }
-
-            const data = await Utils.postData(formData);
-            if (data.result === 'success') {
-                if (data.status === 'Verified') {
-                    UI.showToast('Setoran berhasil disimpan & terverifikasi!');
-                } else {
-                    UI.showToast('Setoran dikirim. Menunggu validasi Musyrif.', 'success');
+        
+            // Skenario 1: Antrian Kosong (Perilaku Normal / Single Submit)
+            // Kode ini persis seperti kode lama Anda, hanya dibungkus if
+            if (State.setoranQueue.length === 0) {
+                if (!validateForm()) return;
+        
+                // UI Loading
+                uiToggleLoading(true);
+        
+                const formData = new FormData(e.target);
+                formData.set('namaSantri', DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text);
+        
+                if (State.currentRole === 'musyrif' && State.userPassword) {
+                    formData.append('password', State.userPassword);
                 }
-                e.target.reset();
-                DOM.namaSantri.dispatchEvent(new Event('change'));
-                await Core.reloadData();
-            } else {
-                UI.showToast(`Gagal: ${data.error}`, 'error');
+        
+                const data = await Utils.postData(formData);
+                handleSingleResult(data, e.target);
+            } 
+            // Skenario 2: Ada Antrian (Multi Submit / Batch)
+            else {
+                await processBatchSubmit();
             }
+        });
+        
+        // --- LOGIC TOMBOL TAMBAH (+) ---
+        DOM.addToQueueBtn.addEventListener('click', () => {
+            if (!validateForm()) return; // Pastikan data saat ini valid dulu
+        
+            // Ambil nilai dari form saat ini
+            const item = {
+                id: Date.now(), // ID unik sementara
+                musyrif: DOM.musyrif.value,
+                namaSantri: DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text,
+                santriId: DOM.santriId.value,
+                kelas: DOM.kelas.value,
+                program: DOM.program.value,
+                jenis: DOM.jenis.value,
+                juz: DOM.juz.value,
+                // Ambil halaman ATAU surat tergantung input yg aktif
+                halaman: (!DOM.halaman.disabled && DOM.halaman.value) ? DOM.halaman.value : '',
+                surat: (!DOM.surat.disabled && DOM.surat.value) ? DOM.surat.value : '',
+                tanggal: DOM.tanggal.value,
+                kualitas: 'Lancar' 
+            };
+        
+            // Masukkan ke State
+            State.setoranQueue.push(item);
             
-            btn.disabled = false;
-            DOM.submitButtonText.textContent = State.currentRole === 'musyrif' ? 'Simpan Setoran' : 'Kirim untuk Validasi';
-            DOM.submitButtonIcon.classList.remove('hidden');
-            DOM.submitSpinner.classList.add('hidden');
+            // Update Tampilan & Reset Form sebagian
+            renderQueueUI();
+            resetHafalanInputs(); 
+            UI.showToast('Ditambahkan ke daftar. Isi lagi atau klik Simpan.', 'success');
         });
 
+        // Logic Hapus Item dari Antrian
+        DOM.queueList.addEventListener('click', (e) => {
+            const btn = e.target.closest('.remove-queue-item');
+            if (btn) {
+                State.setoranQueue = State.setoranQueue.filter(i => i.id != btn.dataset.id);
+                renderQueueUI();
+            }
+        });
         // --- Navigation (Tidak Berubah) ---
         DOM.nowBtn.addEventListener('click', () => {
             const now = new Date();
