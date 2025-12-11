@@ -172,9 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('cachedData', JSON.stringify(data)); 
                 return data;
             } catch (error) {
-                console.warn('Network error, attempting to load offline cache...');
+                console.warn('Mengambil data offline dari cache...');
                 const cached = localStorage.getItem('cachedData');
                 if (cached) return JSON.parse(cached);
+                
                 UI.showToast('Gagal memuat data (Offline & Cache kosong).', 'error');
                 return [];
             }
@@ -277,48 +278,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
         },
 
-        // --- ROLE UI LOGIC ---
+        // --- ROLE UI SETUP ---
         applyRoleUI: () => {
             // 1. Reset
             DOM.roleSelectionModal.classList.add('hidden');
             DOM.mainLayout.classList.remove('hidden');
             DOM.navItemInput.classList.remove('hidden');
-            DOM.navItemAnalisis.classList.remove('hidden'); 
             DOM.validationSection.classList.add('hidden');
             
-            // Sembunyikan tombol hapus secara default
-            document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
-
-            // 2. Adjust Tampilan
+            // 2. Adjust based on Role
             if (State.currentRole === 'musyrif') {
                 DOM.headerRoleText.textContent = 'Dashboard Musyrif';
                 DOM.appRoleLabel.textContent = 'Mode Admin';
-                DOM.submitButtonText.textContent = 'Simpan Setoran';
-                DOM.formSubtitle.textContent = 'Masukkan data setoran hafalan terbaru (Langsung Terverifikasi).';
-                
+                // Tampilkan Inbox Validasi jika ada data pending
                 if (State.pendingSetoran.length > 0) {
                     DOM.validationSection.classList.remove('hidden');
                     UI.renderValidationInbox();
                 }
-                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.remove('hidden'));
-
             } else if (State.currentRole === 'santri') {
                 DOM.headerRoleText.textContent = 'Dashboard Santri';
                 DOM.appRoleLabel.textContent = 'Mode Santri';
-                DOM.formSubtitle.textContent = 'Data akan dikirim ke Musyrif untuk diverifikasi.';
+                DOM.formSubtitle.textContent = 'Data akan diverifikasi oleh Musyrif.';
                 DOM.submitButtonText.textContent = 'Kirim untuk Validasi';
-
+                // Sembunyikan elemen sensitif
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
             } else if (State.currentRole === 'wali') {
                 DOM.headerRoleText.textContent = 'Dashboard Wali';
                 DOM.appRoleLabel.textContent = 'Mode Pemantau';
+                // Sembunyikan menu input & analisis dalam
                 DOM.navItemInput.classList.add('hidden');
-                
-                if (document.querySelector('.page-content:not(.hidden)')?.id === 'page-form') {
-                    UI.switchPage('page-beranda', false); 
-                }
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
+                // Redirect jika sedang di halaman form
+                UI.switchPage('page-beranda', false); 
             }
         },
-        
+
         renderValidationInbox: () => {
             const container = DOM.validationContainer;
             container.innerHTML = '';
@@ -327,10 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (State.pendingSetoran.length === 0) {
                 DOM.validationSection.classList.add('hidden');
                 return;
-            }
-            
-            if (State.currentRole === 'musyrif') {
-                 DOM.validationSection.classList.remove('hidden');
             }
 
             State.pendingSetoran.forEach(s => {
@@ -348,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnApprove.dataset.id = s.rowNumber;
                 btnReject.dataset.id = s.rowNumber;
 
+                // Event Listeners langsung di sini
                 btnApprove.addEventListener('click', () => Core.handleValidation(s.rowNumber, 'Verified'));
                 btnReject.addEventListener('click', () => Core.handleValidation(s.rowNumber, 'Rejected'));
 
@@ -357,19 +348,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderAll: () => {
             UI.renderBeranda();
-            UI.renderValidationInbox(); 
+            UI.renderValidationInbox(); // Pastikan inbox dirender ulang
             UI.renderHistoryTable();
             UI.renderRekap();
             UI.renderAnalisisPage();
             
+            // Re-apply role restrictions (e.g. hide delete buttons in history)
             if (State.currentRole !== 'musyrif') {
                 document.querySelectorAll('.delete-btn').forEach(btn => btn.classList.add('hidden'));
             }
         },
 
-        // --- DASHBOARD RENDERERS ---
         renderBeranda: () => {
-            // Gunakan Verified Data untuk Statistik
+            // Statistik hanya hitung data verified
             const santriAktifIds = new Set(State.verifiedSetoran.map(s => s.santriId));
             const totalSantri = State.rawSantriList.length;
             const tuntasCount = State.santriData.filter(s => s.isTuntas).length;
@@ -601,6 +592,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (startDate) startDate.setHours(0, 0, 0, 0);
             if (endDate) endDate.setHours(23, 59, 59, 999);
 
+            // Filter logic: Musyrif lihat semua, Wali/Santri lihat Verified saja (atau semua untuk santri tapi ada badge)
+            // Di sini kita biarkan Wali/Santri melihat status Pending juga untuk transparansi
             const filtered = State.allSetoran
                 .filter(setoran => {
                     const santri = State.santriData.find(st => st.id === setoran.santriId);
@@ -609,6 +602,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const programMatch = (programFilter === 'Semua' || (santri && santri.program === programFilter));
                     const searchMatch = setoran.namaSantri.toLowerCase().includes(searchTerm);
                     
+                    // Filter Khusus Wali: Hanya Verified (Opsional, saat ini semua ditampilkan)
+                    // if (State.currentRole === 'wali' && setoran.status !== 'Verified') return false;
+
                     return searchMatch && programMatch && classMatch && dateMatch;
                 })
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -627,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Utils.setText(clone, '.data-jenis', setoran.jenis);
                 Utils.setText(clone, '.data-juz-text', String(setoran.juz) === "juz30_setengah" ? "Setengah Juz 30" : `Juz ${setoran.juz}`);
                 Utils.setText(clone, '.data-unit', setoran.halaman ? `${setoran.halaman} hlm` : setoran.surat);
+                // Utils.setText(clone, '.data-tanggal', new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }));
                 
                 const dateContainer = clone.querySelector('.data-tanggal');
                 if (dateContainer) {
@@ -637,15 +634,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const statusEl = clone.querySelector('.data-status');
                 if (setoran.status === 'Pending') {
                     statusEl.innerHTML = `<span class="badge-pending text-[10px] px-2 py-0.5 rounded-full font-bold">Menunggu Validasi</span>`;
+                } else {
+                    // Verified: Tidak perlu badge atau badge hijau kecil
+                    // statusEl.innerHTML = `<span class="badge-verified text-[10px] px-2 py-0.5 rounded-full font-bold">Terverifikasi</span>`;
                 }
 
                 const deleteBtn = clone.querySelector('.delete-btn');
                 const actionCell = clone.querySelector('.action-cell');
                 if(deleteBtn) {
                     deleteBtn.dataset.id = setoran.id;
+                    // Sembunyikan tombol hapus jika bukan Musyrif
                     if (State.currentRole !== 'musyrif') {
                         deleteBtn.classList.add('hidden');
-                        if (actionCell) actionCell.classList.add('hidden');
+                        if (actionCell) actionCell.classList.add('hidden'); // Sembunyikan kolom aksi jika semua isinya tersembunyi
                     } else {
                         deleteBtn.classList.remove('hidden');
                         if (actionCell) actionCell.classList.remove('hidden');
@@ -654,10 +655,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (santri) {
                     const pIcon = clone.querySelector('.data-program-icon');
-                    if(pIcon) pIcon.innerHTML = santri.program === 'Unggulan' ? `<span title="Unggulan" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">U</span>` : `<span title="Tahfizh" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">T</span>`;
+                    if(pIcon) pIcon.innerHTML = santri.program === 'Unggulan' 
+                        ? `<span title="Unggulan" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">U</span>` 
+                        : `<span title="Tahfizh" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">T</span>`;
                     const cIcon = clone.querySelector('.data-kelas-icon');
                     if(cIcon) {
-                        let cl = 'bg-slate-200 text-slate-700'; const i = santri.kelas.charAt(1); 
+                        let cl = 'bg-slate-200 text-slate-700'; 
+                        const i = santri.kelas.charAt(1); 
                         if (['A'].includes(i)) cl = 'bg-red-100 text-red-700'; if (['B'].includes(i)) cl = 'bg-amber-100 text-amber-700'; if (['C', 'D'].includes(i)) cl = 'bg-emerald-100 text-emerald-700'; if (['G', 'H'].includes(i)) cl = 'bg-blue-100 text-blue-700'; 
                         cIcon.innerHTML = `<span title="Kelas ${santri.kelas}" class="inline-flex items-center justify-center h-5 w-5 rounded-full ${cl} text-[10px] font-bold">${santri.kelas}</span>`;
                     }
@@ -757,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const ctx = DOM.progressChart.getContext('2d');
             if (State.chartInstance) State.chartInstance.destroy();
             const monthlyData = {};
-            // Gunakan hanya data Verified untuk chart
+            // Gunakan hanya data Verified untuk chart pribadi
             const validSetoran = santri.setoran.filter(s => s.status !== 'Pending'); 
             const sortedSetoran = [...validSetoran].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             sortedSetoran.forEach(s => {
@@ -779,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '';
             const targetJuzs = [30, 29, 28, 1]; 
             targetJuzs.forEach(juzNum => {
-                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum && s.status !== 'Pending'); 
+                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum && s.status !== 'Pending'); // Filter Pending
                 let totalPagesDone = 0;
                 setoranJuz.forEach(s => {
                     if (s.jenis === 'Mutqin') { totalPagesDone = 20; } else { let pages = parseFloat(s.halaman) || 0; if (!pages && s.surat) { pages = AppConfig.hafalanData.surahData[juzNum]?.pages[s.surat] || 0; } totalPagesDone += pages; }
@@ -794,6 +798,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 grid.innerHTML = Array(20).fill(0).map((_, i) => { const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-slate-200'; return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`; }).join('');
                 container.appendChild(clone);
             });
+        },
+
+        renderAnalisisPage: () => {
+            if (!DOM.santriSelectAnalisis) return;
+            const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
+            Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
+            DOM.analisisContentContainer.innerHTML = '';
+            DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
         },
 
         renderSantriDashboard: (sId) => {
@@ -847,9 +859,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. CORE LOGIC (BUSINESS LOGIC)
     // ==========================================
     const Core = {
-        /**
-         * Mengambil data baru, memproses statistik (hanya data Verified), dan memicu render UI.
-         */
         reloadData: async () => {
             const response = await Utils.fetchSetoranData(); 
             if (!response || !response.setoran) { console.error("Format data server tidak valid."); return; }
@@ -865,8 +874,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: `row-${item.rowNumber}`,
                 santriId: State.santriNameMap.get(Utils.normalizeName(item.namaSantri || '')) || null,
                 createdAt: item.tanggal, 
-                rowNumber: item.rowNumber, // Penting untuk validasi/delete
-                status: item.Status || 'Verified', // Ambil dari kolom Status
+                rowNumber: item.rowNumber,
+                status: item.Status || 'Verified', // Default Verified jika kolom kosong
                 ...item
             }));
             
@@ -875,41 +884,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             Core.calculateSantriStats();
             Core.buildClassGroups();
+            UI.renderAll();
+            UI.applyRoleUI(); // Re-apply role logic after reload
             Core.updateMusyrifList(); 
-            // UI Render dipanggil di Init
         },
 
-        /**
-         * Mengirim perintah validasi (Approve/Reject) setoran Santri.
-         */
         handleValidation: async (rowNumber, status) => {
-            if (State.currentRole !== 'musyrif' || !State.userPassword) {
-                UI.showToast("Akses ditolak. Silakan login sebagai Musyrif.", 'error');
-                return;
-            }
-
             const formData = new FormData();
             formData.append('action', 'validate');
             formData.append('password', State.userPassword);
             formData.append('rowNumber', rowNumber);
             formData.append('status', status);
 
-            // Optimistic Update UI (Hapus dari list segera)
-            const btn = DOM.validationContainer.querySelector(`button[data-id="${rowNumber}"]`);
-            if (btn) btn.closest('div').remove(); 
+            // Optimistic Update UI
+            const item = DOM.validationContainer.querySelector(`button[data-id="${rowNumber}"]`)?.closest('div');
+            if (item) item.remove();
             
+            // Update State
             State.pendingSetoran = State.pendingSetoran.filter(s => s.rowNumber != rowNumber);
             DOM.validationCount.textContent = State.pendingSetoran.length;
             if (State.pendingSetoran.length === 0) DOM.validationSection.classList.add('hidden');
-            
+
             const res = await Utils.postData(formData);
-            
             if (res.result !== 'success') {
-                UI.showToast(`Gagal memvalidasi: ${res.error}. Mohon coba lagi.`, 'error');
-                await Core.reloadData(); // Rollback jika gagal
+                UI.showToast(`Gagal memvalidasi: ${res.error}`, 'error');
+                await Core.reloadData(); // Rollback
             } else {
-                UI.showToast(status === 'Verified' ? 'Data diterima & terverifikasi.' : 'Data ditolak & dihapus.');
-                await Core.reloadData(); // Refresh data penuh
+                UI.showToast(status === 'Verified' ? 'Data diterima.' : 'Data ditolak.');
+                await Core.reloadData(); 
             }
         },
 
@@ -933,9 +935,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return 'Belum Boleh Pulang';
         },
 
-        /**
-         * Menghitung statistik hafalan setiap santri (HANYA MENGGUNAKAN DATA VERIFIED).
-         */
         calculateSantriStats: () => {
             const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { 
                 ...s, mutqinJuz: new Set(), nilai: 0, nilaiTampil: 0, isTuntas: false, tuntasDate: null, ziyadahPages: 0, unggulanPages: 0, setoran: [], setoranCount: 0, ziyadahProgress: {}, statusPerpulangan: 'Belum Boleh Pulang'
@@ -1027,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. EVENT LISTENERS
     // ==========================================
     function setupEventListeners() {
-        // --- ROLE SELECTION (NEW) ---
+        // --- ROLE SELECTION ---
         DOM.roleButtonsContainer.addEventListener('click', e => {
             const btn = e.target.closest('.role-btn');
             if (!btn) return;
@@ -1061,7 +1060,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 DOM.roleErrorMsg.classList.remove('hidden');
                 return;
             }
-            // Simpan password di state
             State.userPassword = pass;
             State.currentRole = 'musyrif';
             UI.applyRoleUI();
@@ -1078,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.roleButtonsContainer.classList.remove('hidden');
         });
 
-        // --- FORM HANDLING (MODIFIED) ---
+        // --- FORM HANDLING ---
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!validateForm()) return;
@@ -1092,7 +1090,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(e.target);
             formData.set('namaSantri', DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text);
             
-            // PENTING: Kirim password jika role musyrif (untuk langsung Verified)
             if (State.currentRole === 'musyrif' && State.userPassword) {
                 formData.append('password', State.userPassword);
             }
@@ -1117,7 +1114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.submitSpinner.classList.add('hidden');
         });
 
-        // --- Navigation & Interaksi Umum ---
+        // --- Navigation ---
         DOM.nowBtn.addEventListener('click', () => {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -1150,14 +1147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!button) return;
 
             if (button.matches('.export-pdf-btn')) { UI.exportRecapToPDF(button.dataset.classGroup); } 
-            else if (button.matches('.delete-btn')) { 
-                if (State.currentRole === 'musyrif') {
-                    State.setoranIdToDelete = button.dataset.id; 
-                    DOM.passwordConfirmModal.classList.remove('hidden');
-                } else {
-                    UI.showToast('Akses ditolak. Hanya Musyrif yang dapat menghapus.', 'error');
-                }
-            } 
+            else if (button.matches('.delete-btn')) { State.setoranIdToDelete = button.dataset.id; DOM.passwordConfirmModal.classList.remove('hidden'); } 
             else if (button.matches('.accordion-button')) { const panel = button.closest('h2').nextElementSibling; panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`; button.querySelector('.accordion-chevron').classList.toggle('rotate-180'); } 
             else if (button.matches('.sortable')) {
                 const column = button.dataset.sort;
@@ -1175,7 +1165,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // --- Modal & Form Helpers ---
+        DOM.mainContent.addEventListener('input', e => { if (e.target.matches('.tahfizh-search')) { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { const juz = parseInt(e.target.dataset.juzFilter, 10); UI.renderTahfizhContent(juz, e.target.value); }, 300); } });
+
+        if (DOM.santriSelectAnalisis) { DOM.santriSelectAnalisis.addEventListener('change', (e) => { if (e.target.value) { UI.renderSantriDashboard(e.target.value); } else { DOM.analisisContentContainer.innerHTML = ''; DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true)); } }); }
+
+        DOM.rekapSelect.addEventListener('change', (e) => { const selectedId = e.target.value; DOM.rekapContentContainer.querySelectorAll('.rekap-tab-content').forEach(c => c.classList.add('hidden')); document.getElementById(`rekap-tab-${selectedId}`).classList.remove('hidden'); });
+        DOM.rekapContentContainer.addEventListener('click', e => { if (e.target.matches('.detail-santri-btn')) { UI.openDetailModal(e.target.dataset.id); } });
+        DOM.closeDetailModal.addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
+        DOM.studentDetailModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
+
+        // -- Form Dependency --
+        DOM.musyrif.addEventListener('change', () => { const musyrifValue = DOM.musyrif.value; const santriOptions = musyrifValue ? State.rawSantriList.filter(s => s.musyrif === musyrifValue).sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id })) : []; Utils.populateSelect(DOM.namaSantri, santriOptions, 'Pilih Santri'); DOM.namaSantri.disabled = !musyrifValue; DOM.namaSantri.dispatchEvent(new Event('change')); });
+        DOM.namaSantri.addEventListener('change', () => { const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value); const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value); DOM.kelas.value = santri?.kelas || ''; DOM.program.value = santri?.program || ''; DOM.santriId.value = santri?.id || ''; const isTuntas = santriProcessed ? santriProcessed.isTuntas : false; const jenisOptions = santri ? (santri.program === "Unggulan" || (santri.program === "Tahfizh" && isTuntas) ? ["Ziyadah", "Murajaah", "Mutqin"] : ["Murajaah", "Mutqin"]) : []; Utils.populateSelect(DOM.jenis, jenisOptions, 'Pilih Jenis'); DOM.jenis.disabled = !santri; DOM.jenis.dispatchEvent(new Event('change')); });
+        DOM.jenis.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const santri = State.santriData.find(s => s.id === DOM.namaSantri.value); let juzOptions = []; if (jenisValue && santri) { if (jenisValue === 'Mutqin') { if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" }); const availableJuz = Object.keys(AppConfig.hafalanData.surahData); availableJuz.forEach(juzNum => { if (!santri.mutqinJuz.has(parseInt(juzNum))) { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); } }); } else { Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); }); } } Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz'); DOM.juz.disabled = !jenisValue; DOM.juz.dispatchEvent(new Event('change')); });
+        DOM.juz.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const juzValue = DOM.juz.value; ['halaman', 'surat'].forEach(key => { DOM[`${key}Container`].classList.add('hidden'); DOM[key].disabled = true; DOM[key].required = false; }); if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; const juzNum = parseInt(juzValue, 10); if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { DOM.suratContainer.classList.remove('hidden'); DOM.surat.disabled = false; DOM.surat.required = true; Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); } else { DOM.halamanContainer.classList.remove('hidden'); DOM.halaman.disabled = false; DOM.halaman.required = jenisValue !== 'Mutqin'; if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz'; } });
+
+        // -- Filter & Search --
+        [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
+        DOM.searchRiwayat.addEventListener('input', e => { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { UI.renderHistoryTable(); const query = e.target.value; if (query.length < 2) { DOM.suggestionsContainer.classList.add('hidden'); return; } const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5); if (suggestions.length > 0) { DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join(''); DOM.suggestionsContainer.classList.remove('hidden'); } else { DOM.suggestionsContainer.classList.add('hidden'); } }, 300); });
+        DOM.suggestionsContainer.addEventListener('click', e => { if (e.target.matches('.suggestion-item')) { DOM.searchRiwayat.value = e.target.textContent; DOM.suggestionsContainer.classList.add('hidden'); UI.renderHistoryTable(); } });
+
+        // -- Delete Action --
         DOM.cancelPasswordBtn.addEventListener('click', () => DOM.passwordConfirmModal.classList.add('hidden'));
         DOM.confirmPasswordBtn.addEventListener('click', async () => {
             const inputPass = DOM.passwordInput.value;
@@ -1191,17 +1201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.helpButton.addEventListener('click', () => DOM.helpModal.classList.remove('hidden'));
         DOM.closeHelpModal.addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
         DOM.helpModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
-        
-        // --- Form Dependency Logic ---
-        DOM.musyrif.addEventListener('change', () => { const musyrifValue = DOM.musyrif.value; const santriOptions = musyrifValue ? State.rawSantriList.filter(s => s.musyrif === musyrifValue).sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id })) : []; Utils.populateSelect(DOM.namaSantri, santriOptions, 'Pilih Santri'); DOM.namaSantri.disabled = !musyrifValue; DOM.namaSantri.dispatchEvent(new Event('change')); });
-        DOM.namaSantri.addEventListener('change', () => { const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value); const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value); DOM.kelas.value = santri?.kelas || ''; DOM.program.value = santri?.program || ''; DOM.santriId.value = santri?.id || ''; const isTuntas = santriProcessed ? santriProcessed.isTuntas : false; const jenisOptions = santri ? (santri.program === "Unggulan" || (santri.program === "Tahfizh" && isTuntas) ? ["Ziyadah", "Murajaah", "Mutqin"] : ["Murajaah", "Mutqin"]) : []; Utils.populateSelect(DOM.jenis, jenisOptions, 'Pilih Jenis'); DOM.jenis.disabled = !santri; DOM.jenis.dispatchEvent(new Event('change')); });
-        DOM.jenis.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const santri = State.santriData.find(s => s.id === DOM.namaSantri.value); let juzOptions = []; if (jenisValue && santri) { if (jenisValue === 'Mutqin') { if (!santri.nilai || santri.nilai < 100) juzOptions.push({ text: "Setengah Juz 30", value: "juz30_setengah" }); const availableJuz = Object.keys(AppConfig.hafalanData.surahData); availableJuz.forEach(juzNum => { if (!santri.mutqinJuz.has(parseInt(juzNum))) { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); } }); } else { Object.keys(AppConfig.hafalanData.surahData).forEach(juzNum => { juzOptions.push({ text: `Juz ${juzNum}`, value: juzNum }); }); } } Utils.populateSelect(DOM.juz, juzOptions.sort((a,b) => a.value - b.value), 'Pilih Juz'); DOM.juz.disabled = !jenisValue; DOM.juz.dispatchEvent(new Event('change')); });
-        DOM.juz.addEventListener('change', () => { const jenisValue = DOM.jenis.value; const juzValue = DOM.juz.value; ['halaman', 'surat'].forEach(key => { DOM[`${key}Container`].classList.add('hidden'); DOM[key].disabled = true; DOM[key].required = false; }); if (!jenisValue || !juzValue || juzValue === 'juz30_setengah') return; const juzNum = parseInt(juzValue, 10); if ((jenisValue === 'Ziyadah' || jenisValue === 'Murajaah') && AppConfig.hafalanData.surahData[juzNum]) { DOM.suratContainer.classList.remove('hidden'); DOM.surat.disabled = false; DOM.surat.required = true; Utils.populateSelect(DOM.surat, AppConfig.hafalanData.surahData[juzNum].list, 'Pilih Surat'); } else { DOM.halamanContainer.classList.remove('hidden'); DOM.halaman.disabled = false; DOM.halaman.required = jenisValue !== 'Mutqin'; if (jenisValue === 'Mutqin') DOM.halaman.placeholder = 'Kosongkan u/ 1 Juz'; } });
-
-        // -- Filter & Search ---
-        [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
-        DOM.searchRiwayat.addEventListener('input', e => { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { UI.renderHistoryTable(); const query = e.target.value; if (query.length < 2) { DOM.suggestionsContainer.classList.add('hidden'); return; } const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5); if (suggestions.length > 0) { DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join(''); DOM.suggestionsContainer.classList.remove('hidden'); } else { DOM.suggestionsContainer.classList.add('hidden'); } }, 300); });
-        DOM.suggestionsContainer.addEventListener('click', e => { if (e.target.matches('.suggestion-item')) { DOM.searchRiwayat.value = e.target.textContent; DOM.suggestionsContainer.classList.add('hidden'); UI.renderHistoryTable(); } });
     }
 
     function validateForm() {
@@ -1229,7 +1228,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 2. Tampilkan Role Selection Modal (sebelum switch page)
         DOM.roleSelectionModal.classList.remove('hidden');
-        DOM.mainLayout.classList.add('hidden');
+        DOM.mainLayout.classList.add('hidden'); // Sembunyikan main content sampai role dipilih
 
         // 3. Matikan loading skeleton setelah data dimuat
         UI.switchPage('page-beranda', false); 
