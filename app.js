@@ -1,31 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
+    // ==========================================
+    // 0. DEPENDENCIES & CONFIGURATION
+    // ==========================================
+    // Pastikan AppConfig sudah didefinisikan di file lain atau di window object
+    // sebelum script ini berjalan.
+
     // ==========================================
     // 1. STATE MANAGEMENT
     // ==========================================
+    /**
+     * Menyimpan seluruh data aplikasi yang dinamis.
+     * State ini menjadi "Single Source of Truth" setelah data ditarik dari API.
+     */
     const State = {
-        allSetoran: [],
-        rawSantriList: [], 
-        santriData: [],    
-        classGroups: {},
-        setoranIdToDelete: null,
-        searchDebounceTimer: null,
-        santriNameMap: new Map(),
-        chartInstance: null,
-        countdownInterval: null 
+        allSetoran: [],         // Data mentah setoran dari spreadsheet
+        rawSantriList: [],      // Data mentah daftar santri
+        santriData: [],         // Data santri yang sudah diolah dengan statistik (Processed Data)
+        classGroups: {},        // Pengelompokan santri berdasarkan musyrif/kelas untuk fitur Rekap
+        setoranIdToDelete: null,// ID sementara untuk proses penghapusan
+        searchDebounceTimer: null, // Timer untuk fitur pencarian (menghindari lag)
+        santriNameMap: new Map(),  // Map untuk pencarian cepat ID berdasarkan nama
+        chartInstance: null,       // Instance Chart.js (untuk dimusnahkan saat update)
+        countdownInterval: null    // Interval timer mundur perpulangan
     };
 
     // ==========================================
     // 2. DOM CACHING
     // ==========================================
     const DOM = {};
+
+    /**
+     * Menyimpan referensi elemen HTML ke dalam object DOM.
+     * Tujuannya agar tidak melakukan document.getElementById berulang-ulang (Performance Optimization).
+     */
     function cacheDOMElements() {
         const elementMapping = {
-            // -- Halaman & Nav --
+            // -- Navigasi & Layout Utama --
             mainNav: 'main-nav',
             mainContent: 'main-content',
+            datetimeContainer: 'datetime-container',
             
-            // -- Form Input --
+            // -- Form Input Setoran --
             setoranForm: 'setoranForm',
             tanggal: 'tanggal',
             nowBtn: 'nowBtn',
@@ -40,13 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
             halaman: 'halaman',
             suratContainer: 'surat-container',
             surat: 'surat',
-            kualitas: 'kualitas',
             submitButton: 'submit-button',
             submitButtonText: 'submit-button-text',
             submitButtonIcon: 'submit-button-icon',
             submitSpinner: 'submit-spinner',
 
-            // -- Riwayat --
+            // -- Tabel Riwayat --
             setoranTableBody: 'setoranTableBody',
             historyRowTemplate: 'history-row-template',
             searchRiwayat: 'search-riwayat',
@@ -56,12 +71,12 @@ document.addEventListener('DOMContentLoaded', () => {
             filterProgram: 'filter-program',
             filterKelas: 'filter-kelas',
 
-            // -- Statistik Beranda --
+            // -- Dashboard: Statistik Atas --
             statsSantriAktif: 'stats-santri-aktif',
             statsSantriTuntas: 'stats-santri-tuntas',
             statsSantriBelumTuntas: 'stats-santri-belum-tuntas',
-            
-            // -- Progres Mutqin (Visual) --
+
+            // -- Dashboard: Visual Progress Mutqin --
             mutqinJuz29ProgressContainer: 'mutqin-juz29-progress-container',
             mutqinJuz30ProgressContainer: 'mutqin-juz30-progress-container',
             mutqinUnggulanProgressContainer: 'mutqin-unggulan-progress-container',
@@ -71,22 +86,25 @@ document.addEventListener('DOMContentLoaded', () => {
             mutqinUnggulanDetails: 'mutqin-unggulan-details',
             mutqinJuz30Details: 'mutqin-juz30-details',
             mutqinJuz29Details: 'mutqin-juz29-details',
-            
-            // -- Section Beranda Lainnya --
+
+            // -- Dashboard: Section Lainnya --
             peringkatSection: 'peringkat-section',
             tuntasTrackingAccordion: 'tuntas-tracking-accordion',
             tahfizhTuntasTrackingSection: 'tahfizh-tuntas-tracking-section',
-            datetimeContainer: 'datetime-container',
-            
-            // -- FITUR BARU: Section Jadwal Perpulangan --
             jadwalPerpulanganSection: 'jadwal-perpulangan-section',
 
-            // -- Rekap --
+            // -- Halaman Rekap --
             rekapSelect: 'rekap-select',
             rekapContentContainer: 'rekap-content-container',
             rekapContentTemplate: 'rekap-content-template',
 
-            // -- Modals & Toast --
+            // -- Halaman Analisis --
+            santriSelectAnalisis: 'santri-select-analisis',
+            analisisContentContainer: 'analisis-content-container',
+            analisisDashboardTemplate: 'analisis-dashboard-template',
+            analisisPromptTemplate: 'analisis-prompt-template',
+
+            // -- Komponen: Toast & Modal --
             toast: 'toast',
             toastMessage: 'toast-message',
             toastIcon: 'toast-icon',
@@ -98,8 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             helpButton: 'help-button',
             helpModal: 'helpModal',
             closeHelpModal: 'closeHelpModal',
-
-            // -- Modal Detail Santri --
             studentDetailModal: 'studentDetailModal',
             closeDetailModal: 'closeDetailModal',
             detailNama: 'detail-nama',
@@ -107,13 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             progressChart: 'progressChart',
             juzVisualContainer: 'juz-visual-container',
 
-            // -- Halaman Analisis --
-            santriSelectAnalisis: 'santri-select-analisis',
-            analisisContentContainer: 'analisis-content-container',
-            analisisDashboardTemplate: 'analisis-dashboard-template',
-            analisisPromptTemplate: 'analisis-prompt-template',
-
-            // -- TEMPLATE BARU (Mapping ID template di index.html) --
+            // -- Templates (HTML Template Tags) --
             tplJadwalPerpulangan: 'tpl-jadwal-perpulangan',
             tplAccordionItem: 'tpl-accordion-item',
             tplPeringkatSection: 'tpl-peringkat-section',
@@ -129,7 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (element) {
                 DOM[propName] = element;
             } else {
-                console.warn(`Elemen dengan ID '${id}' tidak ditemukan di HTML.`);
+                // Log warning agar developer tahu jika ada ID yang hilang di HTML
+                console.warn(`[DOM Cache] Elemen dengan ID '${id}' tidak ditemukan.`);
             }
         }
         
@@ -141,6 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. UTILITIES & API
     // ==========================================
     const Utils = {
+        /**
+         * Mengambil data dari Google Sheet (via App Script).
+         * Menggunakan LocalStorage sebagai cache fallback jika offline.
+         */
         fetchSetoranData: async () => {
             try {
                 const response = await fetch(AppConfig.scriptURL);
@@ -149,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('cachedData', JSON.stringify(data)); 
                 return data;
             } catch (error) {
-                console.warn('Mengambil data offline dari cache...');
+                console.warn('Network error, attempting to load offline cache...');
                 const cached = localStorage.getItem('cachedData');
                 if (cached) return JSON.parse(cached);
                 
@@ -157,6 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return [];
             }
         },
+
+        /**
+         * Mengirim data form ke Google Sheet.
+         */
         postData: async (formData) => {
             try {
                 const response = await fetch(AppConfig.scriptURL, { method: 'POST', body: formData });
@@ -168,6 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return { result: 'error', error: error.message };
             }
         },
+
+        /**
+         * Helper untuk mengisi elemen <select> dengan opsi.
+         */
         populateSelect: (selectElement, options, placeholder) => {
             selectElement.innerHTML = '';
             if (placeholder) {
@@ -180,15 +203,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectElement.add(option);
             });
         },
+
+        /**
+         * Normalisasi string nama untuk keperluan mapping ID (lowercase, hapus simbol).
+         */
         normalizeName: (name) => {
             return typeof name !== 'string' ? '' : name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
         },
-        // Helper untuk mengisi konten teks elemen dengan aman
+
+        /**
+         * Helper aman untuk mengisi textContent.
+         */
         setText: (element, selector, text) => {
             const el = element.querySelector(selector);
             if (el) el.textContent = text;
         },
-        // Helper untuk mengisi innerHTML (hati-hati XSS jika input user tidak divalidasi)
+
+        /**
+         * Helper aman untuk mengisi innerHTML.
+         */
         setHTML: (element, selector, html) => {
             const el = element.querySelector(selector);
             if (el) el.innerHTML = html;
@@ -199,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. UI MANAGERS
     // ==========================================
     const UI = {
+        // --- General UI Helpers ---
+
         showToast: (message, type = 'success') => {
             DOM.toastMessage.textContent = message;
             const isSuccess = type === 'success';
@@ -211,17 +246,23 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.toast.classList.remove('opacity-0', 'translate-y-[-20px]');
             setTimeout(() => DOM.toast.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         },
+
         switchPage: (pageId, showSkeleton = true) => {
             if (!pageId) return;
             DOM.pages.forEach(page => page.classList.add('hidden'));
+            
+            // Efek Loading Skeleton
             if (showSkeleton) {
                 const skeleton = document.getElementById(`skeleton-${pageId}`);
                 if (skeleton) skeleton.classList.remove('hidden');
             }
+
             setTimeout(() => {
                 DOM.skeletonContainers.forEach(s => s.classList.add('hidden'));
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) targetPage.classList.remove('hidden');
+                
+                // Update state Navigasi
                 DOM.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
                 DOM.mainNav.querySelectorAll('.nav-link div').forEach(div => div.classList.remove('bg-amber-100', 'text-amber-600'));
                 DOM.mainNav.querySelectorAll('.nav-link span').forEach(span => span.classList.remove('text-amber-700'));
@@ -229,7 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const activeLink = DOM.mainNav.querySelector(`a[data-page="${pageId}"]`);
                 if (activeLink) {
                     activeLink.classList.add('active');
-                    // Style manual karena selector CSS .active group mungkin tidak cukup spesifik di beberapa struktur
                     const iconDiv = activeLink.querySelector('div');
                     const textSpan = activeLink.querySelector('span');
                     if(iconDiv) iconDiv.classList.add('bg-amber-100', 'text-amber-600');
@@ -237,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 150);
         },
+
         updateDateTime: () => {
             const now = new Date();
             const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
@@ -250,12 +291,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="text-xs font-medium text-slate-400 font-mono mt-1">${new Intl.DateTimeFormat('id-ID-u-ca-islamic', islamicDateOptions).format(now)}</p>
                 </div>`;
         },
+
+        /**
+         * Render ulang semua komponen UI utama.
+         * Dipanggil setelah data baru diambil.
+         */
         renderAll: () => {
             UI.renderBeranda();
             UI.renderHistoryTable();
             UI.renderRekap();
             UI.renderAnalisisPage();
         },
+
+        // --- DASHBOARD (BERANDA) RENDERERS ---
+
         renderBeranda: () => {
             const santriAktifIds = new Set(State.allSetoran.map(s => s.santriId));
             const totalSantri = State.rawSantriList.length;
@@ -272,7 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.renderTahfizhTuntasTrackingNew();
         },
 
-        // --- FITUR BARU: JADWAL PERPULANGAN (COUNTDOWN) ---
         renderJadwalPerpulangan: () => {
             if (State.countdownInterval) clearInterval(State.countdownInterval);
             const now = new Date();
@@ -280,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             DOM.jadwalPerpulanganSection.innerHTML = '';
             
-            // Gunakan Template
+            // Menggunakan Template
             const template = DOM.tplJadwalPerpulangan.content.cloneNode(true);
             DOM.jadwalPerpulanganSection.appendChild(template);
 
@@ -290,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const monthName = nextPeriod.deadline.toLocaleString('id-ID', { month: 'long' });
                 const deadlineStr = nextPeriod.deadline.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 
-                // Generate Target Badges (Masih string literal karena dynamic loop simple)
                 const targetsHtml = nextPeriod.required.map(t => `<div class="flex items-center gap-2 bg-white/80 py-1.5 px-3 rounded-full text-xs font-bold shadow-sm border border-slate-200/80 text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>${t.replace(/_/g, ' ')}</span></div>`).join('');
                 
                 cont.innerHTML = `
@@ -325,7 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     const d = Math.floor(dist / 864e5), h = Math.floor(dist % 864e5 / 36e5), m = Math.floor(dist % 36e5 / 6e4), s = Math.floor(dist % 6e4 / 1e3);
                     
-                    // Timer Digits HTML string
                     timerEl.innerHTML = [d, h, m, s].map((val, i) => `
                         <div class="bg-white border border-slate-200 p-2 rounded-xl w-16 shadow-sm">
                             <div class="text-2xl font-black text-slate-800">${String(val).padStart(2, '0')}</div>
@@ -337,110 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 cont.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center font-bold text-slate-400 border-2 border-dashed border-slate-200">Semua jadwal perpulangan telah selesai.</div>';
             }
-        },
-
-        renderAnalisisPage: () => {
-            if (!DOM.santriSelectAnalisis) return;
-            const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
-            Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
-            DOM.analisisContentContainer.innerHTML = '';
-            DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
-        },
-
-        renderSantriDashboard: (sId) => {
-            const s = State.santriData.find(s => s.id === sId);
-            if (!s) return;
-            
-            DOM.analisisContentContainer.innerHTML = '';
-            const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
-            
-            // Isi Data Profil
-            Utils.setText(dash, '[data-name]', s.nama);
-            Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
-            Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
-            
-            // Badge Status Tuntas
-            const statusBadge = dash.querySelector('[data-status-badge]');
-            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
-            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
-            
-            // Badge Perpulangan
-            const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
-            if (s.statusPerpulangan === 'Boleh Pulang') {
-                perpulanganBadge.textContent = 'Boleh Pulang';
-                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700';
-            } else {
-                perpulanganBadge.textContent = 'Belum';
-                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700';
-            }
-            
-            // Nilai & Statistik
-            Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
-            Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
-            Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
-            
-            // Progres Juz Wajib
-            const progItems = [
-                { juz: 'Setengah Juz 30', done: s.nilai >= 100 },
-                { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true },
-                { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }
-            ];
-            
-            const progresHtml = progItems
-                .filter(item => !item.tahfizhOnly || s.program === 'Tahfizh')
-                .map(item => `
-                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="font-bold text-sm text-slate-700">${item.juz}</span>
-                        ${item.done 
-                            ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' 
-                            : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
-                    </div>`)
-                .join('');
-            
-            Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
-            
-            // Progres Ziyadah (Jika Tahfizh & Tuntas)
-            const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
-            if (s.program === 'Tahfizh' && s.isTuntas) {
-                ziyadahSect.classList.remove('hidden');
-                const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
-                const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
-                
-                ziyadahCont.innerHTML = allJuz.map(j => {
-                    const compPages = s.ziyadahProgress[j] || 0;
-                    if (compPages <= 0) return '';
-                    const totalPages = AppConfig.hafalanData.juzPageCounts[j];
-                    const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0;
-                    return `
-                    <div class="mb-3">
-                        <div class="flex justify-between mb-1 text-xs font-bold text-slate-600">
-                            <span>Juz ${j}</span>
-                            <span>${compPages.toFixed(1)} / ${totalPages}</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
-            
-            // Tabel Aktivitas
-            const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
-            const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            aktivitasCont.innerHTML = allActivities.length > 0 
-                ? allActivities.map(s => `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4">
-                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
-                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
-                        </td>
-                        <td class="p-4 text-right text-xs font-bold text-slate-400">
-                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                        </td>
-                    </tr>`).join('') 
-                : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
-            
-            DOM.analisisContentContainer.appendChild(dash);
         },
 
         renderMutqinProgress: () => {
@@ -489,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalCount = group.santri.length;
                 const percentage = totalCount > 0 ? ((tuntasCount / totalCount) * 100).toFixed(0) : 0;
                 
-                // Gunakan Template Accordion
                 const clone = DOM.tplAccordionItem.content.cloneNode(true);
                 
                 Utils.setText(clone, '.data-group-name', groupName);
@@ -500,7 +441,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bar = clone.querySelector('.data-progress-bar');
                 if(bar) bar.style.width = `${percentage}%`;
 
-                // Isi List
                 const tuntasList = group.santri.filter(s => s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Belum ada</li>';
                 const belumList = group.santri.filter(s => !s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Semua tuntas</li>';
                 
@@ -524,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tab = container.querySelector(`[data-program="Tahfizh"]`);
             if(tab) {
                 tab.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
-                tab.classList.remove('text-slate-500'); // Asumsi default styling
+                tab.classList.remove('text-slate-500');
             }
         },
 
@@ -542,8 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const medalColors = ['bg-yellow-400', 'bg-slate-300', 'bg-amber-700'];
             
             contentContainer.innerHTML = '';
-            
-            // Grid container
             const grid = document.createElement('div');
             grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
 
@@ -610,7 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const tuntasList = tahfizhSantri.filter(s => s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
             const belumTuntasList = tahfizhSantri.filter(s => !s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
 
-            // Use Template
             contentContainer.innerHTML = '';
             const clone = DOM.tplTahfizhContent.content.cloneNode(true);
             
@@ -636,6 +573,113 @@ document.addEventListener('DOMContentLoaded', () => {
             
             contentContainer.appendChild(clone);
         },
+
+        // --- ANALISIS PAGE RENDERER ---
+
+        renderAnalisisPage: () => {
+            if (!DOM.santriSelectAnalisis) return;
+            const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
+            Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
+            DOM.analisisContentContainer.innerHTML = '';
+            DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
+        },
+
+        renderSantriDashboard: (sId) => {
+            const s = State.santriData.find(s => s.id === sId);
+            if (!s) return;
+            
+            DOM.analisisContentContainer.innerHTML = '';
+            const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
+            
+            // Isi Data Profil
+            Utils.setText(dash, '[data-name]', s.nama);
+            Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
+            Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
+            
+            // Badge Status
+            const statusBadge = dash.querySelector('[data-status-badge]');
+            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
+            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
+            
+            const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
+            if (s.statusPerpulangan === 'Boleh Pulang') {
+                perpulanganBadge.textContent = 'Boleh Pulang';
+                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700';
+            } else {
+                perpulanganBadge.textContent = 'Belum';
+                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700';
+            }
+            
+            // Nilai & Statistik
+            Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
+            Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
+            Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
+            
+            // Progres Juz Wajib
+            const progItems = [
+                { juz: 'Setengah Juz 30', done: s.nilai >= 100 },
+                { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true },
+                { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }
+            ];
+            
+            const progresHtml = progItems
+                .filter(item => !item.tahfizhOnly || s.program === 'Tahfizh')
+                .map(item => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="font-bold text-sm text-slate-700">${item.juz}</span>
+                        ${item.done 
+                            ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' 
+                            : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
+                    </div>`)
+                .join('');
+            
+            Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
+            
+            // Progres Ziyadah
+            const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
+            if (s.program === 'Tahfizh' && s.isTuntas) {
+                ziyadahSect.classList.remove('hidden');
+                const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
+                const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
+                
+                ziyadahCont.innerHTML = allJuz.map(j => {
+                    const compPages = s.ziyadahProgress[j] || 0;
+                    if (compPages <= 0) return '';
+                    const totalPages = AppConfig.hafalanData.juzPageCounts[j];
+                    const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0;
+                    return `
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1 text-xs font-bold text-slate-600">
+                            <span>Juz ${j}</span>
+                            <span>${compPages.toFixed(1)} / ${totalPages}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            
+            // Tabel Aktivitas
+            const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
+            const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            aktivitasCont.innerHTML = allActivities.length > 0 
+                ? allActivities.map(s => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4">
+                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
+                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
+                        </td>
+                        <td class="p-4 text-right text-xs font-bold text-slate-400">
+                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                        </td>
+                    </tr>`).join('') 
+                : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
+            
+            DOM.analisisContentContainer.appendChild(dash);
+        },
+
+        // --- RIWAYAT TABLE RENDERER ---
 
         renderHistoryTable: () => {
             const searchTerm = DOM.searchRiwayat.value.toLowerCase();
@@ -666,7 +710,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const fragment = document.createDocumentFragment();
-            // Template sudah ada di DOM.historyRowTemplate
             filtered.forEach(setoran => {
                 const santri = State.santriData.find(s => s.id === setoran.santriId);
                 const clone = DOM.historyRowTemplate.content.cloneNode(true);
@@ -702,6 +745,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.appendChild(fragment);
         },
 
+        // --- REKAP & REPORT RENDERER ---
+
         renderRekap: () => {
             const groupOrder = ['Seluruh Santri', 'Khusus Tahfizh', ...Object.keys(State.classGroups).filter(g => g !== 'Seluruh Santri' && g !== 'Khusus Tahfizh').sort()];
             const selectEl = DOM.rekapSelect;
@@ -715,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectEl.add(new Option(groupName, tabId));
                 
                 const clone = DOM.rekapContentTemplate.content.cloneNode(true);
-                const content = clone.querySelector('.rekap-tab-content'); // Ambil elemen root di template
+                const content = clone.querySelector('.rekap-tab-content');
                 content.id = `rekap-tab-${tabId}`;
                 
                 const group = State.classGroups[groupName];
@@ -727,7 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(btn) btn.dataset.classGroup = groupName;
                 
                 if (index !== 0) { content.classList.add('hidden'); }
-                contentContainer.appendChild(content); // Append elemen root yang sudah diambil
+                contentContainer.appendChild(content); 
                 UI.renderSingleRekapTable(groupName, { isInitial: true });
             });
         },
@@ -843,7 +888,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // --- FITUR BARU: MODAL DETAIL, CHART, & VISUAL BALOK (Legacy) ---
+        // --- DETAIL MODAL & CHARTS ---
+
         openDetailModal: (santriId) => {
             const santri = State.santriData.find(s => s.id === santriId);
             if (!santri) return;
@@ -922,7 +968,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
                 const percentage = Math.min(Math.round((totalPagesDone / maxPages) * 100), 100);
                 
-                // Use Template
                 const clone = DOM.tplJuzBlock.content.cloneNode(true);
                 Utils.setText(clone, '.block-title', `Juz ${juzNum}`);
                 Utils.setText(clone, '.block-stats', `${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)`);
@@ -939,13 +984,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 5. CORE LOGIC
+    // 5. CORE LOGIC (BUSINESS LOGIC)
     // ==========================================
     const Core = {
+        /**
+         * Mengambil data baru, memproses statistik, dan memicu render UI.
+         */
         reloadData: async () => {
             const response = await Utils.fetchSetoranData(); 
             if (!response || !response.setoran) {
-                console.error("Gagal format data server");
+                console.error("Format data server tidak valid.");
                 return;
             }
             State.rawSantriList = (response.santri || []).map(s => ({
@@ -1005,6 +1053,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return 'Belum Boleh Pulang';
         },
 
+        /**
+         * Menghitung statistik hafalan setiap santri (Nilai, Ziyadah, Status Tuntas).
+         * Ini adalah fungsi logika terberat.
+         */
         calculateSantriStats: () => {
             const santriStatsMap = new Map(State.rawSantriList.map(s => [s.id, { 
                 ...s, 
@@ -1111,7 +1163,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildClassGroups: () => {
             const tempGroups = {};
-            
             State.santriData.forEach(s => {
                 if (!tempGroups[s.musyrif]) {
                     tempGroups[s.musyrif] = { santri: [], musyrif: s.musyrif, classes: new Set() };
@@ -1121,7 +1172,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             State.classGroups = {};
-            
             for (const musyrif in tempGroups) {
                 const group = tempGroups[musyrif];
                 let groupName;
@@ -1148,6 +1198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. EVENT LISTENERS
     // ==========================================
     function setupEventListeners() {
+        // -- Form Handling --
         DOM.setoranForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!validateForm()) return;
@@ -1174,6 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.submitSpinner.classList.add('hidden');
         });
 
+        // -- Navigation & Interaksi Umum --
         DOM.nowBtn.addEventListener('click', () => {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -1188,6 +1240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // -- Event Delegation untuk Elemen Dinamis --
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
             const tabBtn = e.target.closest('.analisis-tab');
@@ -1222,7 +1275,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.querySelector('.accordion-chevron').classList.toggle('rotate-180');
             } else if (button.matches('.sortable')) {
                 const column = button.dataset.sort;
-                // Find group name from the tab ID
                 const tabContent = button.closest('.rekap-tab-content');
                 const groupName = Object.keys(State.classGroups).find(n => n.replace(/, /g, '').replace(/ /g, '-') === tabContent.id.replace('rekap-tab-', ''));
                 if (groupName) {
@@ -1238,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const container = DOM.peringkatSection;
                 container.querySelectorAll('.tab-peringkat').forEach(b => {
                     b.classList.remove('bg-white', 'text-amber-600', 'shadow-sm');
-                    b.classList.add('text-slate-500'); // Reset style
+                    b.classList.add('text-slate-500'); 
                 });
                 button.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
                 button.classList.remove('text-slate-500');
@@ -1251,6 +1303,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // -- Search Input Handling (Debounce) --
         DOM.mainContent.addEventListener('input', e => {
             if (e.target.matches('.tahfizh-search')) {
                 clearTimeout(State.searchDebounceTimer);
@@ -1261,6 +1314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // -- Halaman Analisis --
         if (DOM.santriSelectAnalisis) {
             DOM.santriSelectAnalisis.addEventListener('change', (e) => {
                 if (e.target.value) {
@@ -1272,6 +1326,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // -- Halaman Rekap --
         DOM.rekapSelect.addEventListener('change', (e) => {
             const selectedId = e.target.value;
             DOM.rekapContentContainer.querySelectorAll('.rekap-tab-content').forEach(c => c.classList.add('hidden'));
@@ -1284,9 +1339,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // -- Modals --
         DOM.closeDetailModal.addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
         DOM.studentDetailModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
 
+        // -- Logika Dependensi Form (Musyrif -> Santri -> Detail) --
         DOM.musyrif.addEventListener('change', () => {
             const musyrifValue = DOM.musyrif.value;
             const santriOptions = musyrifValue
@@ -1360,6 +1417,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // -- Filter & Pencarian Riwayat --
         [DOM.filterTanggalMulai, DOM.filterTanggalAkhir, DOM.filterProgram, DOM.filterKelas].forEach(el => el.addEventListener('input', UI.renderHistoryTable));
         DOM.searchRiwayat.addEventListener('input', e => {
             clearTimeout(State.searchDebounceTimer);
@@ -1387,6 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // -- Konfirmasi Hapus Data (Password) --
         DOM.cancelPasswordBtn.addEventListener('click', () => DOM.passwordConfirmModal.classList.add('hidden'));
         DOM.confirmPasswordBtn.addEventListener('click', async () => {
             const inputPass = DOM.passwordInput.value;
@@ -1435,11 +1494,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // -- Help Modal --
         DOM.helpButton.addEventListener('click', () => DOM.helpModal.classList.remove('hidden'));
         DOM.closeHelpModal.addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
         DOM.helpModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.helpModal.classList.add('hidden'));
     }
 
+    /**
+     * Validasi sederhana form setoran sebelum dikirim.
+     */
     function validateForm() {
         let isValid = true;
         document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
@@ -1476,16 +1539,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return isValid;
     }
 
+    // ==========================================
+    // 7. INITIALIZATION
+    // ==========================================
     async function main() {
         cacheDOMElements();
         setupEventListeners();
+        
+        // Set halaman default
         UI.switchPage('page-beranda');
 
+        // Jalankan jam
         UI.updateDateTime();
         setInterval(UI.updateDateTime, 1000);
 
+        // Tarik data awal
         await Core.reloadData();
         
+        // Matikan loading skeleton
         UI.switchPage('page-beranda', false);
     }
 
