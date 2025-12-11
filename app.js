@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
         searchDebounceTimer: null,
         santriNameMap: new Map(),
         chartInstance: null,
-        // STATE BARU: Interval untuk hitung mundur jadwal perpulangan
         countdownInterval: null 
     };
 
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             helpModal: 'helpModal',
             closeHelpModal: 'closeHelpModal',
 
-            // -- Modal Detail Santri (Lama) --
+            // -- Modal Detail Santri --
             studentDetailModal: 'studentDetailModal',
             closeDetailModal: 'closeDetailModal',
             detailNama: 'detail-nama',
@@ -108,11 +107,21 @@ document.addEventListener('DOMContentLoaded', () => {
             progressChart: 'progressChart',
             juzVisualContainer: 'juz-visual-container',
 
-            // -- FITUR BARU: Halaman Analisis --
+            // -- Halaman Analisis --
             santriSelectAnalisis: 'santri-select-analisis',
             analisisContentContainer: 'analisis-content-container',
             analisisDashboardTemplate: 'analisis-dashboard-template',
-            analisisPromptTemplate: 'analisis-prompt-template'
+            analisisPromptTemplate: 'analisis-prompt-template',
+
+            // -- TEMPLATE BARU (Mapping ID template di index.html) --
+            tplJadwalPerpulangan: 'tpl-jadwal-perpulangan',
+            tplAccordionItem: 'tpl-accordion-item',
+            tplPeringkatSection: 'tpl-peringkat-section',
+            tplPeringkatItem: 'tpl-peringkat-item',
+            tplTahfizhSection: 'tpl-tahfizh-section',
+            tplTahfizhContent: 'tpl-tahfizh-content',
+            tplJuzBlock: 'tpl-juz-block',
+            tplRekapRow: 'tpl-rekap-row'
         };
 
         for (const [propName, id] of Object.entries(elementMapping)) {
@@ -137,13 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(AppConfig.scriptURL);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
-                // Simpan data terbaru ke LocalStorage
                 localStorage.setItem('cachedData', JSON.stringify(data)); 
                 return data;
             } catch (error) {
                 console.warn('Mengambil data offline dari cache...');
                 const cached = localStorage.getItem('cachedData');
-                if (cached) return JSON.parse(cached); // Gunakan data lama jika offline
+                if (cached) return JSON.parse(cached);
                 
                 UI.showToast('Gagal memuat data (Offline & Cache kosong).', 'error');
                 return [];
@@ -174,6 +182,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         normalizeName: (name) => {
             return typeof name !== 'string' ? '' : name.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
+        },
+        // Helper untuk mengisi konten teks elemen dengan aman
+        setText: (element, selector, text) => {
+            const el = element.querySelector(selector);
+            if (el) el.textContent = text;
+        },
+        // Helper untuk mengisi innerHTML (hati-hati XSS jika input user tidak divalidasi)
+        setHTML: (element, selector, html) => {
+            const el = element.querySelector(selector);
+            if (el) el.innerHTML = html;
         }
     };
 
@@ -185,12 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.toastMessage.textContent = message;
             const isSuccess = type === 'success';
             DOM.toastIcon.innerHTML = isSuccess
-                ? `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`
-                : `<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+                ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             DOM.toastIcon.classList.toggle('text-green-400', isSuccess);
             DOM.toastIcon.classList.toggle('text-red-400', !isSuccess);
-            DOM.toast.classList.add('show');
-            setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+            
+            DOM.toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            setTimeout(() => DOM.toast.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         },
         switchPage: (pageId, showSkeleton = true) => {
             if (!pageId) return;
@@ -204,8 +223,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) targetPage.classList.remove('hidden');
                 DOM.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+                DOM.mainNav.querySelectorAll('.nav-link div').forEach(div => div.classList.remove('bg-amber-100', 'text-amber-600'));
+                DOM.mainNav.querySelectorAll('.nav-link span').forEach(span => span.classList.remove('text-amber-700'));
+
                 const activeLink = DOM.mainNav.querySelector(`a[data-page="${pageId}"]`);
-                if (activeLink) activeLink.classList.add('active');
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    // Style manual karena selector CSS .active group mungkin tidak cukup spesifik di beberapa struktur
+                    const iconDiv = activeLink.querySelector('div');
+                    const textSpan = activeLink.querySelector('span');
+                    if(iconDiv) iconDiv.classList.add('bg-amber-100', 'text-amber-600');
+                    if(textSpan) textSpan.classList.add('text-amber-700');
+                }
             }, 150);
         },
         updateDateTime: () => {
@@ -215,17 +244,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const islamicDateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
 
             DOM.datetimeContainer.innerHTML = `
-                <div class="text-center space-y-1">
-                    <p class="text-2xl font-bold">${new Intl.DateTimeFormat('id-ID', timeOptions).format(now).replace(/\./g, ':')}</p>
-                    <p class="text-xs font-semibold text-[var(--subtle-text)]">${new Intl.DateTimeFormat('id-ID', dateOptions).format(now)}</p>
-                    <p class="text-xs font-semibold text-gray-500">${new Intl.DateTimeFormat('id-ID-u-ca-islamic', islamicDateOptions).format(now)}</p>
+                <div class="space-y-1">
+                    <p class="text-4xl font-black text-slate-800 tracking-tighter">${new Intl.DateTimeFormat('id-ID', timeOptions).format(now).replace(/\./g, ':')}</p>
+                    <p class="text-sm font-bold text-amber-600 uppercase tracking-widest">${new Intl.DateTimeFormat('id-ID', dateOptions).format(now)}</p>
+                    <p class="text-xs font-medium text-slate-400 font-mono mt-1">${new Intl.DateTimeFormat('id-ID-u-ca-islamic', islamicDateOptions).format(now)}</p>
                 </div>`;
         },
         renderAll: () => {
             UI.renderBeranda();
             UI.renderHistoryTable();
             UI.renderRekap();
-            // BARU: Render halaman Analisis (Dropdown)
             UI.renderAnalisisPage();
         },
         renderBeranda: () => {
@@ -237,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.statsSantriTuntas.textContent = tuntasCount;
             DOM.statsSantriBelumTuntas.textContent = totalSantri - tuntasCount;
 
-            UI.renderJadwalPerpulangan(); // BARU: Render Countdown
+            UI.renderJadwalPerpulangan();
             UI.renderMutqinProgress();
             UI.renderTuntasTracking();
             UI.renderPeringkatNew();
@@ -248,35 +276,38 @@ document.addEventListener('DOMContentLoaded', () => {
         renderJadwalPerpulangan: () => {
             if (State.countdownInterval) clearInterval(State.countdownInterval);
             const now = new Date();
-            // Mengambil konfigurasi dari AppConfig (pastikan config.js sudah diupdate)
             const nextPeriod = AppConfig.perpulanganPeriods.find(p => now < p.deadline);
             
-            DOM.jadwalPerpulanganSection.innerHTML = `
-                <h3 class="section-header">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Jadwal Perpulangan Terdekat
-                </h3>
-                <div id="jadwal-content-container"></div>`;
+            DOM.jadwalPerpulanganSection.innerHTML = '';
             
+            // Gunakan Template
+            const template = DOM.tplJadwalPerpulangan.content.cloneNode(true);
+            DOM.jadwalPerpulanganSection.appendChild(template);
+
             const cont = DOM.jadwalPerpulanganSection.querySelector('#jadwal-content-container');
             
             if (nextPeriod) {
                 const monthName = nextPeriod.deadline.toLocaleString('id-ID', { month: 'long' });
                 const deadlineStr = nextPeriod.deadline.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                const targetsHtml = nextPeriod.required.map(t => `<div class="flex items-center gap-2 bg-white/80 py-1 px-3 rounded-full text-sm shadow-sm border border-gray-200/80"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span class="font-medium text-gray-700">${t.replace(/_/g, ' ')}</span></div>`).join('');
+                
+                // Generate Target Badges (Masih string literal karena dynamic loop simple)
+                const targetsHtml = nextPeriod.required.map(t => `<div class="flex items-center gap-2 bg-white/80 py-1.5 px-3 rounded-full text-xs font-bold shadow-sm border border-slate-200/80 text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>${t.replace(/_/g, ' ')}</span></div>`).join('');
                 
                 cont.innerHTML = `
-                    <div class="glass-card rounded-2xl p-6">
+                    <div class="glass-card rounded-2xl p-6 bg-gradient-to-br from-white to-slate-50 border border-white/60">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                             <div class="text-center">
-                                <h4 class="text-lg font-bold text-gray-800">Waktu Tersisa Menuju Perpulangan ${monthName}</h4>
-                                <p class="text-sm text-gray-500 mb-4">Deadline: ${deadlineStr} WIB</p>
+                                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Menuju Perpulangan</h4>
+                                <h2 class="text-2xl font-black text-slate-800 mb-2">${monthName}</h2>
+                                <p class="text-xs text-slate-500 mb-6 bg-slate-100 inline-block px-3 py-1 rounded-lg">Deadline: ${deadlineStr} WIB</p>
                                 <div id="countdown-timer" class="flex justify-center gap-3 text-center"></div>
                             </div>
-                            <div class="border-t md:border-t-0 md:border-l border-[var(--card-border)] pt-6 md:pt-0 md:pl-6">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <div class="bg-green-100 text-green-700 p-2 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg></div>
-                                    <h4 class="text-lg font-bold">Target Hafalan</h4>
+                            <div class="border-t md:border-t-0 md:border-l border-slate-200 pt-6 md:pt-0 md:pl-6">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="bg-green-100 text-green-700 p-2 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                                    </div>
+                                    <h4 class="text-sm font-bold text-slate-700">Syarat Hafalan</h4>
                                 </div>
                                 <div class="flex flex-wrap gap-2">${targetsHtml}</div>
                             </div>
@@ -285,62 +316,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const timerEl = cont.querySelector('#countdown-timer');
                 const updateCountdown = () => {
-                    const now = new Date().getTime();
-                    const dist = nextPeriod.deadline.getTime() - now;
+                    const nowMs = new Date().getTime();
+                    const dist = nextPeriod.deadline.getTime() - nowMs;
                     if (dist < 0) {
-                        timerEl.innerHTML = '<p class="font-bold text-lg text-red-600">Waktu Habis</p>';
+                        timerEl.innerHTML = '<p class="font-bold text-lg text-red-500 bg-red-50 px-4 py-2 rounded-xl">Waktu Habis</p>';
                         clearInterval(State.countdownInterval);
                         return;
                     }
                     const d = Math.floor(dist / 864e5), h = Math.floor(dist % 864e5 / 36e5), m = Math.floor(dist % 36e5 / 6e4), s = Math.floor(dist % 6e4 / 1e3);
-                    timerEl.innerHTML = [d, h, m, s].map((val, i) => `<div class="bg-sky-100/50 text-sky-800 p-3 rounded-lg w-16 shadow-inner"><div class="text-3xl font-bold">${String(val).padStart(2, '0')}</div><div class="text-xs font-semibold opacity-70">${['Hari', 'Jam', 'Menit', 'Detik'][i]}</div></div>`).join('');
+                    
+                    // Timer Digits HTML string
+                    timerEl.innerHTML = [d, h, m, s].map((val, i) => `
+                        <div class="bg-white border border-slate-200 p-2 rounded-xl w-16 shadow-sm">
+                            <div class="text-2xl font-black text-slate-800">${String(val).padStart(2, '0')}</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${['Hari', 'Jam', 'Mnt', 'Dtk'][i]}</div>
+                        </div>`).join('');
                 };
                 State.countdownInterval = setInterval(updateCountdown, 1000);
                 updateCountdown();
             } else {
-                cont.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center font-semibold text-gray-600">Semua jadwal perpulangan telah selesai.</div>';
+                cont.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center font-bold text-slate-400 border-2 border-dashed border-slate-200">Semua jadwal perpulangan telah selesai.</div>';
             }
         },
 
-        // --- FITUR BARU: HALAMAN ANALISIS ---
         renderAnalisisPage: () => {
-            // Populate dropdown santri
             if (!DOM.santriSelectAnalisis) return;
             const opts = State.santriData.sort((a, b) => a.nama.localeCompare(b.nama)).map(s => ({ text: s.nama, value: s.id }));
             Utils.populateSelect(DOM.santriSelectAnalisis, opts, 'Pilih nama santri...');
-            DOM.analisisContentContainer.innerHTML = DOM.analisisPromptTemplate.innerHTML;
+            DOM.analisisContentContainer.innerHTML = '';
+            DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
         },
 
         renderSantriDashboard: (sId) => {
             const s = State.santriData.find(s => s.id === sId);
             if (!s) return;
             
+            DOM.analisisContentContainer.innerHTML = '';
             const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
             
             // Isi Data Profil
-            dash.querySelector('[data-name]').textContent = s.nama;
-            dash.querySelector('[data-kelas-text]').innerHTML = `Kelas ${s.kelas}`;
-            dash.querySelector('[data-program-text]').innerHTML = `${s.program}`;
+            Utils.setText(dash, '[data-name]', s.nama);
+            Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
+            Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
             
             // Badge Status Tuntas
             const statusBadge = dash.querySelector('[data-status-badge]');
             statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
-            statusBadge.className = `mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block ${s.isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`;
+            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
             
             // Badge Perpulangan
             const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
             if (s.statusPerpulangan === 'Boleh Pulang') {
                 perpulanganBadge.textContent = 'Boleh Pulang';
-                perpulanganBadge.className = 'mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block bg-green-100 text-green-800';
+                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700';
             } else {
-                perpulanganBadge.textContent = 'Belum Boleh Pulang';
-                perpulanganBadge.className = 'mt-1 text-xs font-bold px-3 py-1 rounded-full inline-block bg-red-100 text-red-800';
+                perpulanganBadge.textContent = 'Belum';
+                perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700';
             }
             
             // Nilai & Statistik
-            dash.querySelector('[data-nilai]').textContent = s.nilaiTampil;
-            dash.querySelector('[data-ziyadah]').textContent = s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)} hlm` : '-';
-            dash.querySelector('[data-total-setoran]').textContent = s.setoranCount;
+            Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
+            Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
+            Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
             
             // Progres Juz Wajib
             const progItems = [
@@ -349,10 +386,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }
             ];
             
-            dash.querySelector('[data-progres-juz]').innerHTML = progItems
+            const progresHtml = progItems
                 .filter(item => !item.tahfizhOnly || s.program === 'Tahfizh')
-                .map(item => `<div class="flex items-center justify-between p-3 bg-white/50 rounded-lg"><span class="font-medium text-sm">${item.juz}</span>${item.done ? '<span class="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Selesai</span>' : '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">Proses</span>'}</div>`)
+                .map(item => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="font-bold text-sm text-slate-700">${item.juz}</span>
+                        ${item.done 
+                            ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' 
+                            : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
+                    </div>`)
                 .join('');
+            
+            Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
             
             // Progres Ziyadah (Jika Tahfizh & Tuntas)
             const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
@@ -366,7 +411,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (compPages <= 0) return '';
                     const totalPages = AppConfig.hafalanData.juzPageCounts[j];
                     const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0;
-                    return `<div><div class="flex justify-between mb-1 text-sm"><span class="font-medium">Juz ${j}</span><span>${compPages.toFixed(1)} / ${totalPages} hlm</span></div><div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full" style="width: ${pct}%"></div></div></div>`;
+                    return `
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1 text-xs font-bold text-slate-600">
+                            <span>Juz ${j}</span>
+                            <span>${compPages.toFixed(1)} / ${totalPages}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>`;
                 }).join('');
             }
             
@@ -374,10 +428,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
             const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             aktivitasCont.innerHTML = allActivities.length > 0 
-                ? allActivities.map(s => `<tr class="hover:bg-[var(--hover-bg)]"><td class="p-3"><p class="font-semibold text-sm">${s.jenis} ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p><p class="text-xs text-[var(--subtle-text)]">${s.halaman ? `${s.halaman} hlm` : s.surat}</p></td><td class="p-3 text-right text-xs text-[var(--subtle-text)]">${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</td></tr>`).join('') 
-                : '<tr><td class="p-4 text-center text-gray-500">Belum ada aktivitas.</td></tr>';
+                ? allActivities.map(s => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4">
+                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
+                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
+                        </td>
+                        <td class="p-4 text-right text-xs font-bold text-slate-400">
+                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                        </td>
+                    </tr>`).join('') 
+                : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
             
-            DOM.analisisContentContainer.innerHTML = '';
             DOM.analisisContentContainer.appendChild(dash);
         },
 
@@ -392,11 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const offset = circumference - (pct / 100) * circumference;
                     
                     circleEl.innerHTML = `
-                        <svg class="w-full h-full" viewBox="0 0 100 100">
-                            <circle class="text-gray-200/80" stroke-width="8" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50" />
-                            <circle class="progress-ring-circle ${color}" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50" style="stroke-dasharray:${circumference};stroke-dashoffset:${circumference};" />
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle class="text-slate-100" stroke-width="8" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50" />
+                            <circle class="progress-ring-circle ${color} transition-all duration-1000 ease-out" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="50" cy="50" style="stroke-dasharray:${circumference};stroke-dashoffset:${circumference};" />
                         </svg>
-                        <span class="absolute inset-0 flex items-center justify-center text-2xl font-bold ${color}">${pct}%</span>`;
+                        <span class="absolute inset-0 flex items-center justify-center text-3xl font-black ${color}">${pct}%</span>`;
                     
                     setTimeout(() => { 
                         const circle = circleEl.querySelector('.progress-ring-circle');
@@ -416,6 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
             createProgress(DOM.mutqinJuz30ProgressContainer, DOM.mutqinJuz30Circle, DOM.mutqinJuz30Details, tahfizh, 'text-green-500', s => s.mutqinJuz.has(30));
             createProgress(DOM.mutqinJuz29ProgressContainer, DOM.mutqinJuz29Circle, DOM.mutqinJuz29Details, tahfizh, 'text-amber-500', s => s.mutqinJuz.has(29));
         },
+
         renderTuntasTracking: () => {
             const container = DOM.tuntasTrackingAccordion;
             container.innerHTML = '';
@@ -425,53 +488,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tuntasCount = group.santri.filter(s => s.isTuntas).length;
                 const totalCount = group.santri.length;
                 const percentage = totalCount > 0 ? ((tuntasCount / totalCount) * 100).toFixed(0) : 0;
-                const tuntasList = group.santri.filter(s => s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-gray-500">Belum ada</li>';
-                const belumTuntasList = group.santri.filter(s => !s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-gray-500">Semua tuntas</li>';
                 
-                const item = document.createElement('div');
-                item.className = 'glass-card rounded-lg overflow-hidden';
-                item.innerHTML = `
-                    <h2 class="accordion-header"><button type="button" class="accordion-button flex items-center justify-between w-full p-4 font-semibold text-left transition-colors hover:bg-[var(--hover-bg)]">
-                        <span class="font-bold">${groupName}</span>
-                        <div class="flex items-center gap-2 sm:gap-4">
-                            <div class="hidden sm:flex items-center gap-2">
-                                <div class="w-24 bg-gray-200 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width: ${percentage}%"></div></div>
-                                <span class="text-xs font-semibold">${percentage}%</span>
-                            </div>
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-800">Tuntas: ${tuntasCount}</span>
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Belum: ${totalCount - tuntasCount}</span>
-                            <svg class="accordion-chevron w-4 h-4 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </button></h2>
-                    <div class="accordion-panel border-t border-[var(--card-border)] bg-white/10">
-                        <div class="p-4 pb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                            <div><h5 class="font-semibold text-green-700 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>Sudah Tuntas (${tuntasCount})</h5><ul class="space-y-1 list-disc list-inside">${tuntasList}</ul></div>
-                            <div><h5 class="font-semibold text-red-700 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>Belum Tuntas (${totalCount - tuntasCount})</h5><ul class="space-y-1 list-disc list-inside">${belumTuntasList}</ul></div>
-                        </div>
-                    </div>`;
-                container.appendChild(item);
+                // Gunakan Template Accordion
+                const clone = DOM.tplAccordionItem.content.cloneNode(true);
+                
+                Utils.setText(clone, '.data-group-name', groupName);
+                Utils.setText(clone, '.data-percentage-text', `${percentage}%`);
+                Utils.setText(clone, '.data-tuntas-badge', `Tuntas: ${tuntasCount}`);
+                Utils.setText(clone, '.data-belum-badge', `Belum: ${totalCount - tuntasCount}`);
+                
+                const bar = clone.querySelector('.data-progress-bar');
+                if(bar) bar.style.width = `${percentage}%`;
+
+                // Isi List
+                const tuntasList = group.santri.filter(s => s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Belum ada</li>';
+                const belumList = group.santri.filter(s => !s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Semua tuntas</li>';
+                
+                Utils.setText(clone, '.label-tuntas', `Sudah Tuntas (${tuntasCount})`);
+                Utils.setHTML(clone, '.list-tuntas', tuntasList);
+                
+                Utils.setText(clone, '.label-belum', `Belum Tuntas (${totalCount - tuntasCount})`);
+                Utils.setHTML(clone, '.list-belum', belumList);
+
+                container.appendChild(clone);
             }
         },
+
         renderPeringkatNew: () => {
             const container = DOM.peringkatSection;
-            container.innerHTML = `
-                <h3 class="section-header">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                    Peringkat Santri
-                </h3>
-                <div class="glass-card p-2 rounded-xl">
-                    <div class="flex bg-gray-200/80 rounded-lg p-1 space-x-1" id="peringkat-program-tabs">
-                        <button class="tab-peringkat flex-1 p-2 rounded-md text-sm font-semibold transition-colors duration-300" data-program="Tahfizh">Program Tahfizh</button>
-                        <button class="tab-peringkat flex-1 p-2 rounded-md text-sm font-semibold transition-colors duration-300" data-program="Unggulan">Program Unggulan</button>
-                    </div>
-                    <div id="peringkat-content" class="mt-4 p-2"></div>
-                </div>`;
+            container.innerHTML = '';
+            const clone = DOM.tplPeringkatSection.content.cloneNode(true);
+            container.appendChild(clone);
             
             UI.renderPeringkatContent('Tahfizh');
-            container.querySelector(`[data-program="Tahfizh"]`).classList.add('active');
+            const tab = container.querySelector(`[data-program="Tahfizh"]`);
+            if(tab) {
+                tab.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
+                tab.classList.remove('text-slate-500'); // Asumsi default styling
+            }
         },
+
         renderPeringkatContent: (program) => {
             const contentContainer = document.getElementById('peringkat-content');
+            if(!contentContainer) return;
             const santriList = State.santriData.filter(s => s.program === program);
 
             const getPeringkat = (list, key) => list.sort((a, b) => b[key] - a[key]).slice(0, 5);
@@ -480,55 +539,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? [{ key: 'setoranCount', title: 'Paling Rajin (Total Setoran)', unit: 'setoran' }, { key: 'ziyadahPages', title: 'Hafalan Terbanyak (Ziyadah)', unit: 'hlm' }]
                 : [{ key: 'setoranCount', title: 'Paling Rajin (Total Setoran)', unit: 'setoran' }, { key: 'unggulanPages', title: 'Hafalan Terbanyak (Halaman)', unit: 'hlm' }];
 
-            const medalColors = ['bg-yellow-400', 'bg-gray-400', 'bg-yellow-600'];
+            const medalColors = ['bg-yellow-400', 'bg-slate-300', 'bg-amber-700'];
             
-            contentContainer.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    ${criteria.map(c => `
-                        <div>
-                            <h4 class="font-bold text-center mb-3">${c.title}</h4>
-                            <ul class="space-y-3">
-                                ${getPeringkat(santriList, c.key).map((s, i) => `
-                                    <li class="bg-white/50 p-3 rounded-lg shadow-sm flex items-center gap-4">
-                                        <span class="flex-shrink-0 h-8 w-8 rounded-full ${medalColors[i] || 'bg-gray-300'} flex items-center justify-center font-bold text-white text-sm">${i + 1}</span>
-                                        <div class="flex-grow">
-                                            <p class="font-semibold text-sm">${s.nama}</p>
-                                            <p class="text-xs text-[var(--subtle-text)]">Kelas ${s.kelas}</p>
-                                        </div>
-                                        <div class="text-right flex-shrink-0">
-                                            <p class="font-bold text-amber-600 text-lg">${(s[c.key] || 0).toFixed(['ziyadahPages', 'unggulanPages'].includes(c.key) ? 1 : 0)}</p>
-                                            <p class="text-xs text-gray-500">${c.unit}</p>
-                                        </div>
-                                    </li>
-                                `).join('') || '<li class="text-center text-sm text-gray-500 col-span-1">Belum ada data.</li>'}
-                            </ul>
-                        </div>
-                    `).join('')}
-                </div>`;
+            contentContainer.innerHTML = '';
+            
+            // Grid container
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+
+            criteria.forEach(c => {
+                const col = document.createElement('div');
+                const title = document.createElement('h4');
+                title.className = 'font-bold text-center mb-3 text-slate-700 text-sm uppercase tracking-wide';
+                title.textContent = c.title;
+                col.appendChild(title);
+
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-3';
+
+                const topList = getPeringkat(santriList, c.key);
+                if (topList.length > 0) {
+                    topList.forEach((s, i) => {
+                        const itemClone = DOM.tplPeringkatItem.content.cloneNode(true);
+                        const badge = itemClone.querySelector('.medal-bg');
+                        badge.textContent = i + 1;
+                        badge.classList.add(medalColors[i] || 'bg-slate-200');
+                        
+                        Utils.setText(itemClone, '.item-nama', s.nama);
+                        Utils.setText(itemClone, '.item-kelas', `Kelas ${s.kelas}`);
+                        
+                        const scoreVal = (s[c.key] || 0).toFixed(['ziyadahPages', 'unggulanPages'].includes(c.key) ? 1 : 0);
+                        Utils.setText(itemClone, '.item-score', scoreVal);
+                        Utils.setText(itemClone, '.item-unit', c.unit);
+                        
+                        ul.appendChild(itemClone);
+                    });
+                } else {
+                    ul.innerHTML = '<li class="text-center text-sm text-slate-400 py-4 italic">Belum ada data.</li>';
+                }
+                col.appendChild(ul);
+                grid.appendChild(col);
+            });
+            contentContainer.appendChild(grid);
         },
+
         renderTahfizhTuntasTrackingNew: () => {
             const container = DOM.tahfizhTuntasTrackingSection;
-            container.innerHTML = `
-                <h3 class="section-header">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-                    Lacak Ketuntasan Khusus Tahfizh
-                </h3>
-                <div class="glass-card p-4 rounded-xl">
-                    <div class="flex border-b border-[var(--input-border)]" id="tahfizh-juz-tabs">
-                        <button class="tahfizh-tab flex-1 p-3 text-sm font-semibold border-b-2 border-transparent hover:bg-[var(--hover-bg)]" data-juz="30">Mutqin Juz 30</button>
-                        <button class="tahfizh-tab flex-1 p-3 text-sm font-semibold border-b-2 border-transparent hover:bg-[var(--hover-bg)]" data-juz="29">Mutqin Juz 29</button>
-                    </div>
-                    <div id="tahfizh-content" class="mt-4"></div>
-                </div>`;
+            container.innerHTML = '';
+            const clone = DOM.tplTahfizhSection.content.cloneNode(true);
+            container.appendChild(clone);
 
             UI.renderTahfizhContent(30);
-            container.querySelector(`[data-juz="30"]`).classList.add('text-amber-600', 'border-amber-500');
+            const tab = container.querySelector(`[data-juz="30"]`);
+            if(tab) tab.classList.add('text-amber-600', 'border-amber-500');
         },
+
         renderTahfizhContent: (juz, searchTerm = '') => {
             const contentContainer = document.getElementById('tahfizh-content');
             const tahfizhSantri = State.santriData.filter(s => s.program === 'Tahfizh');
             if (tahfizhSantri.length === 0) {
-                contentContainer.innerHTML = '<p class="text-center text-gray-500">Tidak ada santri program Tahfizh.</p>';
+                contentContainer.innerHTML = '<p class="text-center text-slate-500 py-4 italic">Tidak ada santri program Tahfizh.</p>';
                 return;
             }
 
@@ -540,29 +610,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const tuntasList = tahfizhSantri.filter(s => s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
             const belumTuntasList = tahfizhSantri.filter(s => !s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
 
-            contentContainer.innerHTML = `
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold">Progres: ${tuntasCount} / ${totalCount} Santri</span>
-                        <span class="text-sm font-bold text-amber-700">${percentage}%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-amber-500 h-2.5 rounded-full" style="width: ${percentage}%"></div></div>
-                </div>
-                <div class="mt-4 relative">
-                     <input type="search" data-juz-filter="${juz}" value="${searchTerm}" class="tahfizh-search w-full pl-10 pr-4 py-2 text-sm glass-input rounded-lg" placeholder="Cari nama santri...">
-                     <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <h5 class="font-semibold text-green-700 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>Sudah Tuntas (${tuntasList.length})</h5>
-                        <ul class="text-sm space-y-1 h-48 overflow-y-auto pr-2">${tuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-gray-500">Tidak ada</li>'}</ul>
-                    </div>
-                    <div>
-                        <h5 class="font-semibold text-red-700 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>Belum Tuntas (${belumTuntasList.length})</h5>
-                        <ul class="text-sm space-y-1 h-48 overflow-y-auto pr-2">${belumTuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-gray-500">Semua tuntas</li>'}</ul>
-                    </div>
-                </div>`;
+            // Use Template
+            contentContainer.innerHTML = '';
+            const clone = DOM.tplTahfizhContent.content.cloneNode(true);
+            
+            Utils.setText(clone, '.text-progress-label', `Progres: ${tuntasCount} / ${totalCount} Santri`);
+            Utils.setText(clone, '.text-percentage', `${percentage}%`);
+            const bar = clone.querySelector('.progress-bar');
+            if(bar) bar.style.width = `${percentage}%`;
+            
+            const searchInput = clone.querySelector('.tahfizh-search');
+            if(searchInput) {
+                searchInput.setAttribute('data-juz-filter', juz);
+                searchInput.value = searchTerm;
+            }
+
+            Utils.setText(clone, '.count-tuntas', tuntasList.length);
+            Utils.setText(clone, '.count-belum', belumTuntasList.length);
+            
+            const listTuntasEl = clone.querySelector('.list-tuntas');
+            listTuntasEl.innerHTML = tuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-slate-400 italic">Tidak ada</li>';
+            
+            const listBelumEl = clone.querySelector('.list-belum');
+            listBelumEl.innerHTML = belumTuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-slate-400 italic">Semua tuntas</li>';
+            
+            contentContainer.appendChild(clone);
         },
+
         renderHistoryTable: () => {
             const searchTerm = DOM.searchRiwayat.value.toLowerCase();
             const programFilter = DOM.filterProgram.value;
@@ -587,31 +661,47 @@ document.addEventListener('DOMContentLoaded', () => {
             const tableBody = DOM.setoranTableBody;
             tableBody.innerHTML = '';
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-gray-500">Tidak ada data yang cocok dengan filter.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-slate-500 italic">Tidak ada data yang cocok dengan filter.</td></tr>`;
                 return;
             }
 
             const fragment = document.createDocumentFragment();
-            const template = DOM.historyRowTemplate;
+            // Template sudah ada di DOM.historyRowTemplate
             filtered.forEach(setoran => {
                 const santri = State.santriData.find(s => s.id === setoran.santriId);
-                const clone = template.content.cloneNode(true);
-                clone.querySelector('.data-nama').textContent = setoran.namaSantri;
-                clone.querySelector('.data-jenis').textContent = setoran.jenis;
-                clone.querySelector('.data-juz-text').textContent = String(setoran.juz) === "juz30_setengah" ? "Setengah Juz 30" : `Juz ${setoran.juz}`;
-                clone.querySelector('.data-unit').textContent = setoran.halaman ? `${setoran.halaman} hlm` : setoran.surat;
-                clone.querySelector('.data-tanggal').textContent = new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-                clone.querySelector('.delete-btn').dataset.id = setoran.id;
+                const clone = DOM.historyRowTemplate.content.cloneNode(true);
+                
+                Utils.setText(clone, '.data-nama', setoran.namaSantri);
+                Utils.setText(clone, '.data-jenis', setoran.jenis);
+                Utils.setText(clone, '.data-juz-text', String(setoran.juz) === "juz30_setengah" ? "Setengah Juz 30" : `Juz ${setoran.juz}`);
+                Utils.setText(clone, '.data-unit', setoran.halaman ? `${setoran.halaman} hlm` : setoran.surat);
+                Utils.setText(clone, '.data-tanggal', new Date(setoran.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }));
+                
+                const deleteBtn = clone.querySelector('.delete-btn');
+                if(deleteBtn) deleteBtn.dataset.id = setoran.id;
+                
                 if (santri) {
-                    const getProgramIcon = p => p === 'Unggulan' ? `<span title="Unggulan" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gray-200 text-gray-800 text-xs font-bold">U</span>` : `<span title="Tahfizh" class="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-200 text-purple-800 text-xs font-bold">T</span>`;
-                    const getClassIcon = c => { let cl = 'bg-gray-200 text-gray-800'; const i = c.charAt(1); if (['A'].includes(i)) cl = 'bg-red-100 text-red-800'; if (['B'].includes(i)) cl = 'bg-yellow-100 text-yellow-800'; if (['C', 'D'].includes(i)) cl = 'bg-green-100 text-green-800'; if (['G', 'H'].includes(i)) cl = 'bg-blue-100 text-blue-800'; return `<span title="Kelas ${c}" class="ml-1 inline-flex items-center justify-center h-5 w-5 rounded-full ${cl} text-xs font-bold">${c}</span>`; };
-                    clone.querySelector('.data-program-icon').innerHTML = getProgramIcon(santri.program);
-                    clone.querySelector('.data-kelas-icon').innerHTML = getClassIcon(santri.kelas);
+                    const pIcon = clone.querySelector('.data-program-icon');
+                    if(pIcon) pIcon.innerHTML = santri.program === 'Unggulan' 
+                        ? `<span title="Unggulan" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">U</span>` 
+                        : `<span title="Tahfizh" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">T</span>`;
+                    
+                    const cIcon = clone.querySelector('.data-kelas-icon');
+                    if(cIcon) {
+                        let cl = 'bg-slate-200 text-slate-700'; 
+                        const i = santri.kelas.charAt(1); 
+                        if (['A'].includes(i)) cl = 'bg-red-100 text-red-700'; 
+                        if (['B'].includes(i)) cl = 'bg-amber-100 text-amber-700'; 
+                        if (['C', 'D'].includes(i)) cl = 'bg-emerald-100 text-emerald-700'; 
+                        if (['G', 'H'].includes(i)) cl = 'bg-blue-100 text-blue-700'; 
+                        cIcon.innerHTML = `<span title="Kelas ${santri.kelas}" class="inline-flex items-center justify-center h-5 w-5 rounded-full ${cl} text-[10px] font-bold">${santri.kelas}</span>`;
+                    }
                 }
                 fragment.appendChild(clone);
             });
             tableBody.appendChild(fragment);
         },
+
         renderRekap: () => {
             const groupOrder = ['Seluruh Santri', 'Khusus Tahfizh', ...Object.keys(State.classGroups).filter(g => g !== 'Seluruh Santri' && g !== 'Khusus Tahfizh').sort()];
             const selectEl = DOM.rekapSelect;
@@ -624,18 +714,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tabId = groupName.replace(/, /g, '').replace(/ /g, '-');
                 selectEl.add(new Option(groupName, tabId));
                 
-                const content = DOM.rekapContentTemplate.content.cloneNode(true).querySelector('.rekap-tab-content');
+                const clone = DOM.rekapContentTemplate.content.cloneNode(true);
+                const content = clone.querySelector('.rekap-tab-content'); // Ambil elemen root di template
                 content.id = `rekap-tab-${tabId}`;
+                
                 const group = State.classGroups[groupName];
-                content.querySelector('.data-title').textContent = `Rekap Capaian - ${groupName}`;
-                content.querySelector('.data-musyrif').textContent = `Musyrif: ${group.musyrif}`;
-                content.querySelector('.data-timestamp').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
-                content.querySelector('.export-pdf-btn').dataset.classGroup = groupName;
+                Utils.setText(clone, '.data-title', `Rekap Capaian - ${groupName}`);
+                Utils.setText(clone, '.data-musyrif', `Musyrif: ${group.musyrif}`);
+                Utils.setText(clone, '.data-timestamp', new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }));
+                
+                const btn = clone.querySelector('.export-pdf-btn');
+                if(btn) btn.dataset.classGroup = groupName;
+                
                 if (index !== 0) { content.classList.add('hidden'); }
-                contentContainer.appendChild(content);
+                contentContainer.appendChild(content); // Append elemen root yang sudah diambil
                 UI.renderSingleRekapTable(groupName, { isInitial: true });
             });
         },
+
         renderSingleRekapTable: (groupName, options = {}) => {
             const group = State.classGroups[groupName]; if (!group) return;
             const contentDiv = document.getElementById(`rekap-tab-${groupName.replace(/, /g, '').replace(/ /g, '-')}`); if (!contentDiv) return;
@@ -662,29 +758,43 @@ document.addEventListener('DOMContentLoaded', () => {
             contentDiv.querySelectorAll('th.sortable').forEach(th => {
                 th.removeAttribute('data-sort-dir');
                 const iconSpan = th.querySelector('.sort-icon');
-                iconSpan.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 12L3 8m4 8l4-8" /></svg>`;
+                if(iconSpan) iconSpan.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 12L3 8m4 8l4-8" /></svg>`;
+                
                 if (th.dataset.sort === column) {
                     th.setAttribute('data-sort-dir', dir);
-                    iconSpan.innerHTML = dir === 'asc' 
-                        ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>` 
-                        : `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>`;
+                    if(iconSpan) {
+                        iconSpan.innerHTML = dir === 'asc' 
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>` 
+                            : `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>`;
+                    }
                 }
             });
 
             const tableBody = contentDiv.querySelector('.data-table-body');
-            tableBody.innerHTML = group.santri.map((santri, idx) => `
-                <tr class="hover:bg-[var(--hover-bg)]">
-                    <td class="px-4 py-2">${idx + 1}</td>
-                    <td class="px-4 py-2 font-medium text-gray-900">
-                        <button class="detail-santri-btn hover:text-amber-600 hover:underline text-left" data-id="${santri.id}">
-                            ${santri.nama}
-                        </button>
-                    </td>
-                    <td class="px-4 py-2 font-medium text-center">${santri.nilaiTampil}</td>
-                    <td class="px-4 py-2 font-medium text-center">${santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-'}</td>
-                    <td class="px-4 py-2 text-center"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${santri.isTuntas ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${santri.isTuntas ? 'Tuntas' : 'Belum Tuntas'}</span></td>
-                </tr>`).join('');
+            tableBody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
+            group.santri.forEach((santri, idx) => {
+                const row = DOM.tplRekapRow.content.cloneNode(true);
+                Utils.setText(row, '.col-no', idx + 1);
+                
+                const btnDetail = row.querySelector('.detail-santri-btn');
+                if(btnDetail) {
+                    btnDetail.textContent = santri.nama;
+                    btnDetail.dataset.id = santri.id;
+                }
+                
+                Utils.setText(row, '.col-nilai', santri.nilaiTampil);
+                Utils.setText(row, '.col-ziyadah', santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-');
+                
+                const statusCell = row.querySelector('.col-status');
+                statusCell.innerHTML = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${santri.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${santri.isTuntas ? 'Tuntas' : 'Belum'}</span>`;
+                
+                fragment.appendChild(row);
+            });
+            tableBody.appendChild(fragment);
         },
+
         exportRecapToPDF: (classGroup) => {
             try {
                 const { jsPDF } = window.jspdf;
@@ -705,8 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     head: head,
                     body: body,
                     theme: 'grid',
-                    headStyles: { fillColor: [217, 119, 6] },
-                    styles: { font: 'Inter', cellPadding: 6, valign: 'middle' },
+                    headStyles: { fillColor: [245, 158, 11] }, // Amber-500
+                    styles: { font: 'helvetica', cellPadding: 6, valign: 'middle' },
                     columnStyles: { 
                         0: { cellWidth: 30 }, 
                         1: { cellWidth: 'auto' }, 
@@ -714,11 +824,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         3: { cellWidth: 70, halign: 'center' }, 
                         4: { cellWidth: 80, halign: 'center' } 
                     },
-                    didParseCell: (data) => { if (data.column.index === 1) data.cell.styles.fontSize = 8; },
+                    didParseCell: (data) => { if (data.column.index === 1) data.cell.styles.fontSize = 9; },
                     didDrawPage: (data) => {
-                        doc.setFontSize(20); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(18); doc.setTextColor(180, 83, 9); doc.setFont('helvetica', 'bold');
                         doc.text('Laporan Capaian Tahfizh', data.settings.margin.left, 40);
-                        doc.setFontSize(12); doc.setTextColor(40); doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(11); doc.setTextColor(60); doc.setFont('helvetica', 'normal');
                         doc.text(`Kelompok: ${classGroup} | Musyrif: ${group.musyrif}`, data.settings.margin.left, 58);
                         doc.setFontSize(8); doc.setTextColor(150);
                         doc.text(`Halaman ${data.pageNumber} dari ${doc.internal.getNumberOfPages()}`, data.settings.margin.left, doc.internal.pageSize.height - 20);
@@ -726,10 +836,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     margin: { top: 70, bottom: 40 }
                 });
-                doc.save(`rekap_setoran_${classGroup.replace(/, /g, '_').replace(/ /g, '-')}_${Date.now()}.pdf`);
+                doc.save(`rekap_${classGroup.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`);
             } catch (error) {
                 console.error("PDF Export Error:", error);
-                UI.showToast('Gagal mengekspor PDF. Pastikan library jsPDF termuat.', 'error');
+                UI.showToast('Gagal mengekspor PDF.', 'error');
             }
         },
 
@@ -770,14 +880,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Total Halaman Hafalan',
+                        label: 'Total Halaman',
                         data: dataPoints,
                         borderColor: '#f59e0b',
                         backgroundColor: 'rgba(245, 158, 11, 0.1)',
                         tension: 0.4,
                         fill: true,
                         pointBackgroundColor: '#d97706',
-                        pointBorderColor: '#fff'
+                        pointBorderColor: '#fff',
+                        pointRadius: 4
                     }]
                 },
                 options: {
@@ -810,21 +921,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const maxPages = 20;
                 const filledBlocks = Math.min(Math.floor(totalPagesDone), maxPages);
                 const percentage = Math.min(Math.round((totalPagesDone / maxPages) * 100), 100);
-                const juzWrapper = document.createElement('div');
-                juzWrapper.className = 'mb-4';
-                juzWrapper.innerHTML = `
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="font-bold text-gray-700">Juz ${juzNum}</span>
-                        <span class="text-xs text-gray-500">${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)</span>
-                    </div>
-                    <div class="grid grid-cols-10 gap-1">
-                        ${Array(20).fill(0).map((_, i) => {
-                            const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-gray-200';
-                            return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
-                        }).join('')}
-                    </div>
-                `;
-                container.appendChild(juzWrapper);
+                
+                // Use Template
+                const clone = DOM.tplJuzBlock.content.cloneNode(true);
+                Utils.setText(clone, '.block-title', `Juz ${juzNum}`);
+                Utils.setText(clone, '.block-stats', `${totalPagesDone.toFixed(1)} / 20 Hlm (${percentage}%)`);
+                
+                const grid = clone.querySelector('.block-grid');
+                grid.innerHTML = Array(20).fill(0).map((_, i) => {
+                    const colorClass = i < filledBlocks ? 'bg-green-500 shadow-sm' : 'bg-slate-200';
+                    return `<div class="h-6 rounded-sm ${colorClass} transition-all duration-300 hover:scale-110" title="Halaman ${i+1}"></div>`;
+                }).join('');
+                
+                container.appendChild(clone);
             });
         }
     };
@@ -859,20 +968,16 @@ document.addEventListener('DOMContentLoaded', () => {
             Core.updateMusyrifList(); 
         },
 
-        // --- FITUR BARU: LOGIKA PERPULANGAN ---
         checkPerpulanganStatus: (s) => {
-            // Prioritas 1: Sudah Mutqin Setengah Juz 30 (Nilai 100)
             const hasMutqinSetengahJuz = s.setoran.some(set => set.jenis === 'Mutqin' && String(set.juz) === "juz30_setengah");
             if (hasMutqinSetengahJuz) return 'Boleh Pulang';
             
-            // Prioritas 2: Mutqin Juz 30 Full
             const hasMutqinJuz30 = s.setoran.some(set => set.jenis === 'Mutqin' && set.juz == 30);
             if (hasMutqinJuz30) return 'Boleh Pulang';
             
             const now = new Date();
             let latestAchievedPeriod = null;
             
-            // Cek setiap periode di AppConfig
             if (AppConfig.perpulanganPeriods) {
                 for (const period of AppConfig.perpulanganPeriods) {
                     let conditionMet = false;
@@ -912,7 +1017,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 unggulanPages: 0, 
                 setoran: [], 
                 setoranCount: 0,
-                // --- PROPERTI BARU ---
                 ziyadahProgress: {}, 
                 statusPerpulangan: 'Belum Boleh Pulang'
             }]));
@@ -935,11 +1039,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mutqinJuz29) santri.mutqinJuz.add(29);
                 if (mutqinJuz30) santri.mutqinJuz.add(30);
 
-                // --- LOGIKA SKOR BARU (SCORING TIERS) ---
                 if (mutqinSetengahJuz || (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineJuz30Score)) {
                     santri.nilai = 100;
                 } else {
-                    // Cek sistem poin otomatis berdasarkan surat (dari Config)
                     const setoranSurahs = new Set(santri.setoran.filter(set => set.juz == 30 && set.surat).map(set => set.surat));
                     let score = 0;
                     if (AppConfig.scoringTiers) {
@@ -950,7 +1052,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // Fallback jika tidak masuk tier tapi ada progres halaman
                     if (score === 0) {
                         score = santri.setoran
                             .filter(s => s.jenis === 'Mutqin' && new Date(s.createdAt) > AppConfig.deadlineJuz30Score)
@@ -982,7 +1083,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (completionDates.length > 0) {
                         santri.tuntasDate = new Date(Math.max(...completionDates));
                         santri.setoran.forEach(setoran => {
-                            // Hitung Ziyadah Progress per Juz (Baru)
                             if (new Date(setoran.createdAt) > santri.tuntasDate) {
                                 const pageValue = (setoran.halaman ? parseFloat(setoran.halaman) : AppConfig.hafalanData.surahData[setoran.juz]?.pages[setoran.surat]) || 0;
                                 if (setoran.jenis === 'Ziyadah') {
@@ -995,7 +1095,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 santri.nilaiTampil = Math.min(100, santri.nilai);
                 
-                // Hitung ulang halaman unggulan
                 santri.unggulanPages = santri.setoran.reduce((sum, s) => {
                     let pageCount = 0;
                     if (s.halaman) pageCount = parseFloat(s.halaman);
@@ -1005,7 +1104,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return sum + pageCount;
                 }, 0);
 
-                // --- HITUNG STATUS PERPULANGAN (BARU) ---
                 santri.statusPerpulangan = Core.checkPerpulanganStatus(santri);
             });
             State.santriData = Array.from(santriStatsMap.values());
@@ -1014,7 +1112,6 @@ document.addEventListener('DOMContentLoaded', () => {
         buildClassGroups: () => {
             const tempGroups = {};
             
-            // 1. Kelompokkan santri berdasarkan Musyrif
             State.santriData.forEach(s => {
                 if (!tempGroups[s.musyrif]) {
                     tempGroups[s.musyrif] = { santri: [], musyrif: s.musyrif, classes: new Set() };
@@ -1025,24 +1122,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             State.classGroups = {};
             
-            // 2. Buat nama grup (Label)
             for (const musyrif in tempGroups) {
                 const group = tempGroups[musyrif];
                 let groupName;
-
-                // [PERBAIKAN] Cek apakah ada nama khusus di config.js?
-                // Gunakan Optional Chaining (?.) untuk keamanan jika config belum ada
                 if (AppConfig.classGroupOverrides && AppConfig.classGroupOverrides[musyrif]) {
                     groupName = AppConfig.classGroupOverrides[musyrif];
                 } else {
-                    // Jika tidak ada di config, otomatis gabungkan nama kelas (contoh: "1A, 1B")
                     groupName = [...group.classes].sort().join(', ');
                 }
-
                 State.classGroups[groupName] = { santri: group.santri, musyrif: group.musyrif };
             }
 
-            // Grup statis tambahan
             State.classGroups['Khusus Tahfizh'] = { santri: State.santriData.filter(s => s.program === 'Tahfizh'), musyrif: 'Semua Musyrif' };
             State.classGroups['Seluruh Santri'] = { santri: State.santriData, musyrif: 'Semua Musyrif' };
         },
@@ -1102,17 +1192,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
             const tabBtn = e.target.closest('.analisis-tab');
 
-            // Navigasi Internal
             if (button && button.matches('[data-target-page]')) {
                 UI.switchPage(button.dataset.targetPage);
                 return;
             }
 
-            // Tab Analisis (Ringkasan vs Aktivitas)
             if (tabBtn) {
                 const targetId = tabBtn.dataset.target;
-                tabBtn.parentElement.querySelectorAll('.analisis-tab').forEach(t => t.classList.remove('active', 'text-amber-600', 'border-amber-500'));
-                tabBtn.classList.add('active', 'text-amber-600', 'border-amber-500');
+                const parent = tabBtn.parentElement;
+                parent.querySelectorAll('.analisis-tab').forEach(t => t.classList.remove('active', 'bg-white', 'text-amber-600', 'shadow-sm'));
+                tabBtn.classList.add('active', 'bg-white', 'text-amber-600', 'shadow-sm');
+                
                 DOM.analisisContentContainer.querySelectorAll('.analisis-tab-content').forEach(c => c.classList.add('hidden'));
                 const targetPanel = DOM.analisisContentContainer.querySelector(`#${targetId}`);
                 if(targetPanel) targetPanel.classList.remove('hidden');
@@ -1132,7 +1222,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.querySelector('.accordion-chevron').classList.toggle('rotate-180');
             } else if (button.matches('.sortable')) {
                 const column = button.dataset.sort;
-                const groupName = Object.keys(State.classGroups).find(n => n.replace(/, /g, '').replace(/ /g, '-') === button.closest('.rekap-tab-content').id.replace('rekap-tab-', ''));
+                // Find group name from the tab ID
+                const tabContent = button.closest('.rekap-tab-content');
+                const groupName = Object.keys(State.classGroups).find(n => n.replace(/, /g, '').replace(/ /g, '-') === tabContent.id.replace('rekap-tab-', ''));
                 if (groupName) {
                     const group = State.classGroups[groupName];
                     const isSameColumn = group.sortState?.column === column;
@@ -1143,11 +1235,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     UI.renderSingleRekapTable(groupName);
                 }
             } else if (button.matches('.tab-peringkat')) {
-                document.querySelectorAll('.tab-peringkat').forEach(b => b.classList.remove('active'));
-                button.classList.add('active');
+                const container = DOM.peringkatSection;
+                container.querySelectorAll('.tab-peringkat').forEach(b => {
+                    b.classList.remove('bg-white', 'text-amber-600', 'shadow-sm');
+                    b.classList.add('text-slate-500'); // Reset style
+                });
+                button.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
+                button.classList.remove('text-slate-500');
                 UI.renderPeringkatContent(button.dataset.program);
             } else if (button.matches('.tahfizh-tab')) {
-                document.querySelectorAll('.tahfizh-tab').forEach(b => b.classList.remove('text-amber-600', 'border-amber-500'));
+                const container = DOM.tahfizhTuntasTrackingSection;
+                container.querySelectorAll('.tahfizh-tab').forEach(b => b.classList.remove('text-amber-600', 'border-amber-500'));
                 button.classList.add('text-amber-600', 'border-amber-500');
                 UI.renderTahfizhContent(parseInt(button.dataset.juz, 10));
             }
@@ -1163,13 +1261,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Dropdown Halaman Analisis
         if (DOM.santriSelectAnalisis) {
             DOM.santriSelectAnalisis.addEventListener('change', (e) => {
                 if (e.target.value) {
                     UI.renderSantriDashboard(e.target.value);
                 } else {
-                    DOM.analisisContentContainer.innerHTML = DOM.analisisPromptTemplate.innerHTML;
+                    DOM.analisisContentContainer.innerHTML = '';
+                    DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true));
                 }
             });
         }
@@ -1180,14 +1278,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`rekap-tab-${selectedId}`).classList.remove('hidden');
         });
 
-        // Event Listener untuk Tombol Detail Santri di Tabel Rekap (Delegation)
         DOM.rekapContentContainer.addEventListener('click', e => {
             if (e.target.matches('.detail-santri-btn')) {
                 UI.openDetailModal(e.target.dataset.id);
             }
         });
 
-        // Event Listener Tutup Modal Detail
         DOM.closeDetailModal.addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
         DOM.studentDetailModal.querySelector('.modal-backdrop').addEventListener('click', () => DOM.studentDetailModal.classList.add('hidden'));
 
@@ -1203,7 +1299,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOM.namaSantri.addEventListener('change', () => {
             const santri = State.rawSantriList.find(s => s.id === DOM.namaSantri.value);
-            // Cari data santri yang sudah diolah (untuk cek status tuntas)
             const santriProcessed = State.santriData.find(s => s.id === DOM.namaSantri.value);
             
             DOM.kelas.value = santri?.kelas || '';
@@ -1277,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const suggestions = State.santriData.filter(s => s.nama.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
                 if (suggestions.length > 0) {
-                    DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-[var(--hover-bg)] cursor-pointer">${s.nama}</div>`).join('');
+                    DOM.suggestionsContainer.innerHTML = suggestions.map(s => `<div class="suggestion-item p-2 hover:bg-slate-50 cursor-pointer text-sm font-medium text-slate-700">${s.nama}</div>`).join('');
                     DOM.suggestionsContainer.classList.remove('hidden');
                 } else {
                     DOM.suggestionsContainer.classList.add('hidden');
