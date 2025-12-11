@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         santriNameMap: new Map(),
         chartInstance: null,
         countdownInterval: null,
-        setoranQueue: [], // <--- Tambahkan ini
     };
 
     // ==========================================
