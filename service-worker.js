@@ -5,7 +5,6 @@ const ASSETS_TO_CACHE = [
   './style.css',
   './app.js',
   './config.js',
-  './data-hafalan.js'
 ];
 
 self.addEventListener('install', (event) => {
