@@ -972,8 +972,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let tuntas = false;
                 if (santri.program === 'Unggulan' && santri.nilai >= 100) { tuntas = true; } 
-                else if (santri.program === 'Tahfizh') { const deadlineMet = (mutqinJuz29 && new Date(mutqinJuz29.createdAt) <= AppConfig.deadlineTahfizhTuntas) && (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineTahfizhTuntas); if (santri.nilai >= 100 && santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30) && deadlineMet) { tuntas = true; } }
+                // ... di dalam loop santriStatsMap.forEach ...
+
+                else if (santri.program === 'Tahfizh') {
+                    // HAPUS atau KOMENTARI logika deadlineMet yang ketat ini
+                    /* const deadlineMet = (mutqinJuz29 && new Date(mutqinJuz29.createdAt) <= AppConfig.deadlineTahfizhTuntas) && 
+                                        (mutqinJuz30 && new Date(mutqinJuz30.createdAt) <= AppConfig.deadlineTahfizhTuntas);
+                    */
                 
+                    // Ganti kondisi IF menjadi lebih sederhana:
+                    // Cukup cek apakah Juz 29 dan 30 sudah ada (has) dan nilai Juz 30 cukup
+                    if (santri.nilai >= 100 && santri.mutqinJuz.has(29) && santri.mutqinJuz.has(30)) { 
+                        tuntas = true; 
+                    } 
+                }
                 if (tuntas) {
                     santri.isTuntas = true;
                     let completionDates = [];
