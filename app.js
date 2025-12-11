@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         searchDebounceTimer: null,
         santriNameMap: new Map(),
         chartInstance: null,
-        countdownInterval: null
+        countdownInterval: null,
+        setoranQueue: [], // <--- Tambahkan ini
     };
 
     // ==========================================
@@ -42,6 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
             navItemAnalisis: 'nav-item-analisis',
             headerRoleText: 'header-role-text',
             appRoleLabel: 'app-role-label',
+
+            addToQueueBtn: 'add-to-queue-btn',
+            queueContainer: 'queue-container',
+            queueList: 'queue-list',
+            queueCount: 'queue-count',
 
             // -- Role Selection Modal --
             roleSelectionModal: 'roleSelectionModal',
