@@ -1115,6 +1115,55 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+                // --- LOGIC MULTI-INPUT (QUEUE) ---
+        
+        // 1. Handle Tombol Tambah
+        DOM.addToQueueBtn.addEventListener('click', () => {
+            // Validasi input saat ini dulu
+            if (!validateForm()) return;
+        
+            // Ambil data dari form saat ini
+            const formData = new FormData(DOM.setoranForm);
+            
+            // Buat object item untuk antrian
+            const item = {
+                id: Date.now(), // ID unik sementara
+                musyrif: DOM.musyrif.value,
+                namaSantri: DOM.namaSantri.options[DOM.namaSantri.selectedIndex].text,
+                santriId: DOM.santriId.value,
+                kelas: DOM.kelas.value,
+                program: DOM.program.value,
+                jenis: DOM.jenis.value,
+                juz: DOM.juz.value,
+                // Logika ambil halaman atau surat
+                halaman: (!DOM.halaman.disabled && DOM.halaman.value) ? DOM.halaman.value : '',
+                surat: (!DOM.surat.disabled && DOM.surat.value) ? DOM.surat.value : '',
+                tanggal: DOM.tanggal.value,
+                kualitas: 'Lancar' // Default value dari hidden input
+            };
+        
+            // Tambahkan ke State
+            State.setoranQueue.push(item);
+        
+            // Render UI Antrian
+            renderQueueUI();
+        
+            // Reset Input Parsial (Hanya bagian hafalan, nama/musyrif jangan direset biar cepat)
+            resetHafalanInputs();
+            
+            UI.showToast('Ditambahkan ke daftar. Klik (+) lagi untuk tambah atau Simpan Setoran untuk kirim.', 'success');
+        });
+        
+        // 2. Handle Hapus Item dari Antrian (Event Delegation)
+        DOM.queueList.addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.remove-queue-item');
+            if (removeBtn) {
+                const id = Number(removeBtn.dataset.id);
+                State.setoranQueue = State.setoranQueue.filter(i => i.id !== id);
+                renderQueueUI();
+            }
+        });
+
         DOM.backRoleBtn.addEventListener('click', () => {
             DOM.musyrifLoginForm.classList.add('hidden');
             DOM.roleButtonsContainer.classList.remove('hidden');
