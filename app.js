@@ -1123,13 +1123,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const juzOrder = [...Array(30).keys()].map(i => i + 1).reverse(); 
 
             juzOrder.forEach(juzNum => {
-                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum && s.status !== 'Pending');
-                if (setoranJuz.length === 0) return; // Hide jika kosong
-
+                const setoranJuz = santri.setoran.filter(s => 
+                    (s.juz == juzNum || (juzNum === 30 && String(s.juz) === 'juz30_setengah')) 
+                    && s.status !== 'Pending'
+                );
+            
+                if (setoranJuz.length === 0) return; 
+            
                 hasData = true;
                 let totalPagesDone = 0;
+                
                 setoranJuz.forEach(s => {
-                    if (s.jenis === 'Mutqin') totalPagesDone = 20; 
+                    // Logika penghitungan
+                    if (s.jenis === 'Mutqin') {
+                        if (String(s.juz) === 'juz30_setengah') {
+                            totalPagesDone += 9; // Tambah 9 jika setengah juz
+                        } else {
+                            totalPagesDone = 20; // Full 1 juz
+                        }
+                    } 
                     else {
                         let pages = parseFloat(s.halaman) || 0;
                         if (!pages && s.surat && AppConfig.hafalanData?.surahData[juzNum]) {
