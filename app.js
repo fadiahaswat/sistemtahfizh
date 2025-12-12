@@ -873,8 +873,18 @@ document.addEventListener('DOMContentLoaded', () => {
             sortedSetoran.forEach(s => {
                 const date = new Date(s.createdAt);
                 const monthKey = date.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
+                
                 let pages = parseFloat(s.halaman) || 0;
-                if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) { pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0; }
+            
+                // --- PERBAIKAN DI SINI ---
+                if (String(s.juz) === 'juz30_setengah') {
+                    pages = 9; // Hardcode 9 halaman untuk setengah juz 30
+                } 
+                else if (!s.halaman && s.surat && AppConfig.hafalanData.surahData[s.juz]) { 
+                    pages = AppConfig.hafalanData.surahData[s.juz].pages[s.surat] || 0; 
+                }
+                // -------------------------
+            
                 if (!monthlyData[monthKey]) monthlyData[monthKey] = 0;
                 monthlyData[monthKey] += pages;
             });
