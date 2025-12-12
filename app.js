@@ -1502,8 +1502,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.tanggal.value = now.toISOString().slice(0, 16);
         });
 
-        DOM.mainNav.addEventListener('click', e => {
-            const navLinks = document.querySelectorAll('.nav-link');
+        const navLinks = document.querySelectorAll('.nav-link');
 
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
