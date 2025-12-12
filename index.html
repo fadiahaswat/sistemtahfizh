@@ -956,27 +956,31 @@
         </div>
 
         <div class="fade-in sticky top-4 z-30" style="animation-delay: 100ms;">
-            <div class="glass-card bg-white/90 backdrop-blur-xl p-3 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-3">
+            <div class="glass-card bg-white/90 backdrop-blur-xl p-2 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-2">
                 
                 <div class="relative flex-grow group">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
-                    <input type="text" id="search-riwayat" placeholder="Cari nama santri..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all placeholder:font-medium placeholder:text-slate-400">
+                    <input type="text" id="search-riwayat" placeholder="Cari nama santri..." class="w-full pl-11 pr-4 py-3 bg-transparent border-none rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:bg-slate-50 transition-all placeholder:font-medium placeholder:text-slate-400 hover:bg-slate-50">
                     <div id="suggestions-container" class="absolute z-20 left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl hidden max-h-60 overflow-y-auto p-2"></div>
                 </div>
 
-                <div class="hidden lg:block w-px bg-slate-200 my-1"></div>
+                <div class="hidden lg:block w-px bg-slate-200 my-2"></div>
 
-                <div class="flex flex-wrap lg:flex-nowrap gap-2">
-                    <div class="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-100">
-                        <input type="date" id="filter-tanggal-mulai" class="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 cursor-pointer w-32 px-2" title="Mulai Tanggal">
-                        <span class="text-slate-300 font-bold">-</span>
-                        <input type="date" id="filter-tanggal-akhir" class="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 cursor-pointer w-32 px-2" title="Sampai Tanggal">
+                <div class="flex flex-wrap lg:flex-nowrap gap-2 p-1 lg:p-0">
+                    
+                    <div class="flex items-center bg-slate-50 rounded-xl border border-slate-100 px-2 h-[46px] flex-grow lg:flex-grow-0">
+                        <div class="text-slate-400 px-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        </div>
+                        <input type="date" id="filter-tanggal-mulai" class="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 cursor-pointer w-28 p-0" title="Mulai Tanggal">
+                        <span class="text-slate-300 font-bold px-1">-</span>
+                        <input type="date" id="filter-tanggal-akhir" class="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 cursor-pointer w-28 p-0" title="Sampai Tanggal">
                     </div>
 
-                    <div class="relative min-w-[140px]">
-                        <select id="filter-program" class="w-full appearance-none bg-slate-50 border border-slate-100 text-slate-600 text-xs font-bold rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-brand-500 focus:bg-white cursor-pointer transition-all">
+                    <div class="relative min-w-[140px] flex-grow lg:flex-grow-0">
+                        <select id="filter-program" class="w-full h-[46px] appearance-none bg-slate-50 border border-slate-100 text-slate-600 text-xs font-bold rounded-xl pl-4 pr-10 focus:ring-2 focus:ring-brand-500 focus:bg-white cursor-pointer transition-all">
                             <option value="Semua">Semua Program</option>
                             <option value="Tahfizh">Tahfizh</option>
                             <option value="Unggulan">Unggulan</option>
@@ -986,8 +990,8 @@
                         </div>
                     </div>
 
-                    <div class="relative min-w-[130px]">
-                        <select id="filter-kelas" class="w-full appearance-none bg-slate-50 border border-slate-100 text-slate-600 text-xs font-bold rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-brand-500 focus:bg-white cursor-pointer transition-all">
+                    <div class="relative min-w-[130px] flex-grow lg:flex-grow-0">
+                        <select id="filter-kelas" class="w-full h-[46px] appearance-none bg-slate-50 border border-slate-100 text-slate-600 text-xs font-bold rounded-xl pl-4 pr-10 focus:ring-2 focus:ring-brand-500 focus:bg-white cursor-pointer transition-all">
                             <option value="Semua">Semua Kelas</option>
                             <option value="2CDGH">2C, 2D, 2G, 2H</option>
                             <option value="2A">2A</option>
@@ -1003,26 +1007,26 @@
 
         <div class="fade-in bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden relative min-h-[400px]" style="animation-delay: 200ms;">
             
-            <div class="absolute top-0 left-0 right-0 h-16 bg-slate-50/80 border-b border-slate-200 z-0"></div>
+            <div class="absolute top-0 left-0 right-0 h-14 bg-slate-50 border-b border-slate-200 z-0"></div>
 
             <div class="overflow-x-auto relative z-10 custom-scrollbar max-h-[70vh]">
                 <table class="w-full text-left border-collapse">
                     <thead class="sticky top-0 z-20">
                         <tr class="text-slate-400 text-[10px] uppercase tracking-wider font-extrabold bg-slate-50/95 backdrop-blur-sm shadow-sm">
-                            <th class="p-6 rounded-tl-[2rem]">Nama Santri & Info</th>
-                            <th class="p-6">Detail Hafalan</th>
-                            <th class="p-6">Waktu Setor</th>
-                            <th class="p-6 text-center rounded-tr-[2rem] action-col">Aksi</th>
+                            <th class="p-5 pl-8">Nama Santri & Info</th>
+                            <th class="p-5">Detail Hafalan</th>
+                            <th class="p-5">Waktu Setor</th>
+                            <th class="p-5 pr-8 text-center action-col">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="setoranTableBody" class="divide-y divide-slate-100 text-sm bg-white">
                         <tr>
                             <td colspan="4" class="p-12 text-center text-slate-400 italic">
                                 <div class="flex flex-col items-center justify-center gap-3">
-                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
+                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                                     </div>
-                                    Memuat data...
+                                    <p>Memuat data riwayat...</p>
                                 </div>
                             </td>
                         </tr>
@@ -1532,5 +1536,6 @@
        
     </body>
 </html>
+
 
 
