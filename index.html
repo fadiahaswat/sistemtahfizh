@@ -725,28 +725,21 @@
             <div id="page-analisis" class="page-content hidden p-4 sm:p-8">
     <div class="max-w-6xl mx-auto space-y-8">
         
-        <div class="fade-in pt-4 pb-2">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 class="text-3xl font-black text-slate-800 flex items-center gap-3 tracking-tight">
-                        <span class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-brand-500 to-orange-600 rounded-2xl text-white shadow-lg shadow-brand-500/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                        </span>
-                        Analisis Progres
-                    </h2>
-                    <p class="text-slate-500 mt-2 text-base font-medium ml-1">Laporan mendalam performa hafalan santri.</p>
-                </div>
+        <div class="sticky top-4 z-40 flex flex-col gap-4 fade-in">
+            <div class="hidden md:block pl-2">
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Analisis Progres</h2>
+                <p class="text-slate-500 text-sm font-medium">Laporan detail performa hafalan santri.</p>
             </div>
-        </div>
 
-        <div class="fade-in sticky top-4 z-30" style="animation-delay: 100ms;">
-            <div class="glass-card p-2 rounded-[1.5rem] flex items-center bg-white/90 backdrop-blur-xl border border-white/50 shadow-xl shadow-slate-200/40 transition-all focus-within:ring-4 focus-within:ring-brand-100 focus-within:border-brand-300">
-                <div class="pl-4 pr-2 text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <div class="glass-card p-2 rounded-2xl bg-white/90 backdrop-blur-xl border border-slate-200 shadow-xl shadow-slate-200/40 flex items-center transition-all focus-within:ring-4 focus-within:ring-brand-100 focus-within:border-brand-400">
+                <div class="pl-4 pr-3 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </div>
-                <select id="santri-select-analisis" class="w-full py-4 bg-transparent border-none focus:ring-0 text-slate-700 font-bold cursor-pointer text-lg placeholder-slate-400"></select>
-                <div class="pr-6 pointer-events-none text-brand-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                <div class="relative w-full">
+                    <select id="santri-select-analisis" class="w-full py-3 bg-transparent border-none focus:ring-0 text-slate-700 font-bold cursor-pointer text-base sm:text-lg appearance-none"></select>
+                    <span class="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg pointer-events-none mr-2">Pilih Santri</span>
                 </div>
             </div>
         </div>
@@ -754,68 +747,89 @@
         <div id="analisis-content-container" class="min-h-[400px]"></div>                                
         
         <template id="analisis-dashboard-template">
-            <div class="space-y-8 animate-slide-up">
+            <div class="space-y-6 animate-slide-up">
                 
-                <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl shadow-brand-900/5 border border-white bg-white relative group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800"></div>
-                    <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-1000"></div>
-                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -ml-20 -mb-20 group-hover:scale-110 transition-transform duration-1000"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <div class="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
-                        <div class="flex-shrink-0">
-                            <div class="w-32 h-32 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/20 shadow-inner">
-                                <span class="text-6xl filter drop-shadow-lg">🎓</span>
-                            </div>
-                        </div>
+                    <div class="lg:col-span-2 glass-card rounded-[2rem] bg-white border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-[3rem] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                         
-                        <div class="flex-grow text-center md:text-left text-white">
-                            <h3 class="font-black text-3xl sm:text-5xl tracking-tight leading-none mb-2" data-name>Nama Santri</h3>
-                            <div class="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-                                <span class="bg-white/10 px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-sm border border-white/10 text-brand-100" data-kelas-text></span>
-                                <span class="bg-white/10 px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-sm border border-white/10 text-brand-100" data-program-text></span>
+                        <div class="relative z-10 flex-shrink-0">
+                            <div class="w-24 h-24 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-3 min-w-[140px]">
-                            <div class="bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/10 text-center">
-                                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Status</p>
-                                <div data-status-badge class="text-xs font-black px-3 py-1 rounded-xl shadow-sm"></div>
+                        <div class="relative z-10 flex-grow text-center sm:text-left">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2 justify-center sm:justify-start">
+                                <h3 class="font-black text-2xl sm:text-3xl text-slate-800 tracking-tight" data-name>Nama Santri</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                             </div>
-                            <div class="bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/10 text-center">
-                                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Perpulangan</p>
-                                <div data-perpulangan-badge class="text-xs font-black px-3 py-1 rounded-xl shadow-sm"></div>
+                            
+                            <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-xs font-bold text-slate-600 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    <span data-kelas-text></span>
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-xs font-bold text-slate-600 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                    <span data-program-text></span>
+                                </span>
+                            </div>
+
+                            <div class="flex justify-center sm:justify-start gap-4">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Status</p>
+                                    <div data-status-badge class="text-xs font-bold px-3 py-1 rounded-md border shadow-sm"></div>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Perpulangan</p>
+                                    <div data-perpulangan-badge class="text-xs font-bold px-3 py-1 rounded-md border shadow-sm"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="relative z-10 bg-white/5 backdrop-blur-sm border-t border-white/10 p-6 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-                        <div class="px-4 text-center">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Nilai Akhir</p>
-                            <p class="text-4xl font-black text-white" data-nilai></p>
+                    <div class="glass-card rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-800 p-6 sm:p-8 text-white flex flex-col justify-center items-center shadow-xl shadow-slate-900/20 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvc3ZnPg==')] opacity-20"></div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 relative z-10">Skor Hafalan</p>
+                        <div class="flex items-baseline gap-1 relative z-10">
+                            <span class="text-6xl font-black tracking-tighter" data-nilai>0</span>
+                            <span class="text-xl text-slate-500 font-bold">/100</span>
                         </div>
-                        <div class="px-4 text-center">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Setoran</p>
-                            <p class="text-4xl font-black text-white" data-total-setoran></p>
+                        <div class="absolute -bottom-10 -right-10 w-32 h-32 border-4 border-white/5 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white border border-slate-200 p-5 rounded-3xl flex items-center justify-between shadow-sm">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Setoran</p>
+                            <p class="text-2xl font-black text-slate-800" data-total-setoran>0</p>
                         </div>
-                        <div class="px-4 text-center">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Ziyadah</p>
-                            <p class="text-4xl font-black text-white" data-ziyadah></p>
+                        <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-slate-200 p-5 rounded-3xl flex items-center justify-between shadow-sm">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Halaman Ziyadah</p>
+                            <p class="text-2xl font-black text-slate-800" data-ziyadah>0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm sticky top-24 z-20" id="analisis-tabs">
-                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all active shadow-sm bg-slate-900 text-white ring-1 ring-black/5" data-target="analisis-ringkasan">
-                        <span class="flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" /></svg>
-                            Ringkasan
-                        </span>
+                <div class="bg-slate-100 p-1.5 rounded-2xl flex" id="analisis-tabs">
+                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all shadow-sm bg-white text-slate-800" data-target="analisis-ringkasan">
+                        Ringkasan
                     </button>
-                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50" data-target="analisis-aktivitas">
-                        <span class="flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
-                            Aktivitas
-                        </span>
+                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all text-slate-500 hover:text-slate-700" data-target="analisis-aktivitas">
+                        Aktivitas
                     </button>
                 </div>
 
@@ -824,59 +838,58 @@
                         
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             <div class="lg:col-span-8 space-y-6">
+                                
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group hover:shadow-lg transition-all">
-                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 w-full text-left border-b border-slate-100 pb-2 flex items-center gap-2">
-                                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Fokus Saat Ini
+                                    <div class="bg-white border border-slate-200 rounded-[2rem] p-6 flex flex-col items-center text-center shadow-sm">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 w-full text-left flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Fokus Hafalan
                                         </h4>
-                                        <div id="focus-juz-container" class="relative flex-1 flex flex-col items-center justify-center min-h-[180px] w-full">
+                                        <div id="focus-juz-container" class="relative flex-1 flex flex-col items-center justify-center w-full min-h-[160px]">
                                             <p class="text-slate-300 font-bold italic text-sm">Tidak ada juz aktif</p>
                                         </div>
                                     </div>
 
-                                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col group hover:shadow-lg transition-all">
-                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex items-center gap-2">
+                                    <div class="bg-white border border-slate-200 rounded-[2rem] p-6 flex flex-col shadow-sm">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 w-full text-left flex items-center gap-2">
                                             <span class="w-2 h-2 rounded-full bg-blue-500"></span> Komposisi
                                         </h4>
-                                        <div class="relative flex-1 min-h-[180px] flex items-center justify-center">
+                                        <div class="relative flex-1 flex items-center justify-center min-h-[160px]">
                                             <canvas id="compositionChart"></canvas>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
-                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex justify-between items-center">
-                                        <span class="flex items-center gap-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                                            Peta Hafalan (Juz 1-30)
-                                        </span>
-                                        <span class="text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-bold">Hanya Juz Terisi</span>
-                                    </h4>
+                                <div class="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm">
+                                    <div class="flex justify-between items-center mb-6">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            Peta Juz (1-30)
+                                        </h4>
+                                        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-bold">Terisi</span>
+                                    </div>
                                     <div id="dynamic-juz-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
                                 </div>
                             </div>
 
                             <div class="lg:col-span-4 space-y-6">
-                                <div class="glass-card p-6 rounded-[2rem] bg-white/80 border border-white shadow-sm h-full">
+                                <div class="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm h-full">
                                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                                         Target Wajib
                                     </h4>
                                     <div class="space-y-3" data-progres-juz></div>
-                                </div>
-
-                                <div data-ziyadah-section class="hidden">
-                                     <div class="glass-card p-6 rounded-[2rem] bg-white/80 border border-white shadow-sm">
+                                    
+                                    <div data-ziyadah-section class="hidden mt-8 pt-6 border-t border-slate-100">
                                         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Detail Ziyadah</h4>
                                         <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar" data-progres-ziyadah></div>
-                                     </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div id="analisis-aktivitas" class="analisis-tab-content hidden fade-in">
-                         <div class="glass-card rounded-[2.5rem] overflow-hidden border border-slate-200 bg-white shadow-sm">
+                         <div class="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
                             <div class="p-6 border-b border-slate-100 bg-slate-50/50">
                                 <h4 class="font-bold text-slate-700">Riwayat Setoran Terbaru</h4>
                             </div>
@@ -898,26 +911,17 @@
         </template>
 
         <template id="analisis-prompt-template">
-            <div class="flex flex-col items-center justify-center text-center py-24 px-6 glass-card rounded-[3rem] fade-in border border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-sm">
-                <div class="relative mb-8 group cursor-pointer">
-                    <div class="absolute inset-0 bg-brand-200 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                    <div class="relative bg-white w-28 h-28 rounded-3xl flex items-center justify-center shadow-xl shadow-brand-500/10 border border-slate-100 transform transition-transform group-hover:scale-110 group-hover:-rotate-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <h3 class="text-3xl font-black text-slate-800 tracking-tight mb-3">Mulai Analisis</h3>
-                <p class="text-slate-500 max-w-sm mx-auto font-medium text-lg leading-relaxed">
-                    Pilih nama santri pada kolom pencarian di atas untuk melihat rapor hafalan lengkap.
-                </p>
-                
-                <div class="mt-12 animate-bounce text-slate-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            <div class="flex flex-col items-center justify-center text-center py-24 px-6 bg-white border border-slate-200 rounded-[3rem] shadow-sm fade-in">
+                <div class="w-24 h-24 bg-brand-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
+                
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight mb-2">Mulai Analisis</h3>
+                <p class="text-slate-500 max-w-sm mx-auto font-medium text-base">
+                    Pilih nama santri pada kolom pencarian di atas untuk melihat rapor hafalan lengkap.
+                </p>
             </div>
         </template>
     </div>
@@ -1474,3 +1478,4 @@
        
     </body>
 </html>
+
