@@ -453,22 +453,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetsHtml = nextPeriod.required.map(t => `<div class="flex items-center gap-2 bg-white/80 py-1.5 px-3 rounded-full text-xs font-bold shadow-sm border border-slate-200/80 text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>${t.replace(/_/g, ' ')}</span></div>`).join('');
                 
                 cont.innerHTML = `
-                    <div class="glass-card rounded-2xl p-6 bg-gradient-to-br from-white to-slate-50 border border-white/60">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                            <div class="text-center">
-                                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Menuju Perpulangan</h4>
-                                <h2 class="text-2xl font-black text-slate-800 mb-2">${monthName}</h2>
-                                <p class="text-xs text-slate-500 mb-6 bg-slate-100 inline-block px-3 py-1 rounded-lg">Deadline: ${deadlineStr} WIB</p>
-                                <div id="countdown-timer" class="flex justify-center gap-3 text-center"></div>
-                            </div>
-                            <div class="border-t md:border-t-0 md:border-l border-slate-200 pt-6 md:pt-0 md:pl-6">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-green-100 text-green-700 p-2 rounded-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                    <div class="glass-card rounded-[2.5rem] p-8 relative overflow-hidden group transition-all hover:shadow-2xl hover:shadow-indigo-100 border border-white/60 bg-gradient-to-br from-white via-indigo-50/20 to-purple-50/40">
+                        
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none transition-transform duration-700 group-hover:scale-110"></div>
+                        <div class="absolute bottom-0 left-0 w-48 h-48 bg-purple-100/40 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
+                
+                        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                            
+                            <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+                                <div>
+                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-indigo-100 backdrop-blur-sm mb-3 shadow-sm">
+                                        <span class="relative flex h-2 w-2">
+                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                          <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                                        </span>
+                                        <h4 class="text-[10px] font-bold text-indigo-900 uppercase tracking-widest">Menuju Perpulangan</h4>
                                     </div>
-                                    <h4 class="text-sm font-bold text-slate-700">Syarat Hafalan</h4>
+                                    <h2 class="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-indigo-900">${monthName}</h2>
+                                    <div class="inline-flex items-center gap-2 text-xs font-medium text-slate-500 bg-slate-100/50 px-4 py-2 rounded-xl border border-white/50">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        Deadline: <span class="font-bold font-mono text-slate-700">${deadlineStr} WIB</span>
+                                    </div>
                                 </div>
-                                <div class="flex flex-wrap gap-2">${targetsHtml}</div>
+                
+                                <div id="countdown-timer" class="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4"></div>
+                            </div>
+                
+                            <div class="lg:col-span-5 relative">
+                                <div class="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/60 shadow-lg shadow-indigo-500/5">
+                                    <div class="flex items-center gap-3 mb-5 border-b border-indigo-50/50 pb-4">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-black text-slate-700">Syarat Hafalan</h4>
+                                            <p class="text-[10px] text-slate-400 font-medium">Wajib diselesaikan sebelum tanggal diatas</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2 content-start min-h-[80px]">
+                                        ${targetsHtml}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>`;
