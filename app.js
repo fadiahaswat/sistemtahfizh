@@ -1523,50 +1523,19 @@ document.addEventListener('DOMContentLoaded', () => {
             DOM.tanggal.value = now.toISOString().slice(0, 16);
         });
 
-        const navLinks = document.querySelectorAll('.nav-link');
+        // Di dalam function setupEventListeners() ...
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault(); // Penting: Biar page tidak refresh
-
-                // 1. Panggil fungsi ganti halaman (PENTING! agar konten berubah)
-                // Kita ambil target page dari atribut data-page
-                const targetPage = this.getAttribute('data-page');
-                if(targetPage) {
-                    UI.switchPage(targetPage); 
-                }
-
-                // 2. Hapus class 'active' dari SEMUA link
-                navLinks.forEach(nav => {
-                    nav.classList.remove('active');
-                    // Reset style manual jika ada (sesuai kode lama kamu)
-                    const icon = nav.querySelector('div');
-                    const text = nav.querySelector('span');
-                    if(icon) icon.classList.remove('bg-amber-100', 'text-amber-600');
-                    if(text) text.classList.remove('text-amber-700');
-                });
-
-                // 3. Tambahkan class 'active' ke link yang DIKLIK
-                this.classList.add('active');
+        // Event listener ini sudah cukup menghandle klik Desktop & Mobile
+        DOM.mainNav.addEventListener('click', e => {
+            // Cari elemen terdekat yang punya class 'nav-link'
+            const link = e.target.closest('.nav-link');
+            
+            if (link) { 
+                e.preventDefault(); // Mencegah reload halaman
                 
-                // Tambahkan style manual (agar sesuai desain lama kamu)
-                const activeIcon = this.querySelector('div');
-                const activeText = this.querySelector('span');
-                if(activeIcon) activeIcon.classList.add('bg-amber-100', 'text-amber-600');
-                if(activeText) activeText.classList.add('text-amber-700');
-
-                // 4. Khusus untuk Tab "Analisis" (Sinkronisasi Mobile & Desktop)
-                if(targetPage === 'page-analisis'){
-                    document.querySelectorAll('[data-page="page-analisis"]').forEach(el => {
-                        el.classList.add('active');
-                        // Tambah style manual juga ke kembarannya
-                        const icon = el.querySelector('div');
-                        const text = el.querySelector('span');
-                        if(icon) icon.classList.add('bg-amber-100', 'text-amber-600');
-                        if(text) text.classList.add('text-amber-700');
-                    });
-                }
-            });
+                // Panggil fungsi Otak yang sudah kita perbaiki di atas
+                UI.switchPage(link.dataset.page); 
+            }
         });
             
         // --- Event Delegation (BAGIAN INI DIPERBAIKI) ---
