@@ -1503,10 +1503,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         DOM.mainNav.addEventListener('click', e => {
-            const link = e.target.closest('.nav-link');
-            if (link) { e.preventDefault(); UI.switchPage(link.dataset.page); }
-        });
+            const navLinks = document.querySelectorAll('.nav-link');
 
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault(); // Penting: Biar page tidak refresh
+
+                // 1. Panggil fungsi ganti halaman (PENTING! agar konten berubah)
+                // Kita ambil target page dari atribut data-page
+                const targetPage = this.getAttribute('data-page');
+                if(targetPage) {
+                    UI.switchPage(targetPage); 
+                }
+
+                // 2. Hapus class 'active' dari SEMUA link
+                navLinks.forEach(nav => {
+                    nav.classList.remove('active');
+                    // Reset style manual jika ada (sesuai kode lama kamu)
+                    const icon = nav.querySelector('div');
+                    const text = nav.querySelector('span');
+                    if(icon) icon.classList.remove('bg-amber-100', 'text-amber-600');
+                    if(text) text.classList.remove('text-amber-700');
+                });
+
+                // 3. Tambahkan class 'active' ke link yang DIKLIK
+                this.classList.add('active');
+                
+                // Tambahkan style manual (agar sesuai desain lama kamu)
+                const activeIcon = this.querySelector('div');
+                const activeText = this.querySelector('span');
+                if(activeIcon) activeIcon.classList.add('bg-amber-100', 'text-amber-600');
+                if(activeText) activeText.classList.add('text-amber-700');
+
+                // 4. Khusus untuk Tab "Analisis" (Sinkronisasi Mobile & Desktop)
+                if(targetPage === 'page-analisis'){
+                    document.querySelectorAll('[data-page="page-analisis"]').forEach(el => {
+                        el.classList.add('active');
+                        // Tambah style manual juga ke kembarannya
+                        const icon = el.querySelector('div');
+                        const text = el.querySelector('span');
+                        if(icon) icon.classList.add('bg-amber-100', 'text-amber-600');
+                        if(text) text.classList.add('text-amber-700');
+                    });
+                }
+            });
+        });
+            
         // --- Event Delegation (BAGIAN INI DIPERBAIKI) ---
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
