@@ -723,153 +723,205 @@
 </div>
 
             <div id="page-analisis" class="page-content hidden p-4 sm:p-8">
-                <div class="max-w-5xl mx-auto">
-                    <div class="pt-8 sm:pt-0 mb-8 fade-in flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-                        <div>
-                            <h2 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
-                                <span class="bg-brand-100 p-2 rounded-xl text-brand-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                </span>
-                                Analisis Progres
-                            </h2>
-                            <p class="text-slate-500 mt-2 text-sm font-medium">Pantau detail hafalan dan status kelulusan santri.</p>
-                        </div>
-                    </div>
-
-                    <div class="mb-8 fade-in" style="animation-delay: 100ms;">
-                        <div class="glass-card p-1 rounded-2xl flex items-center bg-white/80">
-                            <div class="p-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                            </div>
-                            <select id="santri-select-analisis" class="w-full p-4 bg-transparent border-none focus:ring-0 text-slate-700 font-semibold cursor-pointer text-lg"></select>
-                        </div>
-                    </div>
-                    
-                    <div id="analisis-content-container"></div>                                
-                    
-                    <template id="analisis-dashboard-template">
-                        <div class="space-y-8">
-                            <div class="glass-card rounded-[2.5rem] flex flex-col fade-in shadow-2xl shadow-brand-500/10 overflow-hidden border-0">
-                                <div class="p-8 sm:p-10 bg-gradient-to-r from-brand-500 to-orange-600 text-white relative overflow-hidden">
-                                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
-                                        <div class="relative flex-shrink-0">
-                                            <div class="w-28 h-28 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/30 shadow-inner transform rotate-3">
-                                                <span class="text-5xl drop-shadow-md">🎓</span>
-                                            </div>
-                                        </div>
-                                        <div class="flex-grow text-white pt-2">
-                                            <h3 class="font-black text-3xl sm:text-4xl tracking-tight leading-none" data-name>Nama Santri</h3>
-                                            <div class="flex flex-wrap justify-center sm:justify-start items-center gap-3 text-sm font-bold mt-4 text-brand-100">
-                                                <span class="bg-black/20 px-4 py-1.5 rounded-full flex items-center gap-2 backdrop-blur-sm border border-white/10" data-kelas-text></span>
-                                                <span class="bg-black/20 px-4 py-1.5 rounded-full flex items-center gap-2 backdrop-blur-sm border border-white/10" data-program-text></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="p-6 bg-white flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-                                    <div class="flex-1 p-4 text-center group hover:bg-slate-50 transition-colors rounded-xl">
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Tuntas</p>
-                                        <div data-status-badge class="text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm transform group-hover:scale-105 transition-transform"></div>
-                                    </div>
-                                    <div class="flex-1 p-4 text-center group hover:bg-slate-50 transition-colors rounded-xl">
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nilai Akhir</p>
-                                        <p class="text-4xl font-black text-slate-800" data-nilai></p>
-                                    </div>
-                                    <div class="flex-1 p-4 text-center group hover:bg-slate-50 transition-colors rounded-xl">
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Perpulangan</p>
-                                        <div data-perpulangan-badge class="text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm transform group-hover:scale-105 transition-transform"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="fade-in" style="animation-delay: 100ms;">
-                                <div class="flex p-1.5 bg-slate-200/50 rounded-2xl backdrop-blur-sm" id="analisis-tabs">
-                                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all active shadow-sm bg-white text-brand-600 ring-1 ring-black/5" data-target="analisis-ringkasan">Ringkasan</button>
-                                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all text-slate-500 hover:text-slate-700" data-target="analisis-aktivitas">Aktivitas</button>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div id="analisis-ringkasan" class="analisis-tab-content fade-in space-y-8">
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                        <div class="space-y-6">
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <div class="glass-card p-6 rounded-3xl text-center border-l-8 border-l-blue-400 bg-white/80">
-                                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Total Setoran</p>
-                                                    <p class="text-4xl font-black text-slate-800" data-total-setoran></p>
-                                                </div>
-                                                <div class="glass-card p-6 rounded-3xl text-center border-l-8 border-l-emerald-400 bg-white/80">
-                                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Total Ziyadah</p>
-                                                    <p class="text-4xl font-black text-slate-800" data-ziyadah></p>
-                                                </div>
-                                            </div>
-                                            <div class="glass-card p-6 rounded-3xl bg-white/80">
-                                                <h4 class="section-header text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 border-b pb-2">Progres Target Wajib</h4>
-                                                <div class="space-y-3" data-progres-juz></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div data-ziyadah-section class="hidden">
-                                             <div class="glass-card p-6 rounded-3xl h-full bg-white/80">
-                                                <h4 class="section-header text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 border-b pb-2">Detail Ziyadah</h4>
-                                                <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar" data-progres-ziyadah></div>
-                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
-                                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 w-full text-left border-b border-slate-100 pb-2 flex items-center gap-2">
-                                                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Fokus Saat Ini
-                                            </h4>
-                                            <div id="focus-juz-container" class="relative flex-1 flex flex-col items-center justify-center min-h-[200px]">
-                                                <p class="text-slate-300 font-bold italic text-sm">Tidak ada juz aktif</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col">
-                                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex items-center gap-2">
-                                                <span class="w-2 h-2 rounded-full bg-blue-500"></span> Komposisi Hafalan
-                                            </h4>
-                                            <div class="relative flex-1 min-h-[200px] flex items-center justify-center">
-                                                <canvas id="compositionChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100">
-                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex justify-between items-center">
-                                            <span>🗺️ Peta Hafalan (Juz 1-30)</span>
-                                            <span class="text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-bold">Hanya Juz Terisi</span>
-                                        </h4>
-                                        <div id="dynamic-juz-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
-                                    </div>
-                                </div>
-
-                                <div id="analisis-aktivitas" class="analisis-tab-content hidden fade-in">
-                                     <div class="glass-card rounded-3xl overflow-hidden max-h-[500px] overflow-y-auto border border-white/50 bg-white/60">
-                                        <table class="min-w-full">
-                                            <tbody class="divide-y divide-slate-100" data-aktivitas-terkini></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template id="analisis-prompt-template">
-                        <div class="text-center py-20 px-6 glass-card rounded-[3rem] fade-in border-4 border-dashed border-slate-200 bg-white/50">
-                            <div class="bg-brand-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-800">Mulai Analisis</h3>
-                            <p class="mt-2 text-slate-500 max-w-sm mx-auto font-medium">Silakan pilih nama santri di menu dropdown atas untuk melihat laporan lengkap.</p>
-                        </div>
-                    </template>
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <div class="fade-in pt-4 pb-2">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-800 flex items-center gap-3 tracking-tight">
+                        <span class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-brand-500 to-orange-600 rounded-2xl text-white shadow-lg shadow-brand-500/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </span>
+                        Analisis Progres
+                    </h2>
+                    <p class="text-slate-500 mt-2 text-base font-medium ml-1">Laporan mendalam performa hafalan santri.</p>
                 </div>
             </div>
+        </div>
+
+        <div class="fade-in sticky top-4 z-30" style="animation-delay: 100ms;">
+            <div class="glass-card p-2 rounded-[1.5rem] flex items-center bg-white/90 backdrop-blur-xl border border-white/50 shadow-xl shadow-slate-200/40 transition-all focus-within:ring-4 focus-within:ring-brand-100 focus-within:border-brand-300">
+                <div class="pl-4 pr-2 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <select id="santri-select-analisis" class="w-full py-4 bg-transparent border-none focus:ring-0 text-slate-700 font-bold cursor-pointer text-lg placeholder-slate-400"></select>
+                <div class="pr-6 pointer-events-none text-brand-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </div>
+            </div>
+        </div>
+        
+        <div id="analisis-content-container" class="min-h-[400px]"></div>                                
+        
+        <template id="analisis-dashboard-template">
+            <div class="space-y-8 animate-slide-up">
+                
+                <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl shadow-brand-900/5 border border-white bg-white relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800"></div>
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-1000"></div>
+                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -ml-20 -mb-20 group-hover:scale-110 transition-transform duration-1000"></div>
+                    
+                    <div class="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <div class="flex-shrink-0">
+                            <div class="w-32 h-32 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/20 shadow-inner">
+                                <span class="text-6xl filter drop-shadow-lg">🎓</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-grow text-center md:text-left text-white">
+                            <h3 class="font-black text-3xl sm:text-5xl tracking-tight leading-none mb-2" data-name>Nama Santri</h3>
+                            <div class="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
+                                <span class="bg-white/10 px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-sm border border-white/10 text-brand-100" data-kelas-text></span>
+                                <span class="bg-white/10 px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-sm border border-white/10 text-brand-100" data-program-text></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3 min-w-[140px]">
+                            <div class="bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/10 text-center">
+                                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Status</p>
+                                <div data-status-badge class="text-xs font-black px-3 py-1 rounded-xl shadow-sm"></div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/10 text-center">
+                                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Perpulangan</p>
+                                <div data-perpulangan-badge class="text-xs font-black px-3 py-1 rounded-xl shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 bg-white/5 backdrop-blur-sm border-t border-white/10 p-6 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+                        <div class="px-4 text-center">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Nilai Akhir</p>
+                            <p class="text-4xl font-black text-white" data-nilai></p>
+                        </div>
+                        <div class="px-4 text-center">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Setoran</p>
+                            <p class="text-4xl font-black text-white" data-total-setoran></p>
+                        </div>
+                        <div class="px-4 text-center">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Ziyadah</p>
+                            <p class="text-4xl font-black text-white" data-ziyadah></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm sticky top-24 z-20" id="analisis-tabs">
+                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all active shadow-sm bg-slate-900 text-white ring-1 ring-black/5" data-target="analisis-ringkasan">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" /></svg>
+                            Ringkasan
+                        </span>
+                    </button>
+                    <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50" data-target="analisis-aktivitas">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
+                            Aktivitas
+                        </span>
+                    </button>
+                </div>
+
+                <div class="relative min-h-[500px]">
+                    <div id="analisis-ringkasan" class="analisis-tab-content fade-in space-y-6">
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <div class="lg:col-span-8 space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col items-center text-center relative overflow-hidden group hover:shadow-lg transition-all">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 w-full text-left border-b border-slate-100 pb-2 flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Fokus Saat Ini
+                                        </h4>
+                                        <div id="focus-juz-container" class="relative flex-1 flex flex-col items-center justify-center min-h-[180px] w-full">
+                                            <p class="text-slate-300 font-bold italic text-sm">Tidak ada juz aktif</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col group hover:shadow-lg transition-all">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Komposisi
+                                        </h4>
+                                        <div class="relative flex-1 min-h-[180px] flex items-center justify-center">
+                                            <canvas id="compositionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
+                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex justify-between items-center">
+                                        <span class="flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                            Peta Hafalan (Juz 1-30)
+                                        </span>
+                                        <span class="text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-bold">Hanya Juz Terisi</span>
+                                    </h4>
+                                    <div id="dynamic-juz-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-4 space-y-6">
+                                <div class="glass-card p-6 rounded-[2rem] bg-white/80 border border-white shadow-sm h-full">
+                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                        Target Wajib
+                                    </h4>
+                                    <div class="space-y-3" data-progres-juz></div>
+                                </div>
+
+                                <div data-ziyadah-section class="hidden">
+                                     <div class="glass-card p-6 rounded-[2rem] bg-white/80 border border-white shadow-sm">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Detail Ziyadah</h4>
+                                        <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar" data-progres-ziyadah></div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="analisis-aktivitas" class="analisis-tab-content hidden fade-in">
+                         <div class="glass-card rounded-[2.5rem] overflow-hidden border border-slate-200 bg-white shadow-sm">
+                            <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                                <h4 class="font-bold text-slate-700">Riwayat Setoran Terbaru</h4>
+                            </div>
+                            <div class="max-h-[600px] overflow-y-auto">
+                                <table class="min-w-full text-left">
+                                    <thead class="bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-4">Detail</th>
+                                            <th class="px-6 py-4 text-right">Waktu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 text-sm" data-aktivitas-terkini></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="analisis-prompt-template">
+            <div class="flex flex-col items-center justify-center text-center py-24 px-6 glass-card rounded-[3rem] fade-in border border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-sm">
+                <div class="relative mb-8 group cursor-pointer">
+                    <div class="absolute inset-0 bg-brand-200 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white w-28 h-28 rounded-3xl flex items-center justify-center shadow-xl shadow-brand-500/10 border border-slate-100 transform transition-transform group-hover:scale-110 group-hover:-rotate-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight mb-3">Mulai Analisis</h3>
+                <p class="text-slate-500 max-w-sm mx-auto font-medium text-lg leading-relaxed">
+                    Pilih nama santri pada kolom pencarian di atas untuk melihat rapor hafalan lengkap.
+                </p>
+                
+                <div class="mt-12 animate-bounce text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
 
             <div id="page-riwayat" class="page-content hidden p-4 sm:p-8">
                 <div class="max-w-6xl mx-auto space-y-6 fade-in">
@@ -1422,6 +1474,7 @@
        
     </body>
 </html>
+
 
 
 
