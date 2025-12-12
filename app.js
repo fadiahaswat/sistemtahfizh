@@ -277,30 +277,51 @@ document.addEventListener('DOMContentLoaded', () => {
      
         switchPage: (pageId, showSkeleton = true) => {
             if (!pageId) return;
+
+            // 1. Sembunyikan semua halaman
             DOM.pages.forEach(page => page.classList.add('hidden'));
             
+            // 2. Tampilkan Skeleton (Loading)
             if (showSkeleton) {
                 const skeleton = document.getElementById(`skeleton-${pageId}`);
                 if (skeleton) skeleton.classList.remove('hidden');
             }
 
+            // 3. Jeda sedikit agar terasa loadingnya (150ms)
             setTimeout(() => {
+                // Sembunyikan skeleton
                 DOM.skeletonContainers.forEach(s => s.classList.add('hidden'));
+                
+                // Tampilkan Halaman Target
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) targetPage.classList.remove('hidden');
                 
-                DOM.mainNav.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
-                DOM.mainNav.querySelectorAll('.nav-link div').forEach(div => div.classList.remove('bg-amber-100', 'text-amber-600'));
-                DOM.mainNav.querySelectorAll('.nav-link span').forEach(span => span.classList.remove('text-amber-700'));
+                // --- [BAGIAN INI YANG DIPERBAIKI] ---
+                
+                // A. Reset SEMUA tombol navigasi (Desktop & Mobile)
+                // Hapus class 'active' dan pewarnaan manual
+                DOM.mainNav.querySelectorAll('.nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                    const iconDiv = nav.querySelector('div');
+                    const textSpan = nav.querySelector('span');
+                    if (iconDiv) iconDiv.classList.remove('bg-amber-100', 'text-amber-600');
+                    if (textSpan) textSpan.classList.remove('text-amber-700');
+                });
 
-                const activeLink = DOM.mainNav.querySelector(`a[data-page="${pageId}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                    const iconDiv = activeLink.querySelector('div');
-                    const textSpan = activeLink.querySelector('span');
+                // B. Aktifkan SEMUA tombol yang mengarah ke pageId ini
+                // Menggunakan querySelectorAll agar tombol Desktop DAN Mobile nyala bareng
+                const activeLinks = DOM.mainNav.querySelectorAll(`a[data-page="${pageId}"]`);
+                
+                activeLinks.forEach(link => {
+                    link.classList.add('active');
+                    const iconDiv = link.querySelector('div');
+                    const textSpan = link.querySelector('span');
+                    
+                    // Tambahkan pewarnaan aktif
                     if(iconDiv) iconDiv.classList.add('bg-amber-100', 'text-amber-600');
                     if(textSpan) textSpan.classList.add('text-amber-700');
-                }
+                });
+
             }, 150);
         },
 
