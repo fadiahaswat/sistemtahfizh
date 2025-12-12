@@ -583,46 +583,91 @@ document.addEventListener('DOMContentLoaded', () => {
             contentContainer.appendChild(grid);
         },
 
+        // ... kode UI lainnya ...
+
         renderTahfizhTuntasTrackingNew: () => {
             const container = DOM.tahfizhTuntasTrackingSection;
             container.innerHTML = '';
             const clone = DOM.tplTahfizhSection.content.cloneNode(true);
             container.appendChild(clone);
-            UI.renderTahfizhContent(30);
-            const tab = container.querySelector(`[data-juz="30"]`);
+            
+            // Default load tab pertama (Juz 30 Tahfizh)
+            UI.renderTahfizhContent('30');
+            
+            // Set style aktif untuk tab default
+            const tab = container.querySelector(`[data-target="30"]`);
             if(tab) tab.classList.add('text-amber-600', 'border-amber-500');
         },
 
-        renderTahfizhContent: (juz, searchTerm = '') => {
+        renderTahfizhContent: (targetKey, searchTerm = '') => {
             const contentContainer = document.getElementById('tahfizh-content');
-            const tahfizhSantri = State.santriData.filter(s => s.program === 'Tahfizh');
-            if (tahfizhSantri.length === 0) { contentContainer.innerHTML = '<p class="text-center text-slate-500 py-4 italic">Tidak ada santri program Tahfizh.</p>'; return; }
+            if (!contentContainer) return;
+
+            let targetProgram = '';
+            let targetLabel = '';
+            let filterFn = null;
+
+            // Tentukan Logika Filter berdasarkan Tab yang dipilih
+            if (targetKey === '30') {
+                targetProgram = 'Tahfizh';
+                targetLabel = 'Mutqin Juz 30';
+                filterFn = (s) => s.mutqinJuz.has(30);
+            } else if (targetKey === '29') {
+                targetProgram = 'Tahfizh';
+                targetLabel = 'Mutqin Juz 29';
+                filterFn = (s) => s.mutqinJuz.has(29);
+            } else if (targetKey === 'juz30_setengah') {
+                targetProgram = 'Unggulan';
+                targetLabel = 'Setengah Juz 30';
+                // Asumsi: Nilai 100 berarti sudah tuntas 1/2 juz sesuai logika calculateSantriStats
+                filterFn = (s) => s.nilai >= 100; 
+            }
+
+            // Ambil data santri sesuai program
+            const targetSantri = State.santriData.filter(s => s.program === targetProgram);
             
-            const tuntasCount = tahfizhSantri.filter(s => s.mutqinJuz.has(juz)).length;
-            const totalCount = tahfizhSantri.length;
+            if (targetSantri.length === 0) { 
+                contentContainer.innerHTML = `<p class="text-center text-slate-500 py-4 italic">Tidak ada santri program ${targetProgram}.</p>`; 
+                return; 
+            }
+            
+            const tuntasCount = targetSantri.filter(filterFn).length;
+            const totalCount = targetSantri.length;
             const percentage = totalCount > 0 ? Math.round((tuntasCount / totalCount) * 100) : 0;
+            
             const lowerSearchTerm = searchTerm.toLowerCase();
-            const tuntasList = tahfizhSantri.filter(s => s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
-            const belumTuntasList = tahfizhSantri.filter(s => !s.mutqinJuz.has(juz) && s.nama.toLowerCase().includes(lowerSearchTerm));
+            const tuntasList = targetSantri.filter(s => filterFn(s) && s.nama.toLowerCase().includes(lowerSearchTerm));
+            const belumTuntasList = targetSantri.filter(s => !filterFn(s) && s.nama.toLowerCase().includes(lowerSearchTerm));
 
             contentContainer.innerHTML = '';
             const clone = DOM.tplTahfizhContent.content.cloneNode(true);
-            Utils.setText(clone, '.text-progress-label', `Progres: ${tuntasCount} / ${totalCount} Santri`);
+            
+            // Update Teks Label
+            Utils.setText(clone, '.text-progress-label', `${targetLabel}: ${tuntasCount} / ${totalCount} Santri`);
             Utils.setText(clone, '.text-percentage', `${percentage}%`);
+            
             const bar = clone.querySelector('.progress-bar');
             if(bar) bar.style.width = `${percentage}%`;
             
+            // Setup Search Input
             const searchInput = clone.querySelector('.tahfizh-search');
-            if(searchInput) { searchInput.setAttribute('data-juz-filter', juz); searchInput.value = searchTerm; }
+            if(searchInput) { 
+                searchInput.setAttribute('data-target-filter', targetKey); // Pakai attribute baru
+                searchInput.value = searchTerm; 
+            }
+            
             Utils.setText(clone, '.count-tuntas', tuntasList.length);
             Utils.setText(clone, '.count-belum', belumTuntasList.length);
+            
             const listTuntasEl = clone.querySelector('.list-tuntas');
             listTuntasEl.innerHTML = tuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-slate-400 italic">Tidak ada</li>';
+            
             const listBelumEl = clone.querySelector('.list-belum');
             listBelumEl.innerHTML = belumTuntasList.map(s => `<li>- ${s.nama}</li>`).join('') || '<li class="text-slate-400 italic">Semua tuntas</li>';
+            
             contentContainer.appendChild(clone);
         },
-
+        
         renderHistoryTable: () => {
             const searchTerm = DOM.searchRiwayat.value.toLowerCase();
             const programFilter = DOM.filterProgram.value;
