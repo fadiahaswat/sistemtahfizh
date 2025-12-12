@@ -1341,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 santri.nilaiTampil = Math.min(100, santri.nilai);
-                santri.unggulanPages = validSetoran.reduce((sum, s) => { let pageCount = 0; if (s.halaman) pageCount = parseFloat(s.halaman); else if (s.juz === 'juz30_setengah') pageCount = AppConfig.hafalanData.juzPageCounts['juz30_setengah']; else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat]; else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz]; return sum + pageCount; }, 0);
+                santri.unggulanPages = validSetoran.reduce((sum, s) => { let pageCount = 0; if (s.halaman) pageCount = parseFloat(s.halaman); else if (String(s.juz) === 'juz30_setengah') pageCount = 9; else if (AppConfig.hafalanData.surahData[s.juz] && AppConfig.hafalanData.surahData[s.juz].pages[s.surat]) pageCount = AppConfig.hafalanData.surahData[s.juz].pages[s.surat]; else if (s.jenis === 'Mutqin' && AppConfig.hafalanData.juzPageCounts[s.juz]) pageCount = AppConfig.hafalanData.juzPageCounts[s.juz]; return sum + pageCount; }, 0);
                 santri.statusPerpulangan = Core.checkPerpulanganStatus(santri);
             });
             State.santriData = Array.from(santriStatsMap.values());
