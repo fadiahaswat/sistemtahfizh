@@ -805,8 +805,8 @@ document.addEventListener('DOMContentLoaded', () => {
             group.santri.forEach((santri, idx) => {
                 const row = DOM.tplRekapRow.content.cloneNode(true);
                 Utils.setText(row, '.col-no', idx + 1);
-                const btnDetail = row.querySelector('.detail-santri-btn');
-                if(btnDetail) { btnDetail.textContent = santri.nama; btnDetail.dataset.id = santri.id; }
+                const btnDetail = row.querySelector('.detail-santri-text') || row.querySelector('.detail-santri-btn');
+                if(btnDetail) { btnDetail.textContent = santri.nama; /* Hapus dataset.id */ }
                 Utils.setText(row, '.col-nilai', santri.nilaiTampil);
                 Utils.setText(row, '.col-ziyadah', santri.program === 'Tahfizh' ? (santri.ziyadahPages || 0).toFixed(1) : '-');
                 const statusCell = row.querySelector('.col-status');
