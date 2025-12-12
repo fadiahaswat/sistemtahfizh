@@ -494,8 +494,116 @@
                         </div>
                     </div>
                     
-                    <div id="analisis-content-container"></div>
+                    <template id="analisis-dashboard-template">
+    <div class="space-y-8">
+        <div class="glass-card rounded-[2.5rem] flex flex-col fade-in shadow-2xl shadow-brand-500/10 overflow-hidden border-0">
+            <div class="p-8 sm:p-10 bg-gradient-to-r from-brand-500 to-orange-600 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
+                    <div class="relative flex-shrink-0">
+                        <div class="w-28 h-28 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/30 shadow-inner transform rotate-3">
+                            <span class="text-5xl drop-shadow-md">🎓</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow text-white pt-2">
+                        <h3 class="font-black text-3xl sm:text-4xl tracking-tight leading-none" data-name>Nama Santri</h3>
+                        <div class="flex flex-wrap justify-center sm:justify-start items-center gap-3 text-sm font-bold mt-4 text-brand-100">
+                            <span class="bg-black/20 px-4 py-1.5 rounded-full flex items-center gap-2 backdrop-blur-sm border border-white/10" data-kelas-text></span>
+                            <span class="bg-black/20 px-4 py-1.5 rounded-full flex items-center gap-2 backdrop-blur-sm border border-white/10" data-program-text></span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="p-6 bg-white flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+                <div class="flex-1 p-4 text-center group hover:bg-slate-50 transition-colors rounded-xl">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Tuntas</p>
+                    <div data-status-badge class="text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm transform group-hover:scale-105 transition-transform"></div>
+                </div>
+                <div class="flex-1 p-4 text-center group hover:bg-slate-50 transition-colors rounded-xl">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nilai Akhir</p>
+                    <p class="text-4xl font-black text-slate-800" data-nilai></p>
+                </div>
+                <div class="flex-1 p-4 text-center group hover:bg-slate-50 transition-colors rounded-xl">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Perpulangan</p>
+                    <div data-perpulangan-badge class="text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm transform group-hover:scale-105 transition-transform"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fade-in" style="animation-delay: 100ms;">
+            <div class="flex p-1.5 bg-slate-200/50 rounded-2xl backdrop-blur-sm" id="analisis-tabs">
+                <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all active shadow-sm bg-white text-brand-600 ring-1 ring-black/5" data-target="analisis-ringkasan">Ringkasan</button>
+                <button class="analisis-tab flex-1 py-3 text-sm font-bold rounded-xl transition-all text-slate-500 hover:text-slate-700" data-target="analisis-aktivitas">Aktivitas</button>
+            </div>
+        </div>
+
+        <div>
+            <div id="analisis-ringkasan" class="analisis-tab-content fade-in space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="glass-card p-6 rounded-3xl text-center border-l-8 border-l-blue-400 bg-white/80">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Total Setoran</p>
+                                <p class="text-4xl font-black text-slate-800" data-total-setoran></p>
+                            </div>
+                            <div class="glass-card p-6 rounded-3xl text-center border-l-8 border-l-emerald-400 bg-white/80">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Total Ziyadah</p>
+                                <p class="text-4xl font-black text-slate-800" data-ziyadah></p>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-3xl bg-white/80">
+                            <h4 class="section-header text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 border-b pb-2">Progres Target Wajib</h4>
+                            <div class="space-y-3" data-progres-juz></div>
+                        </div>
+                    </div>
+                    <div data-ziyadah-section class="hidden">
+                         <div class="glass-card p-6 rounded-3xl h-full bg-white/80">
+                            <h4 class="section-header text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 border-b pb-2">Detail Ziyadah</h4>
+                            <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar" data-progres-ziyadah></div>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 w-full text-left border-b border-slate-100 pb-2 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Fokus Saat Ini
+                        </h4>
+                        <div id="focus-juz-container" class="relative flex-1 flex flex-col items-center justify-center min-h-[200px]">
+                            <p class="text-slate-300 font-bold italic text-sm">Tidak ada juz aktif</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100 flex flex-col">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Komposisi Hafalan
+                        </h4>
+                        <div class="relative flex-1 min-h-[200px] flex items-center justify-center">
+                            <canvas id="compositionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-[2rem] bg-white border border-slate-100">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2 flex justify-between items-center">
+                        <span>🗺️ Peta Hafalan (Juz 1-30)</span>
+                        <span class="text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-bold">Hanya Juz Terisi</span>
+                    </h4>
+                    <div id="dynamic-juz-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+                </div>
+            </div>
+
+            <div id="analisis-aktivitas" class="analisis-tab-content hidden fade-in">
+                 <div class="glass-card rounded-3xl overflow-hidden max-h-[500px] overflow-y-auto border border-white/50 bg-white/60">
+                    <table class="min-w-full">
+                        <tbody class="divide-y divide-slate-100" data-aktivitas-terkini></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
             </div>
 
             <div id="page-riwayat" class="page-content hidden p-4 sm:p-8">
@@ -966,6 +1074,7 @@
     
     </body>
 </html>
+
 
 
 
