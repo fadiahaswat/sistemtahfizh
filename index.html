@@ -914,31 +914,78 @@
     </template>
     
     <template id="tpl-accordion-item">
-        <div class="glass-card rounded-2xl overflow-hidden bg-white/80 hover:bg-white transition-colors">
+        <div class="glass-card rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
             <h2 class="accordion-header">
-                <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-bold text-left transition-colors hover:bg-slate-50">
-                    <span class="text-slate-800 text-lg data-group-name"></span>
-                    <div class="flex items-center gap-2 sm:gap-4">
-                        <div class="hidden sm:flex items-center gap-2">
-                            <div class="w-24 bg-slate-200 rounded-full h-2.5 overflow-hidden"><div class="bg-green-500 h-2.5 rounded-full data-progress-bar shadow-sm"></div></div>
-                            <span class="text-xs font-bold text-slate-600 data-percentage-text"></span>
+                <button type="button" class="accordion-button w-full text-left transition-colors hover:bg-slate-50/80">
+                    <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="text-lg font-black text-slate-800 tracking-tight data-group-name truncate"></span>
+                                <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-100 data-percentage-text"></span>
+                            </div>
+                            
+                            <div class="w-full max-w-md bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/50">
+                                <div class="bg-gradient-to-r from-emerald-400 to-emerald-500 h-full rounded-full data-progress-bar shadow-sm transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-green-100 text-green-700 data-tuntas-badge border border-green-200"></span>
-                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-red-100 text-red-700 data-belum-badge border border-red-200"></span>
-                        <svg class="accordion-chevron w-5 h-5 shrink-0 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+    
+                        <div class="flex items-center justify-between sm:justify-end gap-3">
+                            <div class="flex gap-2">
+                                <div class="flex flex-col items-center bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-xl min-w-[70px]">
+                                    <span class="text-[10px] font-bold text-emerald-400 uppercase">Tuntas</span>
+                                    <span class="text-sm font-black text-emerald-700 data-tuntas-badge-count leading-none mt-0.5" id="badge-tuntas-val">0</span>
+                                    <span class="hidden data-tuntas-badge"></span> </div>
+                                
+                                <div class="flex flex-col items-center bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-xl min-w-[70px]">
+                                    <span class="text-[10px] font-bold text-rose-400 uppercase">Belum</span>
+                                    <span class="hidden data-belum-badge"></span> <span class="text-sm font-black text-rose-700 data-belum-badge-count leading-none mt-0.5" id="badge-belum-val">0</span>
+                                </div>
+                            </div>
+    
+                            <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:border-brand-300 group-hover:text-brand-500 transition-colors">
+                                <svg class="accordion-chevron w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
                     </div>
                 </button>
             </h2>
-            <div class="accordion-panel border-t border-slate-100 bg-slate-50/50" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;">
-                <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-                    <div class="bg-green-50/50 p-4 rounded-xl border border-green-100">
-                        <h5 class="font-bold text-green-700 mb-3 flex items-center gap-2 uppercase tracking-wide text-xs"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span class="label-tuntas"></span></h5>
-                        <ul class="space-y-2 list-none list-tuntas pl-1"></ul>
+    
+            <div class="accordion-panel border-t border-slate-100 bg-slate-50/50" style="max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    
+                    <div class="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100/80 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-100/50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
+                        
+                        <h5 class="font-bold text-emerald-800 mb-4 flex items-center gap-2 uppercase tracking-wide text-xs relative z-10">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                            </span>
+                            <span class="label-tuntas">Sudah Tuntas</span>
+                        </h5>
+                        
+                        <ul class="list-tuntas relative z-10 flex flex-wrap gap-2 
+                            [&>li]:bg-white [&>li]:text-slate-700 [&>li]:px-3 [&>li]:py-1.5 [&>li]:rounded-lg [&>li]:border [&>li]:border-emerald-100 [&>li]:shadow-sm [&>li]:font-medium [&>li]:text-xs [&>li]:transition-transform hover:[&>li]:scale-105 hover:[&>li]:border-emerald-300 cursor-default
+                            [&>li.italic]:bg-transparent [&>li.italic]:border-none [&>li.italic]:shadow-none [&>li.italic]:text-slate-400 [&>li.italic]:w-full [&>li.italic]:text-center">
+                        </ul>
                     </div>
-                    <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
-                        <h5 class="font-bold text-red-700 mb-3 flex items-center gap-2 uppercase tracking-wide text-xs"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span class="label-belum"></span></h5>
-                        <ul class="space-y-2 list-none list-belum pl-1"></ul>
+    
+                    <div class="bg-rose-50/60 p-5 rounded-2xl border border-rose-100/80 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-rose-100/50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
+    
+                        <h5 class="font-bold text-rose-800 mb-4 flex items-center gap-2 uppercase tracking-wide text-xs relative z-10">
+                            <span class="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </span>
+                            <span class="label-belum">Belum Tuntas</span>
+                        </h5>
+    
+                        <ul class="list-belum relative z-10 flex flex-wrap gap-2 
+                            [&>li]:bg-white [&>li]:text-slate-700 [&>li]:px-3 [&>li]:py-1.5 [&>li]:rounded-lg [&>li]:border [&>li]:border-rose-100 [&>li]:shadow-sm [&>li]:font-medium [&>li]:text-xs [&>li]:transition-transform hover:[&>li]:scale-105 hover:[&>li]:border-rose-300 cursor-default
+                            [&>li.italic]:bg-transparent [&>li.italic]:border-none [&>li.italic]:shadow-none [&>li.italic]:text-slate-400 [&>li.italic]:w-full [&>li.italic]:text-center">
+                        </ul>
                     </div>
+    
                 </div>
             </div>
         </div>
@@ -1114,6 +1161,7 @@
        
     </body>
 </html>
+
 
 
 
