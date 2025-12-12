@@ -574,6 +574,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 Utils.setText(clone, '.data-percentage-text', `${percentage}%`);
                 Utils.setText(clone, '.data-tuntas-badge', `Tuntas: ${tuntasCount}`);
                 Utils.setText(clone, '.data-belum-badge', `Belum: ${totalCount - tuntasCount}`);
+                // Mengisi angka besar di desain baru (tambahkan baris ini)
+                const tuntasVal = clone.getElementById('badge-tuntas-val');
+                const belumVal = clone.getElementById('badge-belum-val');
+                if(tuntasVal) tuntasVal.textContent = tuntasCount;
+                if(belumVal) belumVal.textContent = totalCount - tuntasCount;
                 const bar = clone.querySelector('.data-progress-bar');
                 if(bar) bar.style.width = `${percentage}%`;
                 const tuntasList = group.santri.filter(s => s.isTuntas).map(s => `<li>${s.nama}</li>`).join('') || '<li class="list-none text-slate-400 italic">Belum ada</li>';
