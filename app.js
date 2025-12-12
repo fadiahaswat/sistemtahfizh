@@ -509,10 +509,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     const d = Math.floor(dist / 864e5), h = Math.floor(dist % 864e5 / 36e5), m = Math.floor(dist % 36e5 / 6e4), s = Math.floor(dist % 6e4 / 1e3);
                     timerEl.innerHTML = [d, h, m, s].map((val, i) => `
-                        <div class="bg-white border border-slate-200 p-2 rounded-xl w-16 shadow-sm">
-                            <div class="text-2xl font-black text-slate-800">${String(val).padStart(2, '0')}</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${['Hari', 'Jam', 'Mnt', 'Dtk'][i]}</div>
-                        </div>`).join('');
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl border border-white shadow-xl shadow-indigo-500/10 flex items-center justify-center relative overflow-hidden group">
+                                <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-100 to-transparent"></div>
+                                <span class="text-2xl sm:text-3xl font-black text-slate-800 tabular-nums tracking-tight group-hover:scale-110 transition-transform duration-300">
+                                    ${String(val).padStart(2, '0')}
+                                </span>
+                                <div class="absolute bottom-0 w-full h-1 bg-indigo-500/10"></div>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 bg-white/50 px-2 py-0.5 rounded-lg border border-white/50">
+                                ${['Hari', 'Jam', 'Mnt', 'Dtk'][i]}
+                            </span>
+                        </div>`
+                    ).join('');
                 };
                 State.countdownInterval = setInterval(updateCountdown, 1000);
                 updateCountdown();
