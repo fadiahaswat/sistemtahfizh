@@ -1593,10 +1593,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const container = DOM.peringkatSection;
                 container.querySelectorAll('.tab-peringkat').forEach(b => { b.classList.remove('bg-white', 'text-amber-600', 'shadow-sm'); b.classList.add('text-slate-500'); });
                 button.classList.add('bg-white', 'text-amber-600', 'shadow-sm'); button.classList.remove('text-slate-500'); UI.renderPeringkatContent(button.dataset.program);
-            } else if (button.matches('.tahfizh-tab')) {
-                const container = DOM.tahfizhTuntasTrackingSection;
-                container.querySelectorAll('.tahfizh-tab').forEach(b => b.classList.remove('text-amber-600', 'border-amber-500'));
-                button.classList.add('text-amber-600', 'border-amber-500'); UI.renderTahfizhContent(parseInt(button.dataset.juz, 10));
             }
         });
         
