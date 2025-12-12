@@ -1021,8 +1021,8 @@
 
     <template id="tpl-tahfizh-section">
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-            <span class="flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-lg text-indigo-600 shadow-sm border border-indigo-200/50">
+        <h3 class="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+            <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
@@ -1031,87 +1031,102 @@
         </h3>
     </div>
 
-    <div class="glass-card p-1 rounded-[2rem] bg-white border border-slate-200 shadow-sm">
-        <div class="flex flex-wrap p-1 bg-slate-100/80 rounded-[1.8rem] backdrop-blur-sm" id="tahfizh-juz-tabs">
-            <button class="tahfizh-tab flex-1 py-3 px-4 text-sm font-bold rounded-2xl transition-all duration-300 text-slate-500 hover:text-slate-700 border-2 border-transparent focus:outline-none" data-target="30">
-                Mutqin Juz 30 (T)
-            </button>
-            <button class="tahfizh-tab flex-1 py-3 px-4 text-sm font-bold rounded-2xl transition-all duration-300 text-slate-500 hover:text-slate-700 border-2 border-transparent focus:outline-none" data-target="29">
-                Mutqin Juz 29 (T)
-            </button>
-            <button class="tahfizh-tab flex-1 py-3 px-4 text-sm font-bold rounded-2xl transition-all duration-300 text-slate-500 hover:text-slate-700 border-2 border-transparent focus:outline-none" data-target="juz30_setengah">
-                1/2 Juz 30 (U)
-            </button>
+    <div class="glass-card rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+        
+        <div class="bg-slate-50/80 border-b border-slate-200/60 p-2 backdrop-blur-md sticky top-0 z-20">
+            <div class="flex p-1 bg-white rounded-2xl border border-slate-200 shadow-inner overflow-x-auto" id="tahfizh-juz-tabs">
+                <button class="tahfizh-tab flex-1 py-3 px-6 text-sm font-bold rounded-xl transition-all duration-300 text-slate-400 hover:text-slate-600 border-2 border-transparent hover:bg-slate-50 whitespace-nowrap focus:outline-none" data-target="30">
+                    Mutqin Juz 30 (T)
+                </button>
+                <button class="tahfizh-tab flex-1 py-3 px-6 text-sm font-bold rounded-xl transition-all duration-300 text-slate-400 hover:text-slate-600 border-2 border-transparent hover:bg-slate-50 whitespace-nowrap focus:outline-none" data-target="29">
+                    Mutqin Juz 29 (T)
+                </button>
+                <button class="tahfizh-tab flex-1 py-3 px-6 text-sm font-bold rounded-xl transition-all duration-300 text-slate-400 hover:text-slate-600 border-2 border-transparent hover:bg-slate-50 whitespace-nowrap focus:outline-none" data-target="juz30_setengah">
+                    1/2 Juz 30 (U)
+                </button>
+            </div>
         </div>
         
-        <div id="tahfizh-content" class="p-6"></div>
+        <div id="tahfizh-content" class="p-6 sm:p-8"></div>
     </div>
 </template>
 
 <template id="tpl-tahfizh-content">
-    <div class="animate-fadeIn">
-        <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-100/50 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+    <div class="animate-fadeIn space-y-8">
+        
+        <div class="relative overflow-hidden rounded-[2rem] bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/20 group">
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-brand-500 blur-3xl opacity-20 transition-all duration-700 group-hover:scale-125"></div>
+            <div class="absolute bottom-0 left-0 -ml-16 -mb-16 h-48 w-48 rounded-full bg-indigo-500 blur-3xl opacity-20 transition-all duration-700 group-hover:scale-125"></div>
             
-            <div class="flex justify-between items-end mb-3 relative z-10">
-                <div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Target Capaian</p>
-                    <span class="text-lg font-bold text-slate-700 text-progress-label">Loading...</span>
+            <div class="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                <div class="space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Status Capaian</p>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white text-progress-label leading-tight">Loading...</h2>
                 </div>
-                <span class="text-2xl font-black text-brand-600 text-percentage bg-white px-3 py-1 rounded-lg shadow-sm border border-slate-100">0%</span>
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10">
+                    <span class="text-3xl font-black text-brand-400 text-percentage">0%</span>
+                    <span class="text-xs font-medium text-slate-300 w-12 leading-tight">Santri Tuntas</span>
+                </div>
             </div>
-            
-            <div class="w-full bg-slate-200/70 rounded-full h-4 overflow-hidden border border-slate-200/50 relative z-10">
-                <div class="bg-gradient-to-r from-brand-400 to-brand-600 h-full rounded-full progress-bar shadow-md transition-all duration-1000 ease-out relative" style="width: 0%">
-                    <div class="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+
+            <div class="mt-8 relative h-4 w-full overflow-hidden rounded-full bg-slate-800/50 box-border border border-white/5">
+                <div class="progress-bar absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-brand-500 to-orange-500 transition-all duration-1000 ease-out shadow-[0_0_20px_rgba(249,115,22,0.5)]" style="width: 0%">
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-6 relative group">
-             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <div class="relative group">
+             <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                 <svg class="w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
              </div>
-             <input type="search" class="tahfizh-search w-full pl-11 pr-4 py-3.5 text-sm font-semibold bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-brand-100 focus:border-brand-400 transition-all shadow-sm placeholder:text-slate-400" placeholder="Cari nama santri...">
+             <input type="search" class="tahfizh-search w-full pl-12 pr-6 py-4 text-sm font-bold bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-brand-100 focus:border-brand-400 transition-all shadow-sm placeholder:text-slate-400 placeholder:font-medium" placeholder="Cari nama santri untuk filter...">
         </div>
 
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <div class="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100/80 relative overflow-hidden flex flex-col h-[22rem]">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-100/50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
-                
-                <h5 class="font-bold text-emerald-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide flex-shrink-0">
-                    <span class="w-6 h-6 rounded-full bg-white text-emerald-600 flex items-center justify-center shadow-sm border border-emerald-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    </span>
-                    Sudah Tuntas (<span class="count-tuntas">0</span>)
-                </h5>
-                
-                <div class="overflow-y-auto pr-2 custom-scrollbar flex-grow">
-                    <ul class="list-tuntas flex flex-wrap gap-2 content-start
-                        [&>li]:bg-white [&>li]:text-slate-700 [&>li]:px-3 [&>li]:py-1.5 [&>li]:rounded-lg [&>li]:border [&>li]:border-emerald-100 [&>li]:shadow-sm [&>li]:font-medium [&>li]:text-xs [&>li]:transition-transform hover:[&>li]:scale-105 hover:[&>li]:border-emerald-300 cursor-default
-                        [&>li.italic]:bg-transparent [&>li.italic]:border-none [&>li.italic]:shadow-none [&>li.italic]:text-slate-400 [&>li.italic]:w-full [&>li.italic]:text-center [&>li.italic]:py-8">
-                    </ul>
+            <div class="bg-emerald-50/50 p-1 rounded-[2rem] border border-emerald-100/60 flex flex-col h-[26rem] transition-transform hover:scale-[1.01] duration-300">
+                <div class="bg-white/60 p-5 rounded-[1.8rem] h-full flex flex-col backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-4 border-b border-emerald-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                            </span>
+                            <span class="text-sm font-bold text-slate-700 uppercase tracking-wide">Sudah Tuntas</span>
+                        </div>
+                        <span class="count-tuntas bg-emerald-500 text-white text-xs font-black px-2.5 py-1 rounded-lg shadow-emerald-200 shadow-lg">0</span>
+                    </div>
+                    
+                    <div class="overflow-y-auto pr-2 custom-scrollbar flex-grow">
+                        <ul class="list-tuntas flex flex-wrap gap-2 content-start
+                            [&>li]:bg-white [&>li]:text-slate-700 [&>li]:px-3 [&>li]:py-2 [&>li]:rounded-xl [&>li]:border [&>li]:border-slate-100 [&>li]:shadow-sm [&>li]:font-bold [&>li]:text-xs [&>li]:transition-all hover:[&>li]:scale-105 hover:[&>li]:border-emerald-400 hover:[&>li]:text-emerald-700 hover:[&>li]:shadow-md cursor-default
+                            [&>li.italic]:bg-transparent [&>li.italic]:border-none [&>li.italic]:shadow-none [&>li.italic]:text-slate-400 [&>li.italic]:w-full [&>li.italic]:text-center [&>li.italic]:py-10 [&>li.italic]:font-medium">
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-rose-50/60 p-5 rounded-2xl border border-rose-100/80 relative overflow-hidden flex flex-col h-[22rem]">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-rose-100/50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
+            <div class="bg-rose-50/50 p-1 rounded-[2rem] border border-rose-100/60 flex flex-col h-[26rem] transition-transform hover:scale-[1.01] duration-300">
+                <div class="bg-white/60 p-5 rounded-[1.8rem] h-full flex flex-col backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-4 border-b border-rose-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+                            </span>
+                            <span class="text-sm font-bold text-slate-700 uppercase tracking-wide">Belum Tuntas</span>
+                        </div>
+                        <span class="count-belum bg-rose-500 text-white text-xs font-black px-2.5 py-1 rounded-lg shadow-rose-200 shadow-lg">0</span>
+                    </div>
 
-                <h5 class="font-bold text-rose-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide flex-shrink-0">
-                    <span class="w-6 h-6 rounded-full bg-white text-rose-600 flex items-center justify-center shadow-sm border border-rose-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
-                    </span>
-                    Belum Tuntas (<span class="count-belum">0</span>)
-                </h5>
-
-                <div class="overflow-y-auto pr-2 custom-scrollbar flex-grow">
-                    <ul class="list-belum flex flex-wrap gap-2 content-start
-                        [&>li]:bg-white [&>li]:text-slate-700 [&>li]:px-3 [&>li]:py-1.5 [&>li]:rounded-lg [&>li]:border [&>li]:border-rose-100 [&>li]:shadow-sm [&>li]:font-medium [&>li]:text-xs [&>li]:transition-transform hover:[&>li]:scale-105 hover:[&>li]:border-rose-300 cursor-default
-                        [&>li.italic]:bg-transparent [&>li.italic]:border-none [&>li.italic]:shadow-none [&>li.italic]:text-slate-400 [&>li.italic]:w-full [&>li.italic]:text-center [&>li.italic]:py-8">
-                    </ul>
+                    <div class="overflow-y-auto pr-2 custom-scrollbar flex-grow">
+                        <ul class="list-belum flex flex-wrap gap-2 content-start
+                            [&>li]:bg-white [&>li]:text-slate-700 [&>li]:px-3 [&>li]:py-2 [&>li]:rounded-xl [&>li]:border [&>li]:border-slate-100 [&>li]:shadow-sm [&>li]:font-bold [&>li]:text-xs [&>li]:transition-all hover:[&>li]:scale-105 hover:[&>li]:border-rose-400 hover:[&>li]:text-rose-700 hover:[&>li]:shadow-md cursor-default
+                            [&>li.italic]:bg-transparent [&>li.italic]:border-none [&>li.italic]:shadow-none [&>li.italic]:text-slate-400 [&>li.italic]:w-full [&>li.italic]:text-center [&>li.italic]:py-10 [&>li.italic]:font-medium">
+                        </ul>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -1217,6 +1232,7 @@
        
     </body>
 </html>
+
 
 
 
