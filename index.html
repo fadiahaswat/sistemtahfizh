@@ -992,32 +992,72 @@
     </template>
 
     <template id="tpl-peringkat-section">
-        <h3 class="section-header text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <span class="bg-amber-100 p-1.5 rounded-lg text-amber-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg></span>
-            Peringkat Santri
-        </h3>
-        <div class="glass-card p-2 rounded-2xl bg-white/70">
-            <div class="flex bg-slate-100 rounded-xl p-1.5 space-x-2" id="peringkat-program-tabs">
-                <button class="tab-peringkat flex-1 p-2.5 rounded-lg text-sm font-bold transition-all duration-300 hover:bg-white/50 text-slate-500" data-program="Tahfizh">Program Tahfizh</button>
-                <button class="tab-peringkat flex-1 p-2.5 rounded-lg text-sm font-bold transition-all duration-300 hover:bg-white/50 text-slate-500" data-program="Unggulan">Program Unggulan</button>
-            </div>
-            <div id="peringkat-content" class="mt-6 p-2"></div>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-amber-100/50 pb-4">
+        <div>
+            <h3 class="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-500 text-white shadow-lg shadow-amber-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                </span>
+                Peringkat Santri
+            </h3>
+            <p class="text-slate-500 font-medium text-sm mt-1 ml-14">Apresiasi untuk santri dengan capaian terbaik.</p>
         </div>
-    </template>
+    </div>
 
-    <template id="tpl-peringkat-item">
-        <li class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4 border border-slate-100 hover:border-brand-200 transition-colors">
-            <span class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center font-black text-white text-lg shadow-md medal-bg transform scale-100"></span>
-            <div class="flex-grow">
-                <p class="font-bold text-slate-800 item-nama"></p>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide item-kelas"></p>
+    <div class="glass-card p-1 rounded-[2.5rem] bg-gradient-to-b from-white to-amber-50/30 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+        
+        <div class="absolute -right-6 -top-6 text-amber-500/5 transform rotate-12 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-64 w-64" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+            </svg>
+        </div>
+
+        <div class="relative z-10 p-2">
+            <div class="flex bg-slate-100/80 p-1.5 rounded-[1.8rem] backdrop-blur-md" id="peringkat-program-tabs">
+                <button class="tab-peringkat flex-1 py-3.5 px-6 rounded-2xl text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-700 border border-transparent focus:outline-none flex items-center justify-center gap-2" data-program="Tahfizh">
+                    <span>Program Tahfizh</span>
+                </button>
+                <button class="tab-peringkat flex-1 py-3.5 px-6 rounded-2xl text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-700 border border-transparent focus:outline-none flex items-center justify-center gap-2" data-program="Unggulan">
+                    <span>Program Unggulan</span>
+                </button>
             </div>
-            <div class="text-right flex-shrink-0">
-                <p class="font-black text-brand-600 text-2xl item-score"></p>
-                <p class="text-[10px] text-slate-400 font-bold uppercase item-unit"></p>
+        </div>
+
+        <div id="peringkat-content" class="relative z-10 p-4 sm:p-6 min-h-[300px]"></div>
+    </div>
+</template>
+
+<template id="tpl-peringkat-item">
+    <li class="group relative overflow-hidden bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-amber-200 hover:-translate-y-1 mb-4 last:mb-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-amber-50/0 via-amber-50/30 to-amber-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+        
+        <div class="relative flex items-center gap-5">
+            <div class="flex-shrink-0 relative">
+                <span class="medal-bg flex h-14 w-14 items-center justify-center rounded-2xl font-black text-white text-xl shadow-md transform transition-transform group-hover:rotate-6 ring-4 ring-white">
+                    </span>
+                <div class="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 scale-0 group-hover:scale-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.699-3.181a1 1 0 011.827 1.035l-1.74 3.258 2.373 1.957a1 1 0 01.378 1.45 23.275 23.275 0 01-1.282 1.488 1 1 0 01-1.393-1.428l.89-.966-2.126-1.753-.522 3.125a1 1 0 01-1.928.11L10 8.016l-1.123 2.083a1 1 0 01-1.928-.11l-.522-3.125-2.126 1.753.89.966a1 1 0 01-1.393 1.428 23.275 23.275 0 01-1.282-1.488 1 1 0 01.378-1.45l2.373-1.957-1.74-3.258a1 1 0 011.827-1.035l1.699 3.181L10 4.323V3a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
             </div>
-        </li>
-    </template>
+
+            <div class="flex-grow min-w-0">
+                <p class="font-bold text-slate-800 text-lg item-nama truncate group-hover:text-amber-700 transition-colors"></p>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-500 ring-1 ring-inset ring-slate-500/10 item-kelas"></span>
+                </div>
+            </div>
+
+            <div class="flex-shrink-0 text-right pl-4 border-l border-slate-100">
+                <p class="font-black text-3xl tracking-tight text-slate-800 item-score leading-none"></p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 item-unit"></p>
+            </div>
+        </div>
+    </li>
+</template>
 
     <template id="tpl-tahfizh-section">
     <div class="flex items-center justify-between mb-6">
@@ -1232,6 +1272,7 @@
        
     </body>
 </html>
+
 
 
 
