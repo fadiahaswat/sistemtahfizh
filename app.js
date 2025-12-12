@@ -1511,6 +1511,15 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
             const tabBtn = e.target.closest('.analisis-tab');
+            const tabTahfizh = e.target.closest('.tahfizh-tab');
+            if (tabTahfizh) {
+                const container = DOM.tahfizhTuntasTrackingSection;
+                container.querySelectorAll('.tahfizh-tab').forEach(b => b.classList.remove('text-amber-600', 'border-amber-500'));
+                tabTahfizh.classList.add('text-amber-600', 'border-amber-500');
+                
+                // Ambil string data-target, bukan parseInt lagi
+                UI.renderTahfizhContent(tabTahfizh.dataset.target); 
+            }
 
             if (button && button.matches('[data-target-page]')) { UI.switchPage(button.dataset.targetPage); return; }
 
