@@ -1600,7 +1600,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        DOM.mainContent.addEventListener('input', e => { if (e.target.matches('.tahfizh-search')) { clearTimeout(State.searchDebounceTimer); State.searchDebounceTimer = setTimeout(() => { const juz = parseInt(e.target.dataset.juzFilter, 10); UI.renderTahfizhContent(juz, e.target.value); }, 300); } });
+        DOM.mainContent.addEventListener('input', e => { 
+            if (e.target.matches('.tahfizh-search')) { 
+                clearTimeout(State.searchDebounceTimer); 
+                State.searchDebounceTimer = setTimeout(() => { 
+                    // Ambil string data-target-filter
+                    const targetKey = e.target.dataset.targetFilter; 
+                    UI.renderTahfizhContent(targetKey, e.target.value); 
+                }, 300); 
+            } 
+        });
 
         if (DOM.santriSelectAnalisis) { DOM.santriSelectAnalisis.addEventListener('change', (e) => { if (e.target.value) { UI.renderSantriDashboard(e.target.value); } else { DOM.analisisContentContainer.innerHTML = ''; DOM.analisisContentContainer.appendChild(DOM.analisisPromptTemplate.content.cloneNode(true)); } }); }
 
