@@ -851,48 +851,253 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSantriDashboard: (sId) => {
             const s = State.santriData.find(s => s.id === sId);
             if (!s) return;
+            
             DOM.analisisContentContainer.innerHTML = '';
             const dash = DOM.analisisDashboardTemplate.content.cloneNode(true);
+            
+            // --- [BAGIAN 1: LOGIKA LAMA (DIPERTAHANKAN)] ---
+            // 1. Identitas
             Utils.setText(dash, '[data-name]', s.nama);
             Utils.setHTML(dash, '[data-kelas-text]', `<span>🏫</span> Kelas ${s.kelas}`);
             Utils.setHTML(dash, '[data-program-text]', `<span>📖</span> ${s.program}`);
+            
+            // 2. Status Badge
             const statusBadge = dash.querySelector('[data-status-badge]');
-            statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
-            statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
+            if (statusBadge) {
+                statusBadge.textContent = s.isTuntas ? 'Tuntas' : 'Proses';
+                statusBadge.className = `text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm ${s.isTuntas ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
+            }
+
+            // 3. Perpulangan Badge
             const perpulanganBadge = dash.querySelector('[data-perpulangan-badge]');
-            if (s.statusPerpulangan === 'Boleh Pulang') { perpulanganBadge.textContent = 'Boleh Pulang'; perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700'; } else { perpulanganBadge.textContent = 'Belum'; perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700'; }
+            if (perpulanganBadge) {
+                if (s.statusPerpulangan === 'Boleh Pulang') { 
+                    perpulanganBadge.textContent = 'Boleh Pulang'; 
+                    perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-green-100 text-green-700'; 
+                } else { 
+                    perpulanganBadge.textContent = 'Belum'; 
+                    perpulanganBadge.className = 'text-sm font-bold px-4 py-1.5 rounded-full inline-block shadow-sm bg-red-100 text-red-700'; 
+                }
+            }
+
+            // 4. Statistik Angka
             Utils.setText(dash, '[data-nilai]', s.nilaiTampil);
             Utils.setText(dash, '[data-ziyadah]', s.program === 'Tahfizh' ? `${(s.ziyadahPages || 0).toFixed(1)}` : '-');
             Utils.setText(dash, '[data-total-setoran]', s.setoranCount);
-            const progItems = [{ juz: 'Setengah Juz 30', done: s.nilai >= 100 }, { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true }, { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }];
-            const progresHtml = progItems.filter(item => !item.tahfizhOnly || s.program === 'Tahfizh').map(item => `
+
+            // 5. Progres Target Wajib
+            const progItems = [
+                { juz: 'Setengah Juz 30', done: s.nilai >= 100 }, 
+                { juz: 'Mutqin Juz 30', done: s.mutqinJuz.has(30), tahfizhOnly: true }, 
+                { juz: 'Mutqin Juz 29', done: s.mutqinJuz.has(29), tahfizhOnly: true }
+            ];
+            const progresHtml = progItems
+                .filter(item => !item.tahfizhOnly || s.program === 'Tahfizh')
+                .map(item => `
                     <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                         <span class="font-bold text-sm text-slate-700">${item.juz}</span>
                         ${item.done ? '<span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-green-500 text-white uppercase tracking-wider">Selesai</span>' : '<span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-200 text-slate-500 uppercase tracking-wider">Proses</span>'}
                     </div>`).join('');
             Utils.setHTML(dash, '[data-progres-juz]', progresHtml);
+
+            // 6. Detail Ziyadah (Hidden Section)
             const ziyadahSect = dash.querySelector('[data-ziyadah-section]');
             if (s.program === 'Tahfizh' && s.isTuntas) {
                 ziyadahSect.classList.remove('hidden');
                 const ziyadahCont = dash.querySelector('[data-progres-ziyadah]');
                 const allJuz = Object.keys(AppConfig.hafalanData.juzPageCounts).filter(j => !['juz30_setengah', '30', '29'].includes(j));
-                ziyadahCont.innerHTML = allJuz.map(j => { const compPages = s.ziyadahProgress[j] || 0; if (compPages <= 0) return ''; const totalPages = AppConfig.hafalanData.juzPageCounts[j]; const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0; return `<div class="mb-3"><div class="flex justify-between mb-1 text-xs font-bold text-slate-600"><span>Juz ${j}</span><span>${compPages.toFixed(1)} / ${totalPages}</span></div><div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div></div></div>`; }).join('');
+                ziyadahCont.innerHTML = allJuz.map(j => { 
+                    const compPages = s.ziyadahProgress[j] || 0; 
+                    if (compPages <= 0) return ''; 
+                    const totalPages = AppConfig.hafalanData.juzPageCounts[j]; 
+                    const pct = totalPages > 0 ? Math.min(100, (compPages / totalPages) * 100).toFixed(0) : 0; 
+                    return `<div class="mb-3"><div class="flex justify-between mb-1 text-xs font-bold text-slate-600"><span>Juz ${j}</span><span>${compPages.toFixed(1)} / ${totalPages}</span></div><div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div></div></div>`; 
+                }).join('');
             }
+
+            // 7. Aktivitas Terkini
             const aktivitasCont = dash.querySelector('[data-aktivitas-terkini]');
             const allActivities = [...s.setoran].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            aktivitasCont.innerHTML = allActivities.length > 0 ? allActivities.map(s => `
+            aktivitasCont.innerHTML = allActivities.length > 0 ? allActivities.map(act => `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-4">
-                            <p class="font-bold text-sm text-slate-800">${s.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(s.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${s.juz}`}</p>
-                            <p class="text-xs text-slate-400 font-mono mt-0.5">${s.halaman ? `${s.halaman} hlm` : s.surat}</p>
+                            <p class="font-bold text-sm text-slate-800">${act.jenis} <span class="font-normal text-slate-500 mx-1">•</span> ${String(act.juz) === 'juz30_setengah' ? '1/2 Juz 30' : `Juz ${act.juz}`}</p>
+                            <p class="text-xs text-slate-400 font-mono mt-0.5">${act.halaman ? `${act.halaman} hlm` : act.surat}</p>
                         </td>
                         <td class="p-4 text-right text-xs font-bold text-slate-400">
-                            ${new Date(s.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                            ${s.status === 'Pending' ? '<span class="block text-amber-500 mt-1">Pending</span>' : ''}
+                            ${new Date(act.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                            ${act.status === 'Pending' ? '<span class="block text-amber-500 mt-1">Pending</span>' : ''}
                         </td>
                     </tr>`).join('') : '<tr><td class="p-8 text-center text-slate-400 font-medium text-sm">Belum ada aktivitas.</td></tr>';
+
+            // Masukkan template ke halaman
             DOM.analisisContentContainer.appendChild(dash);
-        }
+
+            // --- [BAGIAN 2: LOGIKA BARU (DITAMBAHKAN)] ---
+            // Render visualisasi tambahan setelah elemen ada di DOM
+            UI.renderFocusJuz(s);
+            UI.renderCompositionChart(s);
+            UI.renderDynamicJuzGrid(s);
+        },
+
+        // --- FUNGSI BARU 1: FOKUS JUZ ---
+        renderFocusJuz: (santri) => {
+            const container = document.getElementById('focus-juz-container');
+            if (!container) return;
+
+            let activeJuz = null;
+            let activeProgress = 0;
+            
+            const checkOrder = [...Array(30).keys()].map(i => i + 1).reverse(); // Cek Juz 30 -> 1
+            
+            for (let juz of checkOrder) {
+                const setoranJuz = santri.setoran.filter(set => set.juz == juz && set.status !== 'Pending');
+                let pages = 0;
+                let isMutqin = false;
+
+                setoranJuz.forEach(set => {
+                    if (set.jenis === 'Mutqin') isMutqin = true;
+                    else {
+                        let p = parseFloat(set.halaman) || 0;
+                        if (!p && set.surat && AppConfig.hafalanData?.surahData[juz]) {
+                            p = AppConfig.hafalanData.surahData[juz].pages[set.surat] || 0;
+                        }
+                        pages += p;
+                    }
+                });
+
+                if (isMutqin) pages = 20;
+
+                // Jika ada progres (>0) tapi belum selesai (<20), ini adalah Juz Fokus
+                if (pages > 0 && pages < 20) {
+                    activeJuz = juz;
+                    activeProgress = pages;
+                    break; 
+                }
+            }
+
+            if (activeJuz) {
+                const percentage = Math.min(Math.round((activeProgress / 20) * 100), 100);
+                container.innerHTML = `
+                    <div class="relative w-40 h-40">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle class="text-slate-100" stroke-width="10" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
+                            <circle class="text-red-500 transition-all duration-1000 ease-out" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" 
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: ${251.2 - (percentage / 100 * 251.2)};" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-700">
+                            <span class="text-4xl font-black">${activeJuz}</span>
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Juz</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-sm font-bold text-brand-600 bg-brand-50 px-4 py-1.5 rounded-full inline-block border border-brand-100">
+                            ${activeProgress.toFixed(1)} / 20 Halaman
+                        </p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="p-6 bg-slate-50 rounded-2xl border border-dashed border-slate-300 text-slate-400 font-bold text-sm">Tidak ada juz yang sedang berjalan (Proses/Tuntas Semua).</div>`;
+            }
+        },
+
+        // --- FUNGSI BARU 2: KOMPOSISI ---
+        renderCompositionChart: (santri) => {
+            const ctx = document.getElementById('compositionChart');
+            if (!ctx) return;
+
+            const validSetoran = santri.setoran.filter(s => s.status !== 'Pending');
+            const countZiyadah = validSetoran.filter(s => s.jenis === 'Ziyadah').length;
+            const countMutqin = validSetoran.filter(s => ['Mutqin', 'Murajaah'].includes(s.jenis)).length;
+
+            if (countZiyadah === 0 && countMutqin === 0) {
+                ctx.parentElement.innerHTML = '<p class="text-slate-300 font-bold text-sm italic">Belum ada data setoran.</p>';
+                return;
+            }
+
+            if (window.compositionChartInstance) { window.compositionChartInstance.destroy(); }
+
+            window.compositionChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ziyadah', 'Mutqin/Murajaah'],
+                    datasets: [{
+                        data: [countZiyadah, countMutqin],
+                        backgroundColor: ['#3b82f6', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '75%'
+                }
+            });
+        },
+
+        // --- FUNGSI BARU 3: GRID DINAMIS ---
+        renderDynamicJuzGrid: (santri) => {
+            const container = document.getElementById('dynamic-juz-grid');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            let hasData = false;
+            const juzOrder = [...Array(30).keys()].map(i => i + 1).reverse(); 
+
+            juzOrder.forEach(juzNum => {
+                const setoranJuz = santri.setoran.filter(s => s.juz == juzNum && s.status !== 'Pending');
+                if (setoranJuz.length === 0) return; // Hide jika kosong
+
+                hasData = true;
+                let totalPagesDone = 0;
+                setoranJuz.forEach(s => {
+                    if (s.jenis === 'Mutqin') totalPagesDone = 20; 
+                    else {
+                        let pages = parseFloat(s.halaman) || 0;
+                        if (!pages && s.surat && AppConfig.hafalanData?.surahData[juzNum]) {
+                            pages = AppConfig.hafalanData.surahData[juzNum].pages[s.surat] || 0;
+                        }
+                        totalPagesDone += pages;
+                    }
+                });
+
+                const filledBlocks = Math.min(Math.floor(totalPagesDone), 20);
+                const percentage = Math.min(Math.round((totalPagesDone / 20) * 100), 100);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 p-5 rounded-2xl border border-slate-200';
+                
+                const headerHtml = `
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 shadow-sm">${juzNum}</span>
+                            <span class="font-bold text-slate-700 text-sm">Juz ${juzNum}</span>
+                        </div>
+                        <span class="text-[10px] font-bold ${percentage >= 100 ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-500'} px-2 py-1 rounded-md">
+                            ${percentage >= 100 ? 'Tuntas' : `${percentage}%`}
+                        </span>
+                    </div>
+                `;
+
+                const gridHtml = `
+                    <div class="grid grid-cols-10 gap-1.5">
+                        ${Array(20).fill(0).map((_, i) => {
+                            const isFilled = i < filledBlocks;
+                            return `<div class="h-8 rounded-md ${isFilled ? 'bg-green-500 shadow-sm shadow-green-200' : 'bg-white border border-slate-200'} transition-all hover:scale-110" title="Halaman ${i+1}"></div>`;
+                        }).join('')}
+                    </div>
+                `;
+
+                card.innerHTML = headerHtml + gridHtml;
+                container.appendChild(card);
+            });
+
+            if (!hasData) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 italic">Belum ada data hafalan yang terekam.</div>`;
+            }
+        },
     };
 
     // ==========================================
