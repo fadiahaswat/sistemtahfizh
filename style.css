@@ -249,3 +249,47 @@ body {
 #main-content {
     position: relative;
 }
+
+/* ... kode style.css sebelumnya ... */
+
+/* =========================================
+   7. LOADER ANIMATIONS (FIXED)
+   ========================================= */
+
+/* Animasi Putar Lambat (Cincin Luar) */
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Animasi Putar Balik Cepat (Cincin Dalam) */
+@keyframes spin-reverse {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+}
+
+/* Animasi Denyut (Glow) */
+@keyframes pulse-glow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.95); }
+}
+
+/* Animasi Loading Bar (Gerak dari kiri ke kanan) */
+@keyframes shimmer-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+}
+
+/* Kelas Utilitas untuk Loader */
+.loader-spin-slow {
+    animation: spin-slow 3s linear infinite;
+}
+.loader-spin-reverse {
+    animation: spin-reverse 2s linear infinite;
+}
+.loader-pulse {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+.loader-bar-slide {
+    animation: shimmer-slide 1.5s infinite linear;
+}
