@@ -311,3 +311,16 @@ body {
 .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* Sembunyikan Nav Desktop di Mobile */
+.nav-item-desktop.active {
+    background-color: #fff7ed; /* brand-50 */
+    color: #d97706; /* brand-600 */
+}
+
+/* Padding Bawah Mobile agar tombol tidak tertutup */
+@media (max-width: 640px) {
+    #main-content {
+        padding-bottom: 120px !important;
+    }
+}
