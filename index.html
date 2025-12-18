@@ -103,44 +103,25 @@
 </head>
 <body class="text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900 overflow-hidden">
     
-    <div id="global-loader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-slate-50 transition-all duration-700">
+<div id="global-loader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-slate-50 transition-all duration-700">
     
-    <style>
-        /* 1. Definisi Manual Spin (Wajib ada untuk custom duration) */
-        @keyframes loader-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        /* 2. Definisi Pulse (Wajib ada untuk custom duration) */
-        @keyframes loader-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-
-        /* 3. Definisi Shimmer Baru (Ganti nama jadi 'shimmer-slide' biar tidak bentrok dengan style.css) */
-        @keyframes shimmer-slide {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(200%); }
-        }
-    </style>
-
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-200/40 rounded-full blur-[80px] animate-[loader-pulse_4s_ease-in-out_infinite]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-200/40 rounded-full blur-[80px] animate-[loader-pulse_4s_ease-in-out_infinite]" style="animation-delay: 1s;"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-200/40 rounded-full blur-[80px] loader-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-200/40 rounded-full blur-[80px] loader-pulse" style="animation-delay: 1s;"></div>
     </div>
 
     <div class="relative z-10 flex flex-col items-center">
         
         <div class="relative mb-8 group">
-            <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full animate-[loader-pulse_2s_infinite]"></div>
+            <div class="absolute inset-0 bg-orange-500/20 blur-xl rounded-full loader-pulse"></div>
             
             <div class="relative w-28 h-28">
-                <div class="absolute inset-0 rounded-full border-[3px] border-slate-100 border-t-brand-400 border-r-brand-400 animate-[loader-spin_3s_linear_infinite]"></div>
-                <div class="absolute inset-2 rounded-full border-[3px] border-slate-100 border-b-indigo-400 border-l-indigo-400 animate-[loader-spin_2s_linear_infinite_reverse]"></div>
+                <div class="absolute inset-0 rounded-full border-[3px] border-slate-100 border-t-orange-400 border-r-orange-400 loader-spin-slow"></div>
+                
+                <div class="absolute inset-2 rounded-full border-[3px] border-slate-100 border-b-indigo-400 border-l-indigo-400 loader-spin-reverse"></div>
                 
                 <div class="absolute inset-0 flex items-center justify-center bg-white rounded-full shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-brand-600 animate-[loader-pulse_2s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-orange-600 loader-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
@@ -149,7 +130,7 @@
 
         <div class="text-center space-y-2">
             <h2 class="text-3xl font-black text-slate-800 tracking-tight">
-                Setor<span class="text-brand-600">.in</span>
+                Setor<span class="text-orange-600">.in</span>
             </h2>
             
             <div class="h-6 overflow-hidden relative">
@@ -160,7 +141,7 @@
         </div>
 
         <div class="mt-8 w-48 h-1.5 bg-slate-200 rounded-full overflow-hidden relative">
-            <div class="absolute inset-0 bg-gradient-to-r from-brand-400 to-indigo-500 w-1/2 rounded-full animate-[shimmer-slide_1.5s_infinite_linear]" style="background-size: 200% 100%;"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-indigo-500 w-1/2 rounded-full loader-bar-slide" style="background-size: 200% 100%;"></div>
         </div>
         
         <p class="mt-12 text-xs font-medium text-slate-400 italic">
@@ -1731,6 +1712,7 @@
        
     </body>
 </html>
+
 
 
 
