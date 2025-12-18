@@ -293,34 +293,3 @@ body {
 .loader-bar-slide {
     animation: shimmer-slide 1.5s infinite linear;
 }
-
-/* Tambahkan Padding Bawah agar tidak tertutup Navbar */
-#main-content {
-    padding-bottom: 100px; /* Jarak aman untuk Bottom Nav */
-    min-height: 100vh;
-}
-
-/* Style tambahan untuk Navigasi Aktif */
-.nav-item.active svg,
-.nav-item.active span {
-    color: var(--brand-primary); /* Warna Orange */
-    font-weight: 600;
-}
-
-/* Fix untuk iPhone yang punya Home Indicator (garis bawah) */
-.pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Sembunyikan Nav Desktop di Mobile */
-.nav-item-desktop.active {
-    background-color: #fff7ed; /* brand-50 */
-    color: #d97706; /* brand-600 */
-}
-
-/* Padding Bawah Mobile agar tombol tidak tertutup */
-@media (max-width: 640px) {
-    #main-content {
-        padding-bottom: 120px !important;
-    }
-}
