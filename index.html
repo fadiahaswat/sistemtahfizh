@@ -264,89 +264,77 @@
 
     <div id="main-layout" class="hidden sm:flex h-screen relative overflow-hidden">
         
-        <nav class="fixed bottom-6 left-4 right-4 sm:static sm:w-72 sm:h-screen sm:flex-shrink-0 z-40 flex justify-center pointer-events-none sm:pointer-events-auto">
-            <div class="glass-nav pointer-events-auto rounded-2xl sm:rounded-none sm:h-full sm:border-r sm:border-t-0 border sm:shadow-none p-2 sm:p-6 flex sm:flex-col justify-between items-center sm:items-stretch w-full max-w-md sm:max-w-none">
-                
-                <div class="hidden sm:flex items-center gap-3 mb-8 px-2 mt-2">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30 transform transition hover:rotate-12">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-xl tracking-tight text-slate-900">Setor.in</h1>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" id="app-role-label">Aplikasi Tahfizh</p>
-                    </div>
-                </div>
-
-                <div id="main-nav" class="flex sm:flex-col w-full justify-around sm:justify-start sm:space-y-2 bg-white sm:bg-transparent sm:py-4">
-    
-    <a href="#" data-page="page-beranda" id="nav-item-beranda" class="nav-link active group relative flex flex-col sm:flex-row items-center sm:gap-4 p-2 sm:px-4 sm:py-3 rounded-xl transition-all duration-300 hover:bg-brand-50">
-        <div class="p-2 rounded-lg transition-all duration-300 group-[.active]:bg-brand-100 group-[.active]:text-brand-600 text-slate-400 group-hover:text-brand-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform group-[.active]:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-        </div>
-        <span class="text-[10px] sm:text-sm font-medium transition-colors group-[.active]:font-bold group-[.active]:text-brand-900 text-slate-500">Beranda</span>
-        
-        <div class="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-600 rounded-l-full opacity-0 group-[.active]:opacity-100 transition-opacity duration-300"></div>
-    </a>
-    
-    <a href="#" data-page="page-form" id="nav-item-input" class="nav-link group relative flex flex-col sm:flex-row items-center sm:gap-4 p-2 sm:px-4 sm:py-3 rounded-xl transition-all duration-300 hover:bg-brand-50">
-        <div class="p-2 rounded-lg transition-all duration-300 group-[.active]:bg-brand-100 group-[.active]:text-brand-600 text-slate-400 group-hover:text-brand-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform group-[.active]:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <span class="text-[10px] sm:text-sm font-medium transition-colors group-[.active]:font-bold group-[.active]:text-brand-900 text-slate-500">Input</span>
-        <div class="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-600 rounded-l-full opacity-0 group-[.active]:opacity-100 transition-opacity duration-300"></div>
-    </a>
-
-    <div class="relative sm:hidden -top-8" id="nav-mobile-analysis">
-        <a href="#" data-page="page-analisis" class="nav-link group flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-brand-500 to-orange-600 rounded-2xl rotate-45 shadow-lg shadow-brand-500/40 text-white transform transition-all duration-300 active:scale-95 border-4 border-white group-[.active]:ring-4 group-[.active]:ring-brand-100 group-[.active]:scale-110">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-        </a>
-    </div>
-
-    <a href="#" data-page="page-analisis" id="nav-item-analisis" class="hidden sm:flex nav-link group relative flex-col sm:flex-row items-center sm:gap-4 p-2 sm:px-4 sm:py-3 rounded-xl transition-all duration-300 hover:bg-brand-50">
-        <div class="p-2 rounded-lg transition-all duration-300 group-[.active]:bg-brand-100 group-[.active]:text-brand-600 text-slate-400 group-hover:text-brand-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform group-[.active]:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-        </div>
-        <span class="text-[10px] sm:text-sm font-medium transition-colors group-[.active]:font-bold group-[.active]:text-brand-900 text-slate-500">Analisis</span>
-        <div class="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-600 rounded-l-full opacity-0 group-[.active]:opacity-100 transition-opacity duration-300"></div>
-    </a>
-
-    <a href="#" data-page="page-riwayat" id="nav-item-riwayat" class="nav-link group relative flex flex-col sm:flex-row items-center sm:gap-4 p-2 sm:px-4 sm:py-3 rounded-xl transition-all duration-300 hover:bg-brand-50">
-        <div class="p-2 rounded-lg transition-all duration-300 group-[.active]:bg-brand-100 group-[.active]:text-brand-600 text-slate-400 group-hover:text-brand-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform group-[.active]:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <span class="text-[10px] sm:text-sm font-medium transition-colors group-[.active]:font-bold group-[.active]:text-brand-900 text-slate-500">Riwayat</span>
-        <div class="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-600 rounded-l-full opacity-0 group-[.active]:opacity-100 transition-opacity duration-300"></div>
-    </a>
-    
-    <a href="#" data-page="page-rekap" id="nav-item-rekap" class="nav-link group relative flex flex-col sm:flex-row items-center sm:gap-4 p-2 sm:px-4 sm:py-3 rounded-xl transition-all duration-300 hover:bg-brand-50">
-        <div class="p-2 rounded-lg transition-all duration-300 group-[.active]:bg-brand-100 group-[.active]:text-brand-600 text-slate-400 group-hover:text-brand-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform group-[.active]:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-        </div>
-        <span class="text-[10px] sm:text-sm font-medium transition-colors group-[.active]:font-bold group-[.active]:text-brand-900 text-slate-500">Rekap</span>
-        <div class="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-600 rounded-l-full opacity-0 group-[.active]:opacity-100 transition-opacity duration-300"></div>
-    </a>
-</div>
-                
-                <div class="hidden sm:block mt-auto pt-6 border-t border-slate-100">
-                    <button id="btn-logout" class="w-full text-left flex items-center gap-3 p-2 text-slate-400 hover:text-red-500 transition-colors text-xs font-bold uppercase tracking-wider">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        Ganti Akun
-                    </button>
-                </div>
+        <aside class="hidden sm:flex w-72 h-screen flex-col bg-white border-r border-slate-200 p-6 z-20">
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
-        </nav>
+            <div>
+                <h1 class="font-bold text-xl tracking-tight text-slate-900">Setor.in</h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" id="app-role-label-desktop">Dashboard</p>
+            </div>
+        </div>
+
+        <div class="flex-1 space-y-2">
+            <button onclick="UI.switchPage('page-beranda')" class="nav-item-desktop w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-brand-600 transition-all font-bold text-sm group" data-target="page-beranda">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Beranda
+            </button>
+            <button onclick="UI.switchPage('page-form')" class="nav-item-desktop w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-brand-600 transition-all font-bold text-sm group" data-target="page-form">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Input Setoran
+            </button>
+            <button onclick="UI.switchPage('page-riwayat')" class="nav-item-desktop w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-brand-600 transition-all font-bold text-sm group" data-target="page-riwayat">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Riwayat
+            </button>
+            <button onclick="UI.switchPage('page-analisis')" class="nav-item-desktop w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-brand-600 transition-all font-bold text-sm group" data-target="page-analisis">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Analisis
+            </button>
+            <button onclick="UI.switchPage('page-rekap')" class="nav-item-desktop w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-brand-600 transition-all font-bold text-sm group" data-target="page-rekap">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Rekap
+            </button>
+        </div>
+
+        <div class="pt-6 border-t border-slate-100">
+            <button id="btn-logout-desktop" class="w-full text-left flex items-center gap-3 p-2 text-slate-400 hover:text-red-500 transition-colors text-xs font-bold uppercase tracking-wider">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                Keluar
+            </button>
+        </div>
+    </aside>
+
+    <nav id="bottom-nav" class="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-slate-200 pb-safe pt-2 px-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+        <div class="flex justify-between items-end pb-2">
+            <button onclick="UI.switchPage('page-beranda')" class="nav-item flex flex-col items-center gap-1 text-slate-300 hover:text-brand-600 transition-colors group" data-target="page-beranda">
+                <svg class="h-6 w-6 group-[.active]:text-brand-600 group-[.active]:fill-brand-100 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span class="text-[10px] font-bold">Beranda</span>
+            </button>
+
+            <button onclick="UI.switchPage('page-riwayat')" class="nav-item flex flex-col items-center gap-1 text-slate-300 hover:text-brand-600 transition-colors group" data-target="page-riwayat">
+                <svg class="h-6 w-6 group-[.active]:text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-[10px] font-bold">Riwayat</span>
+            </button>
+
+            <div class="relative -top-6">
+                <button onclick="UI.switchPage('page-form')" class="flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-brand-500 to-orange-600 rounded-full text-white shadow-xl shadow-brand-500/40 border-4 border-slate-50 transform active:scale-95 transition-transform" data-target="page-form">
+                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
+            </div>
+
+            <button onclick="UI.switchPage('page-analisis')" class="nav-item flex flex-col items-center gap-1 text-slate-300 hover:text-brand-600 transition-colors group" data-target="page-analisis">
+                <svg class="h-6 w-6 group-[.active]:text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span class="text-[10px] font-bold">Analisis</span>
+            </button>
+
+            <button onclick="UI.switchPage('page-rekap')" class="nav-item flex flex-col items-center gap-1 text-slate-300 hover:text-brand-600 transition-colors group" data-target="page-rekap">
+                <svg class="h-6 w-6 group-[.active]:text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <span class="text-[10px] font-bold">Menu</span>
+            </button>
+        </div>
+    </nav>
 
         <main id="main-content" class="flex-1 pb-32 sm:pb-0 overflow-y-auto h-screen scroll-smooth relative">
             <div id="skeleton-page-beranda" class="skeleton-container p-4 sm:p-8 space-y-6 max-w-7xl mx-auto">
@@ -1716,6 +1704,7 @@
        
     </body>
 </html>
+
 
 
 
