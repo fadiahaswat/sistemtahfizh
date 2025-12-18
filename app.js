@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const elementMapping = {
             // -- Layout & Navigasi --
             mainLayout: 'main-layout',
+            mainNav: 'main-nav',
             mainContent: 'main-content',
             datetimeContainer: 'datetime-container',
             navItemInput: 'nav-item-input', 
@@ -275,88 +276,55 @@ document.addEventListener('DOMContentLoaded', () => {
         },
      
         switchPage: (pageId, showSkeleton = true) => {
-        if (!pageId) return;
+            if (!pageId) return;
 
-        // 1. Sembunyikan semua halaman & Skeleton aktif
-        document.querySelectorAll('.page-content').forEach(el => {
-            el.classList.add('hidden');
-            el.classList.remove('fade-in'); // Reset animasi
-        });
-        
-        // 2. Logika Skeleton (Loading Effect)
-        if (showSkeleton) {
-            const skeleton = document.getElementById(`skeleton-${pageId}`);
-            if (skeleton) {
-                skeleton.classList.remove('hidden');
-                // Sembunyikan konten utama sementara loading
-                document.querySelectorAll('.skeleton-container').forEach(el => {
-                    if(el.id !== `skeleton-${pageId}`) el.classList.add('hidden');
+            // 1. Sembunyikan semua halaman
+            DOM.pages.forEach(page => page.classList.add('hidden'));
+            
+            // 2. Tampilkan Skeleton (Loading)
+            if (showSkeleton) {
+                const skeleton = document.getElementById(`skeleton-${pageId}`);
+                if (skeleton) skeleton.classList.remove('hidden');
+            }
+
+            // 3. Jeda sedikit agar terasa loadingnya (150ms)
+            setTimeout(() => {
+                // Sembunyikan skeleton
+                DOM.skeletonContainers.forEach(s => s.classList.add('hidden'));
+                
+                // Tampilkan Halaman Target
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) targetPage.classList.remove('hidden');
+                
+                // --- [BAGIAN INI YANG DIPERBAIKI] ---
+                
+                // A. Reset SEMUA tombol navigasi (Desktop & Mobile)
+                // Hapus class 'active' dan pewarnaan manual
+                DOM.mainNav.querySelectorAll('.nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                    const iconDiv = nav.querySelector('div');
+                    const textSpan = nav.querySelector('span');
+                    if (iconDiv) iconDiv.classList.remove('bg-amber-100', 'text-amber-600');
+                    if (textSpan) textSpan.classList.remove('text-amber-700');
                 });
-            }
-        }
 
-        // 3. Jeda sedikit untuk UX (atau langsung jika tidak butuh skeleton)
-        setTimeout(() => {
-            // A. Sembunyikan semua skeleton
-            document.querySelectorAll('.skeleton-container').forEach(s => s.classList.add('hidden'));
-            
-            // B. Tampilkan Halaman Target
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-                targetPage.classList.add('fade-in');
-                window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll ke atas
-            }
-            
-            // --- [UPDATE NAVIGASI BARU] ---
-            
-            // C. Reset SEMUA tombol (Baik Desktop maupun Mobile)
-            // Kita cari elemen dengan class .nav-item (Mobile) dan .nav-item-desktop (Desktop)
-            const allNavButtons = document.querySelectorAll('.nav-item, .nav-item-desktop');
-            
-            allNavButtons.forEach(btn => {
-                // Hapus state aktif
-                btn.classList.remove('active');
-                btn.classList.remove('text-brand-600', 'font-bold');
+                // B. Aktifkan SEMUA tombol yang mengarah ke pageId ini
+                // Menggunakan querySelectorAll agar tombol Desktop DAN Mobile nyala bareng
+                const activeLinks = DOM.mainNav.querySelectorAll(`a[data-page="${pageId}"]`);
                 
-                // Reset warna icon SVG
-                const svg = btn.querySelector('svg');
-                if(svg) svg.classList.remove('text-brand-600');
+                activeLinks.forEach(link => {
+                    link.classList.add('active');
+                    const iconDiv = link.querySelector('div');
+                    const textSpan = link.querySelector('span');
+                    
+                    // Tambahkan pewarnaan aktif
+                    if(iconDiv) iconDiv.classList.add('bg-amber-100', 'text-amber-600');
+                    if(textSpan) textSpan.classList.add('text-amber-700');
+                });
 
-                // Khusus Desktop: Hapus background aktif
-                if (btn.classList.contains('nav-item-desktop')) {
-                    btn.classList.remove('bg-brand-50');
-                    btn.classList.add('text-slate-500'); // Balikin ke warna abu
-                } else {
-                    // Khusus Mobile
-                    btn.classList.add('text-slate-300'); // Balikin ke warna abu
-                }
-            });
+            }, 150);
+        },
 
-            // D. Aktifkan Tombol yang Sesuai Page Ini
-            // Selector ini akan menemukan tombol Desktop DAN tombol Mobile sekaligus
-            const activeButtons = document.querySelectorAll(`[data-target="${pageId}"]`);
-            
-            activeButtons.forEach(btn => {
-                btn.classList.add('active');
-                
-                // Styling Aktif Umum
-                btn.classList.remove('text-slate-300', 'text-slate-500');
-                btn.classList.add('text-brand-600', 'font-bold');
-
-                // Styling Khusus Desktop (Background block)
-                if (btn.classList.contains('nav-item-desktop')) {
-                    btn.classList.add('bg-brand-50');
-                }
-                
-                // Styling Icon SVG
-                const svg = btn.querySelector('svg');
-                if(svg) svg.classList.add('text-brand-600');
-            });
-
-        }, showSkeleton ? 300 : 0); // Delay 300ms jika pakai skeleton
-    },
-        
         updateDateTime: () => {
             const now = new Date();
             const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
@@ -1617,7 +1585,22 @@ document.addEventListener('DOMContentLoaded', () => {
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             DOM.tanggal.value = now.toISOString().slice(0, 16);
         });
-       
+
+        // Di dalam function setupEventListeners() ...
+
+        // Event listener ini sudah cukup menghandle klik Desktop & Mobile
+        DOM.mainNav.addEventListener('click', e => {
+            // Cari elemen terdekat yang punya class 'nav-link'
+            const link = e.target.closest('.nav-link');
+            
+            if (link) { 
+                e.preventDefault(); // Mencegah reload halaman
+                
+                // Panggil fungsi Otak yang sudah kita perbaiki di atas
+                UI.switchPage(link.dataset.page); 
+            }
+        });
+            
         // --- Event Delegation (BAGIAN INI DIPERBAIKI) ---
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
