@@ -1320,7 +1320,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (conditionMet) { latestAchievedPeriod = period; }
                 }
             }
-            if (latestAchievedPeriod) { const resetDate = new Date(latestAchievedPeriod.deadline); resetDate.setDate(resetDate.getDate() + 1); if (now < resetDate) { return 'Boleh Pulang'; } }
+            if (latestAchievedPeriod) {
+                return 'Boleh Pulang';
+            }
             return 'Belum Boleh Pulang';
         },
 
