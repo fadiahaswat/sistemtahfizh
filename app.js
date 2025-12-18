@@ -2025,14 +2025,23 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.updateDateTime();
         setInterval(UI.updateDateTime, 1000);
         
-        // 1. Coba ambil data (with loading screen)
+        // 1. Coba ambil data (Aplikasi akan tertahan di sini sampai data selesai)
         await Core.reloadData();
         
-        // 2. Tampilkan Role Selection Modal (sebelum switch page)
-        DOM.roleSelectionModal.classList.remove('hidden');
-        DOM.mainLayout.classList.add('hidden'); // Sembunyikan main content sampai role dipilih
+        // 2. HILANGKAN LOADING SCREEN (Kode Baru)
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+            loader.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                loader.remove(); // Hapus elemen dari DOM agar ringan
+            }, 500);
+        }
 
-        // 3. Matikan loading skeleton setelah data dimuat
+        // 3. Tampilkan Role Selection Modal (sebelum switch page)
+        DOM.roleSelectionModal.classList.remove('hidden');
+        DOM.mainLayout.classList.add('hidden'); 
+
+        // 4. Matikan loading skeleton setelah data dimuat
         UI.switchPage('page-beranda', false); 
     }
 
