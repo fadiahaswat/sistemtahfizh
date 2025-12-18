@@ -1617,22 +1617,7 @@ document.addEventListener('DOMContentLoaded', () => {
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             DOM.tanggal.value = now.toISOString().slice(0, 16);
         });
-
-        // Di dalam function setupEventListeners() ...
-
-        // Event listener ini sudah cukup menghandle klik Desktop & Mobile
-        DOM.mainNav.addEventListener('click', e => {
-            // Cari elemen terdekat yang punya class 'nav-link'
-            const link = e.target.closest('.nav-link');
-            
-            if (link) { 
-                e.preventDefault(); // Mencegah reload halaman
-                
-                // Panggil fungsi Otak yang sudah kita perbaiki di atas
-                UI.switchPage(link.dataset.page); 
-            }
-        });
-            
+       
         // --- Event Delegation (BAGIAN INI DIPERBAIKI) ---
         DOM.mainContent.addEventListener('click', e => {
             const button = e.target.closest('.export-pdf-btn, .delete-btn, [data-target-page], .accordion-button, .sortable, .tab-peringkat, .tahfizh-tab');
