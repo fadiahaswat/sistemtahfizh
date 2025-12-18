@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const elementMapping = {
             // -- Layout & Navigasi --
             mainLayout: 'main-layout',
-            mainNav: 'main-nav',
             mainContent: 'main-content',
             datetimeContainer: 'datetime-container',
             navItemInput: 'nav-item-input', 
