@@ -2024,6 +2024,33 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.switchPage('page-beranda');
         UI.updateDateTime();
         setInterval(UI.updateDateTime, 1000);
+
+        // --- [MULAI KODE TAMBAHAN UNTUK LOADER] ---
+        const loadingTexts = [
+            "Menghubungkan ke Server...",
+            "Mengambil Data Santri...",
+            "Memuat Riwayat Hafalan...",
+            "Menyiapkan Dashboard...",
+            "Hampir Selesai..."
+        ];
+        const textElement = document.getElementById('loading-text');
+        let textIndex = 0;
+        
+        // Ganti teks setiap 800ms agar terasa interaktif
+        const textInterval = setInterval(() => {
+            if(textElement) {
+                textElement.style.opacity = '0';
+                textElement.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    textIndex = (textIndex + 1) % loadingTexts.length;
+                    textElement.textContent = loadingTexts[textIndex];
+                    textElement.style.opacity = '1';
+                    textElement.style.transform = 'translateY(0)';
+                }, 200);
+            }
+        }, 1200);
+        // --- [SELESAI KODE TAMBAHAN] ---
         
         // 1. Coba ambil data (Aplikasi akan tertahan di sini sampai data selesai)
         await Core.reloadData();
