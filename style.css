@@ -293,3 +293,21 @@ body {
 .loader-bar-slide {
     animation: shimmer-slide 1.5s infinite linear;
 }
+
+/* Tambahkan Padding Bawah agar tidak tertutup Navbar */
+#main-content {
+    padding-bottom: 100px; /* Jarak aman untuk Bottom Nav */
+    min-height: 100vh;
+}
+
+/* Style tambahan untuk Navigasi Aktif */
+.nav-item.active svg,
+.nav-item.active span {
+    color: var(--brand-primary); /* Warna Orange */
+    font-weight: 600;
+}
+
+/* Fix untuk iPhone yang punya Home Indicator (garis bawah) */
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+}
